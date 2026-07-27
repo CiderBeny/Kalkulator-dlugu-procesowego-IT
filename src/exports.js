@@ -307,7 +307,7 @@ PDE.exportCsv = function exportCsv() {
             var ts = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + '_' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
             var filename = 'Process-Debt-Engine_' + ts + '.csv';
 
-            var csvContent = rows.join('\r\n');
+            var csvContent = '\uFEFF' + rows.join('\r\n');
             var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
@@ -452,8 +452,8 @@ PDE.exportPDF = async function exportPDF(mode) {
         if (!PDE.isMobileBrowser()) {
             try {
                 const [regResp, bldResp] = await Promise.all([
-                    fetch('fonts/Inter-Regular.ttf'),
-                    fetch('fonts/Inter-Bold.ttf')
+                    fetch('fonts/Inter-Regular.ttf', { cache: 'force-cache' }),
+                    fetch('fonts/Inter-Bold.ttf', { cache: 'force-cache' })
                 ]);
                 if (regResp.ok && bldResp.ok) {
                     const [regBuf, bldBuf] = await Promise.all([

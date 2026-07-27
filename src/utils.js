@@ -252,7 +252,7 @@ PDE.getParams = function getParams() {
 
 PDE.fetchNbpRates = async function fetchNbpRates() {
     try {
-        const res = await fetch('https://api.nbp.pl/api/exchangerates/tables/A/today?format=json');
+        const res = await fetch('https://api.nbp.pl/api/exchangerates/tables/A/last?format=json');
         const data = await res.json();
         const rates = data[0].rates;
         const getMid = (code) => rates.find(r => r.code === code).mid;

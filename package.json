@@ -25,5 +25,8 @@
     "eslint": "^10.7.0",
     "globals": "^17.7.0",
     "tailwindcss": "^4.3.0"
+  },
+  "dependencies": {
+    "playwright": "^1.62.0"
   }
 }
