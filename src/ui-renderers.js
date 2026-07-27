@@ -497,7 +497,7 @@ PDE.updateDoraBenchmark = function updateDoraBenchmark() {
     const q5 = PDE.clamp('q5');
 
     const rows = [
-        { metric: L.doraMetricLeadTime, value: L.doraLeadTimeDesc(q2), bandDesc: L.doraLeadTimeBand, result: PDE.getDoraBand('leadTime', q2), adapted: false },
+        { metric: L.doraMetricLeadTime, value: L.doraLeadTimeDesc(q2), bandDesc: L.doraLeadTimeBand, result: PDE.getDoraBand('leadTime', q2), adapted: true },
         { metric: L.doraMetricManual,   value: L.doraManualDesc(q1),   bandDesc: L.doraManualBand,   result: PDE.getDoraBand('manual', q1), adapted: true  },
         { metric: L.doraMetricErrors,   value: L.doraErrorsDesc(q5),   bandDesc: L.doraErrorsBand,   result: PDE.getDoraBand('errors', q5), adapted: true  },
     ];

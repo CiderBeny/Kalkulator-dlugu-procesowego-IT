@@ -878,7 +878,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                 pdf.setFontSize(5.5); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(255,255,255);
                 pdf.text('Metric', ML + 2, cy + 5);
                 pdf.text('Your Value', ML + colW + 2, cy + 5);
-                pdf.text('DORA Band', ML + colW * 2 + 2, cy + 5);
+                pdf.text(L.doraBandHeader, ML + colW * 2 + 2, cy + 5);
                 pdf.text('Status', ML + colW * 3 + 2, cy + 5);
                 cy += 10;
 
