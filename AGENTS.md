@@ -8,7 +8,7 @@
 - **Hosting:** Static — GitHub Pages ready
 
 ## Key Dependencies (loaded via CDN with SRI hashes)
-- Chart.js 4.4.4, jsPDF 2.5.1, html2canvas 1.4.1, SheetJS/XLSX 0.18.5
+- Chart.js 4.4.4, jsPDF 4.2.1, html2canvas 1.4.1, SheetJS/XLSX 0.18.5
 - Bundled in `index.html` via `<script defer src="...">` with `integrity` attributes
 - Google Fonts: Space Grotesk (headings) + Inter (body) — 3-tier fallback (base64 → CDN → system)
 
