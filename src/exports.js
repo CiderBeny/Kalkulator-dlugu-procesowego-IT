@@ -217,6 +217,7 @@ PDE.exportCsv = function exportCsv() {
 
             const csvEscape = function (v) {
                 var s = String(v != null ? v : '');
+                if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
                 if (/[",\n\r]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
                 return s;
             };
