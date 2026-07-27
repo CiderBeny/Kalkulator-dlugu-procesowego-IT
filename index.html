@@ -412,16 +412,6 @@
             <div class="tab-content" id="tab-advanced" style="display:none;">
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="label" for="opexAdjMult" data-i18n="cascadeMultLabel">OPEX-adjusted Estimate</label>
-                        <span class="helper-text mt-1 block" data-i18n="cascadeMultHelper">Second-order downstream costs — rework, cascading delays, context-switching — as fraction of direct OPEX waste (0.0–0.3). Default 0.15.</span>
-                        <div class="slider-wrapper">
-                            <div class="slider-track-bg"></div>
-                            <div class="slider-track-fill" id="opexAdjMultFill"></div>
-                            <input type="range" id="opexAdjMult" min="0" max="30" value="15" class="slider">
-                        </div>
-                        <p class="text-center text-xs mt-1"><span id="opexAdjMultVal">0.15</span></p>
-                    </div>
-                    <div>
                         <label class="label" for="erosionRate" data-i18n="erosionRateLabel">Pipeline Erosion Rate</label>
                         <span class="helper-text mt-1 block" data-i18n="erosionRateHelper">Cost of Delay — delayed projects lose ~25% value/yr (0.0–1.0). Default 0.25.</span>
                         <div class="slider-wrapper">
@@ -725,15 +715,8 @@
                 </div>
                 <div class="card border-l-4 border-l-amber-700">
                     <div class="label-row">
-                        <p class="label" data-i18n="statCascadeLabel">OPEX-adjusted Estimate</p>
-                        <span class="formula-tip" tabindex="0" role="button" data-formula="OPEX Waste × 0.15 (adjusted estimate multiplier)" aria-label="Formula: OPEX Waste × 0.15 (adjusted estimate multiplier)" data-i18n-formula="formulaCascade">ⓘ</span>
-                    </div>
-                    <p class="text-3xl font-black mt-1 stat-value" id="statCascade">$0</p>
-                </div>
-                <div class="card bg-slate-900">
-                    <div class="label-row">
                         <p class="label" data-i18n="statTotalLabel">Total Debt Impact</p>
-                        <span class="formula-tip" tabindex="0" role="button" data-formula="OPEX Waste + Risk Exposure + Pipeline Margin Erosion + OPEX-adjusted Estimate" aria-label="Formula: OPEX Waste + Risk Exposure + Pipeline Margin Erosion + OPEX-adjusted Estimate" data-i18n-formula="formulaTotal">ⓘ</span>
+                        <span class="formula-tip" tabindex="0" role="button" data-formula="OPEX Waste + Risk Exposure + Pipeline Margin Erosion" aria-label="Formula: OPEX Waste + Risk Exposure + Pipeline Margin Erosion" data-i18n-formula="formulaTotal">ⓘ</span>
                     </div>
                     <p class="text-3xl font-black mt-1 stat-value" id="totalImpact">$0</p>
                 </div>

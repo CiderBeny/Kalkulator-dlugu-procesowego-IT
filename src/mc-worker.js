@@ -11,7 +11,6 @@ const C = {
     MONTHS_PER_YEAR: 12,
     QUARTERS_PER_YEAR: 4,
     PIPELINE_EROSION_RATE_DEFAULT: 0.25,
-    OPEX_ADJ_MULTIPLIER_DEFAULT: 0.15,
     SCEN_C_AUTO_LEVEL: 0.8,
     SCEN_C_CAPEX_MULTIPLIER: 1.5,
     LEVER_AUTOMATION_DEFAULT: 0.3,
@@ -93,7 +92,6 @@ function computeModel(params, coeffs) {
     const capex          = params.capex          || 0;
     let autoLevel      = (params.autoLevel     || 0) / 100;
     const teamSize       = params.teamSize       || 0;
-    const opexAdjMult    = params.opexAdjMult    !== undefined ? params.opexAdjMult    : coeffs.OPEX_ADJ_MULTIPLIER_DEFAULT;
     const erosionRate    = params.erosionRate    !== undefined ? params.erosionRate    : coeffs.PIPELINE_EROSION_RATE_DEFAULT;
     const discountRate   = params.discountRate   !== undefined ? params.discountRate   : coeffs.DISCOUNT_RATE_DEFAULT;
     const horizonYears   = params.horizonYears   || coeffs.TIME_HORIZON_YEARS_DEFAULT;
@@ -136,10 +134,9 @@ function computeModel(params, coeffs) {
         effectiveTeamSize = Math.pow(teamSize, 0.9);
     }
 
-    const cWaste     = (manualAnnualHrs + chasingAnnualHrs) * rate * effectiveTeamSize;
+    const cWaste     = (manualAnnualHrs + chasingAnnualHrs) * rate * effectiveTeamSize * 1.15;
     let cRisk      = (failures * mttr * downCost) * (riskLevel / coeffs.RISK_SCALE_MAX);
     const cOppDirect = opportunityVal * erosionRate;
-    let cOpexAdj   = cWaste * opexAdjMult;
 
     const riskOperational = cRisk;
     let riskSecurity;
@@ -155,16 +152,13 @@ function computeModel(params, coeffs) {
     }
 
     if (nonlinearEnabled) {
-        const cWasteRatio = cWaste / 1e6;
-        const sigmoidMult = 2 / (1 + Math.exp(-cWasteRatio * 2)) - 1;
-        cOpexAdj = cWaste * opexAdjMult * (0.5 + sigmoidMult * 0.5);
         autoLevel = 1 - Math.pow(1 - autoLevel, 1.2);
     }
 
-    const totalImpact = cWaste + cRisk + cOppDirect + cOpexAdj;
+    const totalImpact = cWaste + cRisk + cOppDirect;
     const netDebt     = totalImpact - capex;
 
-    const annualRecurring = cWaste + cRisk + cOpexAdj;
+    const annualRecurring = cWaste + cRisk;
     const oneTimeCosts    = cOppDirect + capex;
     const dr = discountRate;
     const ny = horizonYears;
@@ -172,7 +166,7 @@ function computeModel(params, coeffs) {
     const npvRecurring = annualRecurring * pvifa;
     const npvTotalDebt = oneTimeCosts + npvRecurring;
 
-    const potentialSavings = (cWaste + cRisk + cOpexAdj) * autoLevel;
+    const potentialSavings = (cWaste + cRisk) * autoLevel;
     const paybackMonths    = discountedPayback(potentialSavings, capex);
 
     const irrCashFlows = [-capex];
@@ -183,7 +177,6 @@ function computeModel(params, coeffs) {
         cWaste:            cWaste,
         cRisk:             cRisk,
         cOppDirect:        cOppDirect,
-        cOpexAdj:          cOpexAdj,
         totalImpact:       totalImpact,
         netDebt:           netDebt,
         annualRecurring:   annualRecurring,
@@ -198,7 +191,7 @@ function computeModel(params, coeffs) {
 
 // ── Statistics computation ──
 function computeStats(results, cl) {
-    const keys = ['cWaste','cRisk','cOppDirect','cOpexAdj','totalImpact','netDebt',
+    const keys = ['cWaste','cRisk','cOppDirect','totalImpact','netDebt',
                 'npvTotalDebt','potentialSavings','paybackMonths','irr'];
     const lowPct = (1 - cl) / 2;
     const highPct = 1 - lowPct;
@@ -257,7 +250,7 @@ self.onmessage = function (e) {
             const r = computeModel(p, C);
             results.push({
                 cWaste: r.cWaste, cRisk: r.cRisk, cOppDirect: r.cOppDirect,
-                cOpexAdj: r.cOpexAdj, totalImpact: r.totalImpact,
+                totalImpact: r.totalImpact,
                 netDebt: r.netDebt, npvTotalDebt: r.npvTotalDebt,
                 potentialSavings: r.potentialSavings, paybackMonths: r.paybackMonths,
                 irr: r.irr,

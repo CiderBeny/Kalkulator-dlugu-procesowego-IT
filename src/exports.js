@@ -36,7 +36,7 @@ PDE.exportExcel = function exportExcel() {
             const top3 = leversRaw.slice(0, 3);
             const totalRecovery = top3.reduce((s, l) => s + l.recovery, 0);
 
-            const annualRecurring = r.cWaste + r.cRisk + r.cOpexAdj;
+            const annualRecurring = r.cWaste + r.cRisk;
             const dr = p.discountRate;
             const ny = p.horizonYears;
             const scenA = PDE.scenCalc(0,    0,                            annualRecurring, dr, ny);
@@ -53,7 +53,6 @@ PDE.exportExcel = function exportExcel() {
             const advancedRows = [
                 [],
                 [L.xlsAdvancedTitle],
-                [L.cascadeMultLabel,    p.opexAdjMult.toFixed(2), ''],
                 [L.erosionRateLabel,    p.erosionRate.toFixed(2), ''],
                 [L.discountRateLabel,   Math.round(p.discountRate * 100) + '%', ''],
                 [L.timeHorizonLabel,    p.horizonYears + ' yr', ''],
@@ -107,7 +106,7 @@ PDE.exportExcel = function exportExcel() {
             XLSX.utils.book_append_sheet(wb, wsInputs, L.xlsSheetInputs);
 
             const resultValues = [
-                Math.round(r.cWaste), Math.round(r.cRisk), Math.round(r.cOppDirect), Math.round(r.cOpexAdj),
+                Math.round(r.cWaste), Math.round(r.cRisk), Math.round(r.cOppDirect),
                 Math.round(r.totalImpact), Math.round(p.capex), Math.round(r.netDebt),
                 Math.round(r.potentialSavings), isFinite(r.paybackMonths) ? Math.round(r.paybackMonths * 10) / 10 : L.scenInfinity,
                 r.irr !== null ? (r.irr * 100).toFixed(1) + '%' : '\u2014',
@@ -202,7 +201,7 @@ PDE.exportCsv = function exportCsv() {
             const top3 = leversRaw.slice(0, 3);
             const totalRecovery = top3.reduce((s, l) => s + l.recovery, 0);
 
-            const annualRecurring = r.cWaste + r.cRisk + r.cOpexAdj;
+            const annualRecurring = r.cWaste + r.cRisk;
             const dr = p.discountRate;
             const ny = p.horizonYears;
             const scenA = PDE.scenCalc(0, 0, annualRecurring, dr, ny);
@@ -238,7 +237,6 @@ PDE.exportCsv = function exportCsv() {
             rows.push('capex,' + csvEscape(capexRaw) + ',' + csvEscape(PDE.currentCurrency));
 
             var advancedPairs = [
-                [L.cascadeMultLabel, p.opexAdjMult.toFixed(2)],
                 [L.erosionRateLabel, p.erosionRate.toFixed(2)],
                 [L.discountRateLabel, Math.round(p.discountRate * 100) + '%'],
                 [L.timeHorizonLabel, p.horizonYears + ' yr'],
@@ -257,9 +255,9 @@ PDE.exportCsv = function exportCsv() {
             rows.push('');
 
             rows.push(L.xlsResultsTitle);
-            var resultLabels = ['cWaste','cRisk','cOppDirect','cOpexAdj','totalImpact','capex','netDebt','potentialSavings','paybackMonths','IRR'];
+            var resultLabels = ['cWaste','cRisk','cOppDirect','totalImpact','capex','netDebt','potentialSavings','paybackMonths','IRR'];
             var resultValues = [
-                Math.round(r.cWaste), Math.round(r.cRisk), Math.round(r.cOppDirect), Math.round(r.cOpexAdj),
+                Math.round(r.cWaste), Math.round(r.cRisk), Math.round(r.cOppDirect),
                 Math.round(r.totalImpact), Math.round(p.capex), Math.round(r.netDebt),
                 Math.round(r.potentialSavings), isFinite(r.paybackMonths) ? Math.round(r.paybackMonths * 10) / 10 : L.scenInfinity,
                 r.irr !== null ? (r.irr * 100).toFixed(1) + '%' : '-',
@@ -599,7 +597,6 @@ PDE.exportPDF = async function exportPDF(mode) {
             { label: PDE.t('autoLabel'),         desc: '',                        id: 'autoLevel',       unit: '%',      isSlider: true, valId: 'autoLevelVal',       min: '0',   max: '100' },
             { label: PDE.t('teamSizeLabel'),      desc: PDE.t('teamSizeHelper'),          id: 'teamSize',         unit: '',       isSlider: false },
             { label: PDE.t('capexLabel'),         desc: PDE.t('capexHelper'),            id: 'capex',            unit: 'money',  isSlider: false },
-            { label: PDE.t('cascadeMultLabel'),   desc: PDE.t('cascadeMultHelper'),       id: 'opexAdjMult',     unit: '',       isSlider: true, valId: 'opexAdjMultVal' },
             { label: PDE.t('erosionRateLabel'),   desc: PDE.t('erosionRateHelper'),       id: 'erosionRate',     unit: '',       isSlider: true, valId: 'erosionRateVal' },
             { label: PDE.t('discountRateLabel'),  desc: PDE.t('discountRateHelper'),      id: 'discountRate',    unit: '%',      isSlider: true, valId: 'discountRateVal',   min: '5%',  max: '20%' },
             { label: PDE.t('timeHorizonLabel'),   desc: PDE.t('timeHorizonHelper'),       id: 'timeHorizon',     unit: 'yr',     isSlider: true, valId: 'timeHorizonVal' },
@@ -713,7 +710,6 @@ PDE.exportPDF = async function exportPDF(mode) {
                     { label: L.statWasteLabel,  val: PDE.formatCurrency(r.cWaste),     color: [220,38,38] },
                     { label: L.statRiskLabel,   val: PDE.formatCurrency(r.cRisk),      color: [234,88,12] },
                     { label: L.statOppLabel,    val: PDE.formatCurrency(r.cOppDirect), color: [124,58,237] },
-                    { label: L.statCascadeLabel, val: PDE.formatCurrency(r.cOpexAdj),  color: [180,83,9] },
                     { label: L.statTotalLabel,  val: PDE.formatCurrency(r.totalImpact), color: [30,41,59] },
                     { label: L.statNpvLabel,    val: PDE.formatCurrency(r.npvTotalDebt), color: [8,145,178] },
                     { label: L.statIrrLabel,    val: r.irr !== null ? (r.irr >= 0.999 ? '>99.9%' : (r.irr * 100).toFixed(1) + '%') : '\u2014', color: [124,58,237] },
@@ -746,7 +742,7 @@ PDE.exportPDF = async function exportPDF(mode) {
             }
 
             function renderSimpleScenarios() {
-                const annualRecurring = r.cWaste + r.cRisk + r.cOpexAdj;
+            const annualRecurring = r.cWaste + r.cRisk;
                 const dr = p.discountRate;
                 const ny = p.horizonYears;
                 const scenA = PDE.scenCalc(0, 0, annualRecurring, dr, ny);
