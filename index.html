@@ -414,6 +414,7 @@
                     <div>
                         <label class="label" for="erosionRate" data-i18n="erosionRateLabel">Pipeline Erosion Rate</label>
                         <span class="helper-text mt-1 block" data-i18n="erosionRateHelper">Cost of Delay — delayed projects lose ~25% value/yr (0.0–1.0). Default 0.25.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="erosionRateFill"></div>
@@ -424,6 +425,7 @@
                     <div>
                         <label class="label" for="discountRate" data-i18n="discountRateLabel">WACC (Discount Rate)</label>
                         <span class="helper-text mt-1 block" data-i18n="discountRateHelper">Weighted Average Cost of Capital (5%–20%). Default 10%.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="discountRateFill"></div>
@@ -434,6 +436,7 @@
                     <div>
                         <label class="label" for="timeHorizon" data-i18n="timeHorizonLabel">Time Horizon (years)</label>
                         <span class="helper-text mt-1 block" data-i18n="timeHorizonHelper">NPV / payback evaluation period (3–10 yr). Default 5.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="timeHorizonFill"></div>
@@ -444,6 +447,7 @@
                     <div>
                         <label class="label" for="leverAutomation" data-i18n="leverAutomationLabel">Automation Lever Recovery</label>
                         <span class="helper-text mt-1 block" data-i18n="leverAutomationHelper">Fraction of OPEX Waste recoverable via automation (10%–60%). Default 30%.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="leverAutomationFill"></div>
@@ -455,6 +459,7 @@
                     <div>
                         <label class="label" for="leverRisk" data-i18n="leverRiskLabel">Risk Lever Recovery</label>
                         <span class="helper-text mt-1 block" data-i18n="leverRiskHelper">Fraction of Risk Exposure recoverable via CMDB/Auto-Discovery (20%–80%). Default 60%.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="leverRiskFill"></div>
@@ -472,6 +477,7 @@
                         <div>
                             <label class="label" for="scenCAutoLevel" data-i18n="scenCAutoLevelLabel">Scenario C Auto Level</label>
                             <span class="helper-text mt-1 block" data-i18n="scenCAutoLevelHelper">Target automation level for full-transformation scenario (50–100%). Default 80%.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="scenCAutoLevelFill"></div>
@@ -482,6 +488,7 @@
                         <div>
                             <label class="label" for="scenCCapexMult" data-i18n="scenCCapexMultLabel">Scenario C CAPEX Multiplier</label>
                             <span class="helper-text mt-1 block" data-i18n="scenCCapexMultHelper">CAPEX multiplier for full-transformation scenario (1.0–3.0). Default 1.5.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="scenCCapexMultFill"></div>
@@ -492,6 +499,7 @@
                         <div>
                             <label class="label" for="annualHours" data-i18n="annualHoursLabel">Annual Hours / Engineer</label>
                             <span class="helper-text mt-1 block" data-i18n="annualHoursHelper">Working hours per engineer per year (1500–2500). Default 1800.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="annualHoursFill"></div>
@@ -509,6 +517,7 @@
                         <div>
                             <label class="label" for="leverInnovation" data-i18n="leverInnovationLabel">Innovation Lever Recovery</label>
                             <span class="helper-text mt-1 block" data-i18n="leverInnovationHelper">Fraction of pipeline margin recovered via innovation (10–80%). Default 50%.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="leverInnovationFill"></div>
@@ -520,6 +529,7 @@
                         <div>
                             <label class="label" for="leverManagement" data-i18n="leverManagementLabel">Management Lever Recovery</label>
                             <span class="helper-text mt-1 block" data-i18n="leverManagementHelper">Fraction of OPEX Waste recovered via management intervention (5–40%). Default 15%.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="leverManagementFill"></div>
@@ -531,6 +541,7 @@
                         <div>
                             <label class="label" for="leverTurnover" data-i18n="leverTurnoverLabel">Turnover Lever Recovery</label>
                             <span class="helper-text mt-1 block" data-i18n="leverTurnoverHelper">Fraction of turnover cost preventable (10–60%). Default 30%.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="leverTurnoverFill"></div>
@@ -569,6 +580,7 @@
                         <div>
                             <label class="label" for="correlationStrength" data-i18n="correlationStrengthLabel">Correlation Strength</label>
                             <span class="helper-text mt-1 block" data-i18n="correlationStrengthHelper">Global multiplier for all correlation effects (0.0–1.0). Default 0.3.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="correlationStrengthFill"></div>
@@ -665,6 +677,7 @@
                         <div>
                             <label class="label" for="riskSecurityWeight" data-i18n="riskSecurityWeightLabel">Security Risk Weight</label>
                             <span class="helper-text mt-1 block" data-i18n="riskSecurityWeightHelper">Scaling factor for security risk relative to operational (0.0–1.0). Default 0.4.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="riskSecurityWeightFill"></div>
@@ -675,6 +688,7 @@
                         <div>
                             <label class="label" for="riskRegulatoryWeight" data-i18n="riskRegulatoryWeightLabel">Regulatory Risk Weight</label>
                             <span class="helper-text mt-1 block" data-i18n="riskRegulatoryWeightHelper">Scaling factor for regulatory risk relative to operational (0.0–1.0). Default 0.25.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="riskRegulatoryWeightFill"></div>
@@ -689,6 +703,12 @@
 
         <!-- SECTION 2: RESULTS -->
         <div id="report-content" class="space-y-6">
+
+            <!-- BLOCK: Tool Estimates Disclaimer -->
+            <div class="card bg-amber-50 border border-amber-300 p-4">
+                <p class="text-xs font-bold uppercase tracking-wide text-amber-800" data-i18n="toolDisclaimerTitle">Model Estimates & Default Values</p>
+                <p class="text-xs mt-1 text-amber-700" data-i18n="toolDisclaimerBody">This model uses 12 user-configurable multipliers. Default values are directional estimates based on published research — see Methodology for specific sources. Change them in Advanced Parameters to match your context.</p>
+            </div>
 
             <!-- BLOCK 3: STAT CARDS -->
             <div id="pdf-block-3" class="grid grid-cols-1 md:grid-cols-5 gap-4">

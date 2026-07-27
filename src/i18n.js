@@ -171,6 +171,10 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 doraErrorsBand:    'Strong 0 · Moderate ≤1 · Weak ≤3 · Critical >3',
                 doraAdaptedLabel: '† Adapted — not an official DORA metric',
                 doraBandHeader: 'Efficiency Band',
+                // Tool estimates disclaimer
+                toolDisclaimerTitle: 'Model Estimates & Default Values',
+                toolDisclaimerBody:  'This model uses 12 user-configurable multipliers. Default values are directional estimates based on published research — see Methodology for specific sources. Change them in Advanced Parameters to match your context.',
+                toolEstimateNote:    'This is a tool estimate. No single authoritative study supports this exact value.',
                 // Scenario comparison
                 scenarioTitle:       'Investment Scenario Comparison',
                 scenarioSubtitle:    'Three strategic paths — same debt, different outcomes',
@@ -580,6 +584,10 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 doraErrorsBand:    'Silny 0 · Umiarkowany ≤1 · Słaby ≤3 · Krytyczny >3',
                 doraAdaptedLabel: '† Adaptacja — nieoficjalna metryka DORA',
                 doraBandHeader: 'Pasmo Efektywności',
+                // Tool estimates disclaimer
+                toolDisclaimerTitle: 'Szacunki Modelu i Wartości Domyślne',
+                toolDisclaimerBody:  'Ten model używa 12 konfigurowalnych mnożników. Wartości domyślne to szacunki kierunkowe oparte na opublikowanych badaniach — zobacz Metodologię po konkretne źródła. Zmień je w parametrach Advanced, aby dopasować do swojego kontekstu.',
+                toolEstimateNote:    'To jest szacunek narzędzia. Żadne pojedyncze autorytatywne badanie nie potwierdza tej dokładnej wartości.',
                 // Scenario comparison
                 scenarioTitle:       'Porównanie Scenariuszy Inwestycyjnych',
                 scenarioSubtitle:    'Trzy ścieżki strategiczne — ten sam dług, różne rezultaty',

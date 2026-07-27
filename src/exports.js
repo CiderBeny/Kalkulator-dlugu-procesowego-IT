@@ -593,6 +593,13 @@ PDE.exportPDF = async function exportPDF(mode) {
         pdf.text(PDE.t('phase2Title').toUpperCase(), ML + 2, cy + 3);
         cy += 14;
 
+        // Disclaimer
+        needSpace(14);
+        pdf.setFontSize(6); pdf.setFont(pdfFont, 'italic'); pdf.setTextColor(180, 83, 9);
+        const discLines = pdf.splitTextToSize(PDE.t('toolDisclaimerBody'), UW - 4);
+        discLines.forEach(function (line) { pdf.text(line, ML, cy); cy += 3.5; });
+        cy += 4;
+
         const paramKeys = [
             { label: PDE.t('autoLabel'),         desc: '',                        id: 'autoLevel',       unit: '%',      isSlider: true, valId: 'autoLevelVal',       min: '0',   max: '100' },
             { label: PDE.t('teamSizeLabel'),      desc: PDE.t('teamSizeHelper'),          id: 'teamSize',         unit: '',       isSlider: false },
