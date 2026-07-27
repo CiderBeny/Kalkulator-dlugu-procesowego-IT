@@ -47,7 +47,6 @@ PDE.computeModel = function computeModel(params) {
     const capex          = params.capex          || 0;
     let autoLevel      = (params.autoLevel     || 0) / 100;
     const teamSize       = params.teamSize        || 0;
-    const opexAdjMult    = params.opexAdjMult   || PDE.COEFFICIENTS.OPEX_ADJ_MULTIPLIER_DEFAULT;
     const erosionRate    = params.erosionRate    || PDE.COEFFICIENTS.PIPELINE_EROSION_RATE_DEFAULT;
     const discountRate   = params.discountRate   || PDE.COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
     const horizonYears   = params.horizonYears   || PDE.COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT;
@@ -100,10 +99,9 @@ PDE.computeModel = function computeModel(params) {
         effectiveTeamSize = Math.pow(teamSize, 0.9);
     }
 
-    const cWaste     = (manualAnnualHrs + chasingAnnualHrs) * rate * effectiveTeamSize;
+    const cWaste     = (manualAnnualHrs + chasingAnnualHrs) * rate * effectiveTeamSize * 1.15;
     let cRisk      = (failures * mttr * downCost) * (riskLevel / PDE.COEFFICIENTS.RISK_SCALE_MAX);
     const cOppDirect = opportunityVal * erosionRate;
-    let cOpexAdj   = cWaste * opexAdjMult;
 
     const riskOperational = cRisk;
     let riskSecurity    = 0;
@@ -120,16 +118,13 @@ PDE.computeModel = function computeModel(params) {
     }
 
     if (nonlinearEnabled) {
-        const cWasteRatio = cWaste / 1e6;
-        const sigmoidMult = 2 / (1 + Math.exp(-cWasteRatio * 2)) - 1;
-        cOpexAdj = cWaste * opexAdjMult * (0.5 + sigmoidMult * 0.5);
         autoLevel = 1 - Math.pow(1 - autoLevel, 1.2);
     }
 
-    const totalImpact = cWaste + cRisk + cOppDirect + cOpexAdj;
+    const totalImpact = cWaste + cRisk + cOppDirect;
     const netDebt      = totalImpact - capex;
 
-    const annualRecurring = cWaste + cRisk + cOpexAdj;
+    const annualRecurring = cWaste + cRisk;
     const oneTimeCosts    = cOppDirect + capex;
     const dr = discountRate;
     const ny = horizonYears;
@@ -137,7 +132,7 @@ PDE.computeModel = function computeModel(params) {
     const npvRecurring = annualRecurring * pvifa;
     const npvTotalDebt = oneTimeCosts + npvRecurring;
 
-    const potentialSavings = (cWaste + cRisk + cOpexAdj) * autoLevel;
+    const potentialSavings = (cWaste + cRisk) * autoLevel;
     const paybackMonths    = PDE.discountedPayback(potentialSavings, capex);
 
     const irrCashFlows = [-capex];
@@ -148,7 +143,7 @@ PDE.computeModel = function computeModel(params) {
 
     const leverRecoveryAuto = Math.round(cWaste * leverAuto);
     const leverRecoveryRisk = Math.round(cRisk * leverRisk);
-    const leverRecoveryInnovation = Math.round((cOppDirect + cOpexAdj) * leverInnovation);
+    const leverRecoveryInnovation = Math.round(cOppDirect * leverInnovation);
     const leverRecoveryMgmt = Math.round(cWaste * leverManagement);
     const leverRecoveryTurnover = Math.round(turnoverCost * leverTurnoverL);
 
@@ -156,7 +151,6 @@ PDE.computeModel = function computeModel(params) {
         cWaste:            cWaste,
         cRisk:             cRisk,
         cOppDirect:        cOppDirect,
-        cOpexAdj:          cOpexAdj,
         totalImpact:       totalImpact,
         netDebt:           netDebt,
         annualRecurring:   annualRecurring,

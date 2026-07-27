@@ -9,7 +9,6 @@ const COEFFICIENTS = {
     MONTHS_PER_YEAR:           12,
     QUARTERS_PER_YEAR:         4,
     PIPELINE_EROSION_RATE_DEFAULT: 0.25,
-    OPEX_ADJ_MULTIPLIER_DEFAULT:    0.15,
     SCEN_C_AUTO_LEVEL:         0.8,
     SCEN_C_CAPEX_MULTIPLIER:   1.5,
     LEVER_AUTOMATION_DEFAULT:  0.3,
@@ -109,46 +108,13 @@ describe('Known Issue #1 (fixed) — MTTR label corrected to hours', () => {
     });
 });
 
-// ── Known Issue #2 — OPEX appears 2.15× in Total Debt Impact ─────────
-describe('Known Issue #2 — OPEX Waste appears 2.15× in Total Debt Impact', () => {
-    const SAMPLE = { cWaste: 500000, cRisk: 80000, cOppDirect: 25000, autoLevel: 0.6, capex: 200000 };
-
-    it('cOpexAdj = cWaste × 0.15 ⇒ OPEX contributes indirectly via adjusted estimate (reduced)', () => {
-        const cOpexAdj = SAMPLE.cWaste * COEFFICIENTS.OPEX_ADJ_MULTIPLIER_DEFAULT;
-        assert.strictEqual(cOpexAdj, 75000,
-            'cOpexAdj = $500k × 0.15 = $75,000 — reduced multiplier to avoid double-counting');
-    });
-
-    it('totalImpact = cWaste + cRisk + cOppDirect + cOpexAdj — adjusted estimate no longer dominates', () => {
-        const cOpexAdj = SAMPLE.cWaste * COEFFICIENTS.OPEX_ADJ_MULTIPLIER_DEFAULT;
-        const total = SAMPLE.cWaste + SAMPLE.cRisk + SAMPLE.cOppDirect + cOpexAdj;
-        const opexContribution = SAMPLE.cWaste + cOpexAdj; // 500k + 75k = 575k
-        assert.strictEqual(total, 500000 + 80000 + 25000 + 75000,
-            'Total = 500k + 80k + 25k + 75k = $680,000');
-        assert.ok(opexContribution > SAMPLE.cWaste,
-            'OPEX contributes $575k of $680k total via 1× direct + 0.15× adjusted estimate');
-    });
-
-    it('Main payback savings base now matches scenario savings — both include adjusted estimate (fixed)', () => {
-        const cOpexAdj = SAMPLE.cWaste * COEFFICIENTS.OPEX_ADJ_MULTIPLIER_DEFAULT;
-        const allSavings = (SAMPLE.cWaste + SAMPLE.cRisk + cOpexAdj) * SAMPLE.autoLevel;
-        assert.strictEqual(allSavings, (500000 + 80000 + 75000) * 0.6,
-            'Both main payback and scenarios use (cWaste + cRisk + cOpexAdj) × autoLevel = $393k/yr');
-        const pb = SAMPLE.capex / Math.max(1, allSavings / 12);
-        assert.strictEqual(pb, 200000 / (393000 / 12),
-            'Payback = $200k / ($393k/12) = 6.1 mo — consistent across main metric and scenarios');
-    });
-});
-
 // ── Known Issue #3: Arbitrary coefficients ─────────────────────
 describe('Known Issue #3 — Hardcoded coefficients without direct empirical basis', () => {
     it('Pipeline erosion rate default = 0.25 (25%) — Cost of Delay heuristic (Reinertsen 2009)', () => {
         assert.strictEqual(COEFFICIENTS.PIPELINE_EROSION_RATE_DEFAULT, 0.25);
     });
 
-    it('OPEX-adjusted estimate multiplier default = 0.15 (reduced from 0.5 to avoid OPEX double-counting)', () => {
-        assert.strictEqual(COEFFICIENTS.OPEX_ADJ_MULTIPLIER_DEFAULT, 0.15);
-    });
+
 
     it('Scenario C: auto level = 80%, CAPEX multiplier = 1.5 — model assumptions, not externally sourced', () => {
         assert.strictEqual(COEFFICIENTS.SCEN_C_AUTO_LEVEL, 0.8);
@@ -193,7 +159,7 @@ describe('Known Issue #4 (mitigated) — NPV model verifies fix is in place', ()
     });
 
     it('NPV recurring = annualRecurring × PVIFA(10%, 5yr) — annuity formula', () => {
-        const annualRecurring = 655000; // cWaste 500k + cRisk 80k + cOpexAdj 75k
+        const annualRecurring = 655000; // cWaste (500k x 1.15) 575k + cRisk 80k
         const r = 0.10, n = 5;
         const pvifa = (1 - Math.pow(1 + r, -n)) / r;
         const npvRecurring = annualRecurring * pvifa;
@@ -242,8 +208,8 @@ describe('Known Issue #4 (mitigated) — NPV model verifies fix is in place', ()
     });
 
     it('Single-year totalImpact still available for waterfall chart compatibility', () => {
-        const cWaste = 500000, cRisk = 80000, cOppDirect = 25000, cOpexAdj = 75000;
-        const totalImpact = cWaste + cRisk + cOppDirect + cOpexAdj;
+        const cWaste = 575000, cRisk = 80000, cOppDirect = 25000; // cWaste = 500k x 1.15
+        const totalImpact = cWaste + cRisk + cOppDirect;
         assert.strictEqual(totalImpact, 680000,
             'Single-year totalImpact = $680,000 — kept for legacy display');
     });
@@ -290,7 +256,6 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
             autoLevel: 0.6,
             teamSize: 10,
             capex: 50000,
-            opexAdjMult: COEFFICIENTS.OPEX_ADJ_MULTIPLIER_DEFAULT,
             erosionRate: COEFFICIENTS.PIPELINE_EROSION_RATE_DEFAULT,
             discountRate: COEFFICIENTS.DISCOUNT_RATE_DEFAULT,
             horizonYears: COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT,
@@ -302,20 +267,19 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
         const chasingAnnualHrs = s.managerHrs * COEFFICIENTS.MONTHS_PER_YEAR;
         const annualFailures = s.failures * COEFFICIENTS.QUARTERS_PER_YEAR;
 
-        const cWaste = (manualAnnualHrs + chasingAnnualHrs) * s.rate * s.teamSize;
+        const cWaste = (manualAnnualHrs + chasingAnnualHrs) * s.rate * s.teamSize * 1.15;
         const cRisk = (annualFailures * s.mttr * s.downCost) * (s.riskLevel / COEFFICIENTS.RISK_SCALE_MAX);
         const cOppDirect = s.opportunityVal * s.erosionRate;
-        const cOpexAdj = cWaste * s.opexAdjMult;
-        const totalImpact = cWaste + cRisk + cOppDirect + cOpexAdj;
-        const annualRecurring = cWaste + cRisk + cOpexAdj;
+        const totalImpact = cWaste + cRisk + cOppDirect;
+        const annualRecurring = cWaste + cRisk;
         const oneTimeCosts = cOppDirect + s.capex;
         const dr = s.discountRate;
         const ny = s.horizonYears;
         const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
         const npvTotalDebt = oneTimeCosts + annualRecurring * pvifa;
-        const potentialSavings = (cWaste + cRisk + cOpexAdj) * s.autoLevel;
+        const potentialSavings = (cWaste + cRisk) * s.autoLevel;
 
-        return { cWaste, cRisk, cOppDirect, cOpexAdj, totalImpact, npvTotalDebt, potentialSavings };
+        return { cWaste, cRisk, cOppDirect, totalImpact, npvTotalDebt, potentialSavings };
     }
 
     // ── Test 1: MTTR is used as hours in cRisk ──
@@ -335,36 +299,10 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
             'Doubling MTTR (2→8 hrs) quadruples cRisk — MTTR is a linear time multiplier');
     });
 
-    // ── Test 2: No OPEX double-counting in totalImpact ──
-    it('totalImpact = cWaste + cRisk + cOppDirect + cOpexAdj (no hidden OPEX terms)', () => {
-        const r = calcRuntime({});
-        const expected = r.cWaste + r.cRisk + r.cOppDirect + r.cOpexAdj;
-        assert.strictEqual(r.totalImpact, expected,
-            'totalImpact is exactly the sum of 4 terms — no double-counted OPEX');
-    });
-
-    it('cOpexAdj = cWaste × opexAdjMult (default 0.15) — OPEX contributes at most 1.15×', () => {
-        const r = calcRuntime({ opexAdjMult: 0.15 });
-        assert.strictEqual(r.cOpexAdj, r.cWaste * 0.15,
-            'cOpexAdj = cWaste × 0.15 = ' + r.cOpexAdj);
-        const opexWeight = (r.cWaste + r.cOpexAdj) / r.totalImpact;
-        assert.ok(opexWeight < 0.95,
-            'OPEX (direct + cascade) accounts for ' + (opexWeight * 100).toFixed(0) +
-            '% of total — does not dominate beyond 95%');
-    });
-
     it('Scenario A (Do Nothing) savings = 0 — no unintended OPEX leakage', () => {
         const r = calcRuntime({ autoLevel: 0 });
         assert.strictEqual(r.potentialSavings, 0,
             'With autoLevel=0, potentialSavings = $0 — no phantom savings');
-    });
-
-    // ── Test 3: readAdvanced-style override affects cOpexAdj ──
-    it('Overriding opexAdjMult to 0.3 doubles cOpexAdj vs default 0.15', () => {
-        const rDefault = calcRuntime({ opexAdjMult: 0.15 });
-        const rOverride = calcRuntime({ opexAdjMult: 0.3 });
-        assert.strictEqual(rOverride.cOpexAdj, rDefault.cOpexAdj * 2,
-            'cOpexAdj at 0.3 = 2× cOpexAdj at 0.15 — slider override propagates correctly');
     });
 
     it('Overriding erosionRate to 0 zeroes cOppDirect', () => {
@@ -381,7 +319,7 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
         const r = calcRuntime({ discountRate: 0.10, horizonYears: 5 });
         const dr = 0.10, ny = 5;
         const pvifa = (1 - Math.pow(1 + dr, -ny)) / dr;
-        const annualRecurring = r.cWaste + r.cRisk + r.cOpexAdj;
+        const annualRecurring = r.cWaste + r.cRisk;
         const oneTime = r.cOppDirect + 50000;
         const expectedNpv = oneTime + annualRecurring * pvifa;
         assert.ok(Math.abs(r.npvTotalDebt - expectedNpv) < 0.01,
@@ -390,7 +328,7 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
 
     it('Discount rate of 0% collapses PVIFA to plain n-years (no discounting)', () => {
         const r = calcRuntime({ discountRate: 0, horizonYears: 5 });
-        const annualRecurring = r.cWaste + r.cRisk + r.cOpexAdj;
+        const annualRecurring = r.cWaste + r.cRisk;
         const oneTime = r.cOppDirect + 50000;
         const expected = oneTime + annualRecurring * 5; // undiscounted sum
         assert.strictEqual(r.npvTotalDebt, expected,

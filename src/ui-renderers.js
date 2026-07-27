@@ -8,7 +8,6 @@ PDE.calculate = function calculate() {
     const p = PDE.getParams();
 
     document.getElementById('autoLevelVal').textContent = Math.round(p.autoLevel);
-    document.getElementById('opexAdjMultVal').textContent  = p.opexAdjMult.toFixed(2);
     document.getElementById('erosionRateVal').textContent  = p.erosionRate.toFixed(2);
     document.getElementById('discountRateVal').textContent = Math.round(p.discountRate * 100);
     document.getElementById('timeHorizonVal').textContent  = p.horizonYears;
@@ -72,7 +71,7 @@ PDE.calculate = function calculate() {
                 mcResults = d.data;
                 const keyMap = {
                     statWaste: 'cWaste', statRisk: 'cRisk', statOpp: 'cOppDirect',
-                    statCascade: 'cOpexAdj', totalImpact: 'totalImpact',
+                    totalImpact: 'totalImpact',
                     npvTotalDebt: 'npvTotalDebt', statNet: 'netDebt',
                 };
                 Object.keys(keyMap).forEach(function (id) {
@@ -114,7 +113,6 @@ PDE.calculate = function calculate() {
         document.getElementById('statWaste').textContent   = PDE.formatCompactCurrency(r.cWaste);
         document.getElementById('statRisk').textContent    = PDE.formatCompactCurrency(r.cRisk);
         document.getElementById('statOpp').textContent     = PDE.formatCompactCurrency(r.cOppDirect);
-        document.getElementById('statCascade').textContent = PDE.formatCompactCurrency(r.cOpexAdj);
         document.getElementById('totalImpact').textContent = PDE.formatCompactCurrency(r.totalImpact);
         document.getElementById('npvTotalDebt').textContent = PDE.formatCompactCurrency(r.npvTotalDebt);
         document.getElementById('statIrr').textContent     = r.irr !== null ? (r.irr >= 0.999 ? '>99.9%' : (r.irr * 100).toFixed(1) + '%') : '\u2014';
@@ -127,15 +125,15 @@ PDE.calculate = function calculate() {
     PDE.updateSliderFills();
 
     PDE.updateCharts(r.totalAnnualHrs, r.manualAnnualHrs, r.chasingAnnualHrs, r.cWaste, p.capex, r.potentialSavings, p.riskLevel, p.manualPercent, p.autoLevel / 100);
-    PDE.updateRecs(r.cWaste, r.cRisk, r.cOppDirect, r.cOpexAdj, r.paybackMonths, r.leverAuto, r.leverRisk);
+    PDE.updateRecs(r.cWaste, r.cRisk, r.cOppDirect, r.paybackMonths, r.leverAuto, r.leverRisk);
     PDE.updateDoraBenchmark();
-    PDE.updateScenarios(r.cWaste, r.cRisk, r.cOpexAdj, p.capex, p.autoLevel / 100, r.totalImpact, p.discountRate, p.horizonYears, r.scenCAutoLevel, r.scenCCapexMult);
+    PDE.updateScenarios(r.cWaste, r.cRisk, p.capex, p.autoLevel / 100, r.totalImpact, p.discountRate, p.horizonYears, r.scenCAutoLevel, r.scenCCapexMult);
     const sensResult = PDE.runSensitivity(p);
     PDE.renderTornado(sensResult);
     PDE.updateCalibration(r);
 };
 
-PDE.updateRecs = function updateRecs(cw, cr, co, cc, pb, leverAuto, leverRisk) {
+PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk) {
     const L = PDE.TRANSLATIONS[PDE.currentLang];
     if (leverAuto === undefined) leverAuto = PDE.readAdvanced('leverAutomation', PDE.COEFFICIENTS.LEVER_AUTOMATION_DEFAULT, 100);
     if (leverRisk === undefined) leverRisk = PDE.readAdvanced('leverRisk', PDE.COEFFICIENTS.LEVER_RISK_DEFAULT, 100);
@@ -144,7 +142,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, cc, pb, leverAuto, leverRisk) {
     let html = `<ul class="list-disc ml-5 space-y-2">`;
     if (cw > PDE.COEFFICIENTS.REC_AUTO_MIN_WASTE)  html += `<li>${L.recAutomation(Math.round(cw * leverAuto))}</li>`;
     if (cr > PDE.COEFFICIENTS.REC_RISK_MIN_EXPOSURE) html += `<li>${L.recRisk()}</li>`;
-    if (co + cc > PDE.COEFFICIENTS.REC_INNOVATION_MIN) html += `<li>${L.recInnovation(Math.round((co + cc) * PDE.COEFFICIENTS.LEVER_INNOVATION))}</li>`;
+    if (co > PDE.COEFFICIENTS.REC_INNOVATION_MIN) html += `<li>${L.recInnovation(Math.round(co * PDE.COEFFICIENTS.LEVER_INNOVATION))}</li>`;
     html += `<li class="mt-3 p-3 font-bold italic" style="background:var(--accent-dim);border-left:4px solid var(--accent);color:var(--accent);border-radius:0 6px 6px 0;">${PDE.esc(L.recVerdict(!isFinite(pb) || pb <= 0 ? L.scenInfinity : (pb < 1 ? '< 1' : pb.toFixed(1))))}</li>`;
     engine.innerHTML = html + `</ul>`;
 
@@ -171,7 +169,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, cc, pb, leverAuto, leverRisk) {
     const levers = [
         { key:'automation', title: L.leverAutomationTitle, recovery: Math.round(cw * leverAuto),  effort: L.effortMedium, timeline: '2\u20134 ' + L.verdictPaybackUnit, color:'var(--red)',    icon: ICONS.automation, detail: L.leverAutomationDetail(Math.round(manualPct * PDE.COEFFICIENTS.AUTOMATABLE_SHARE)) },
         { key:'risk',       title: L.leverRiskTitle,       recovery: Math.round(cr * leverRisk),        effort: L.effortLow,    timeline: '1\u20132 ' + L.verdictPaybackUnit, color:'var(--orange)', icon: ICONS.risk,       detail: L.leverRiskDetail() },
-        { key:'innovation', title: L.leverInnovationTitle, recovery: Math.round((co + cc) * PDE.COEFFICIENTS.LEVER_INNOVATION), effort: L.effortHigh, timeline: '3\u20136 ' + L.verdictPaybackUnit, color:'var(--purple)', icon: ICONS.innovation, detail: L.leverInnovationDetail() },
+        { key:'innovation', title: L.leverInnovationTitle, recovery: Math.round(co * PDE.COEFFICIENTS.LEVER_INNOVATION), effort: L.effortHigh, timeline: '3\u20136 ' + L.verdictPaybackUnit, color:'var(--purple)', icon: ICONS.innovation, detail: L.leverInnovationDetail() },
         { key:'mgmt',       title: L.leverMgmtTitle,       recovery: Math.round(cw * PDE.COEFFICIENTS.LEVER_MANAGEMENT), effort: L.effortLow,    timeline: '1 '   + L.verdictPaybackUnit,  color:'var(--cyan)',   icon: ICONS.mgmt,       detail: L.leverMgmtDetail() },
         { key:'turnover',   title: L.leverTurnoverTitle,   recovery: Math.round(turnoverCost * PDE.COEFFICIENTS.LEVER_TURNOVER), effort: L.effortMedium,timeline: '3\u20135 ' + L.verdictPaybackUnit, color:'var(--green)',  icon: ICONS.turnover,   detail: L.leverTurnoverDetail() },
     ];
@@ -278,7 +276,7 @@ PDE.updateRoadmap = function updateRoadmap(top3) {
     document.getElementById('roadmapGrid').innerHTML = html;
 };
 
-PDE.updateScenarios = function updateScenarios(cWaste, cRisk, cOpexAdj, capex, autoLevel, totalImpact, dr, ny, scenCAutoLevel, scenCCapexMult) {
+PDE.updateScenarios = function updateScenarios(cWaste, cRisk, capex, autoLevel, totalImpact, dr, ny, scenCAutoLevel, scenCCapexMult) {
     const L = PDE.TRANSLATIONS[PDE.currentLang];
     const fmt = (n) => PDE.formatCompactCurrency(Math.abs(n));
     if (dr === undefined) dr = PDE.readAdvanced('discountRate', PDE.COEFFICIENTS.DISCOUNT_RATE_DEFAULT, 100);
@@ -286,7 +284,7 @@ PDE.updateScenarios = function updateScenarios(cWaste, cRisk, cOpexAdj, capex, a
     if (scenCAutoLevel === undefined) scenCAutoLevel = PDE.readAdvanced('scenCAutoLevel', PDE.COEFFICIENTS.SCEN_C_AUTO_LEVEL, 100);
     if (scenCCapexMult === undefined) scenCCapexMult = PDE.readAdvanced('scenCCapexMult', PDE.COEFFICIENTS.SCEN_C_CAPEX_MULTIPLIER, 10);
 
-    const annualRecurring = cWaste + cRisk + cOpexAdj;
+    const annualRecurring = cWaste + cRisk;
 
     const scenA = PDE.scenCalc(0,    0,                            annualRecurring, dr, ny);
     const scenB = PDE.scenCalc(autoLevel, capex,                   annualRecurring, dr, ny);
@@ -497,7 +495,7 @@ PDE.updateDoraBenchmark = function updateDoraBenchmark() {
     const q5 = PDE.clamp('q5');
 
     const rows = [
-        { metric: L.doraMetricLeadTime, value: L.doraLeadTimeDesc(q2), bandDesc: L.doraLeadTimeBand, result: PDE.getDoraBand('leadTime', q2), adapted: false },
+        { metric: L.doraMetricLeadTime, value: L.doraLeadTimeDesc(q2), bandDesc: L.doraLeadTimeBand, result: PDE.getDoraBand('leadTime', q2), adapted: true },
         { metric: L.doraMetricManual,   value: L.doraManualDesc(q1),   bandDesc: L.doraManualBand,   result: PDE.getDoraBand('manual', q1), adapted: true  },
         { metric: L.doraMetricErrors,   value: L.doraErrorsDesc(q5),   bandDesc: L.doraErrorsBand,   result: PDE.getDoraBand('errors', q5), adapted: true  },
     ];

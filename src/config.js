@@ -21,7 +21,7 @@ PDE.COEFFICIENTS = {
 
     // Opportunity & Cascade
     PIPELINE_EROSION_RATE_DEFAULT: 0.25,  // Cost of Delay heuristic — delayed projects lose ~25% value/yr (Reinertsen 2009 · Product Development Flow) · configurable
-    OPEX_ADJ_MULTIPLIER_DEFAULT:    0.15,    // overridden by #opexAdjMult                  · configurable
+
 
     // Scenario C thresholds
     SCEN_C_AUTO_LEVEL:         0.8,    // 80 % full automation                        · confidence: medium
@@ -125,7 +125,7 @@ PDE.CHART_OPTS = {
 // ── URL hash security constraints ──
 PDE.ALLOWED_HASH_KEYS = new Set(
     ['q1','q2','q3','q4','q5','q11','q6','q7','q8','q9','q10','autoLevel','capex','teamSize',
-     'opexAdjMult','erosionRate','discountRate','timeHorizon','leverAutomation','leverRisk']
+     'erosionRate','discountRate','timeHorizon','leverAutomation','leverRisk']
 );
 
 PDE.HASH_CONSTRAINTS = {
@@ -143,7 +143,6 @@ PDE.HASH_CONSTRAINTS = {
     autoLevel: { min: 0,   max: 100   },  // automation level %
     capex:     { min: 0,   max: 1e9   },  // CAPEX investment $
     teamSize:  { min: 1,   max: 10000 },  // F9 fix: was missing, allowing unbounded values
-    opexAdjMult:     { min: 0,   max: 30  },  // 0.0–0.3 (×100)
     erosionRate:     { min: 0,   max: 100  },  // 0.0–1.0 (×100)
     discountRate:    { min: 5,   max: 20   },  // 5%–20%
     timeHorizon:     { min: 3,   max: 10   },  // years

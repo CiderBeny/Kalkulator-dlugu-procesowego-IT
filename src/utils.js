@@ -137,7 +137,6 @@ PDE.updateSliderFills = function updateSliderFills() {
     setSliderFill('q3',            'q3Fill',            1, 5);
     setSliderFill('q9',            'q9Fill',            1, 5);
     setSliderFill('autoLevel',     'autoLevelFill',     0, 100);
-    setSliderFill('opexAdjMult',   'opexAdjMultFill',   0, 30);
     setSliderFill('erosionRate',   'erosionRateFill',   0, 100);
     setSliderFill('discountRate',  'discountRateFill',  5, 20);
     setSliderFill('timeHorizon',   'timeHorizonFill',   3, 10);
@@ -220,7 +219,6 @@ PDE.getParams = function getParams() {
         teamSize:       PDE.clamp('teamSize'),
         turnover:       PDE.clamp('q10'),
         docStandard:    PDE.clamp('q3'),
-        opexAdjMult:    PDE.readAdvanced('opexAdjMult',   PDE.COEFFICIENTS.OPEX_ADJ_MULTIPLIER_DEFAULT, 100),
         erosionRate:    PDE.readAdvanced('erosionRate',   PDE.COEFFICIENTS.PIPELINE_EROSION_RATE_DEFAULT, 100),
         discountRate:   PDE.readAdvanced('discountRate',  PDE.COEFFICIENTS.DISCOUNT_RATE_DEFAULT, 100),
         horizonYears:   PDE.readAdvanced('timeHorizon',   PDE.COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT, 1),
