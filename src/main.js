@@ -177,6 +177,7 @@ window.onload = () => {
     PDE.nbpFetching = true;
     document.getElementById('nbpFooter').textContent = PDE.TRANSLATIONS[PDE.currentLang].nbpFetching;
     PDE.decodeState();
+    PDE.syncInputMaxes();
     PDE.ALLOWED_HASH_KEYS.forEach(function (id) { PDE.validateField(id); });
     PDE.calculate();
     requestAnimationFrame(() => { PDE.calculate(); });

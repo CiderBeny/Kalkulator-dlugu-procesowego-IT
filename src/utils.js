@@ -110,6 +110,7 @@ PDE.toggleCurrency = function toggleCurrency(currency) {
     });
     PDE.currentCurrency = currency;
     document.getElementById('currencySelect').value = currency;
+    PDE.syncInputMaxes();
     PDE.ALLOWED_HASH_KEYS.forEach(function (id) { PDE.validateField(id); });
     PDE.applyTranslations();
     PDE.calculate();
@@ -197,6 +198,18 @@ PDE.validateField = function (id) {
     } else {
         el.classList.remove('is-invalid');
     }
+};
+
+PDE.syncInputMaxes = function syncInputMaxes() {
+    const monetaryIds = ['q4', 'q6', 'q8', 'capex'];
+    monetaryIds.forEach(function (id) {
+        const el = document.getElementById(id);
+        const c = PDE.HASH_CONSTRAINTS[id];
+        if (el && c) {
+            const maxInCurrency = c.max * PDE.EXCHANGE_RATES[PDE.currentCurrency];
+            el.setAttribute('max', maxInCurrency);
+        }
+    });
 };
 
 PDE.flashBtn = function flashBtn(btn, orig) {
