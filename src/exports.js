@@ -215,19 +215,19 @@ PDE.exportCsv = function exportCsv() {
             const autoLvlRaw = PDE.clamp('autoLevel'), teamSizeRaw = PDE.clamp('teamSize'), capexRaw = PDE.currencyToUsd(PDE.clamp('capex'));
 
             const csvEscape = function (v) {
-                var s = String(v != null ? v : '');
+                let s = String(v ?? '');
                 if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
                 if (/[",\n\r]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
                 return s;
             };
-            var rows = [];
+            const rows = [];
 
             rows.push(L.xlsInputsTitle);
             rows.push(L.xlsGenerated + ',' + csvEscape(new Date().toLocaleString()));
             rows.push('');
             rows.push(L.xlsInputsHeaders.map(function (h) { return csvEscape(h); }).join(','));
             L.xlsInputsRows.forEach(function (row, i) {
-                var vals = [csvEscape(row[0]), csvEscape(row[1]), csvEscape(row[2] != null ? row[2] : [q1Raw, q2Raw, q3Raw, q4Raw, q5Raw, q11Raw, q6Raw, q7Raw, q8Raw, q9Raw, q10Raw][i]), csvEscape(row[3])];
+                const vals = [csvEscape(row[0]), csvEscape(row[1]), csvEscape(row[2] ?? [q1Raw, q2Raw, q3Raw, q4Raw, q5Raw, q11Raw, q6Raw, q7Raw, q8Raw, q9Raw, q10Raw][i]), csvEscape(row[3])];
                 rows.push(vals.join(','));
             });
             rows.push('');
@@ -236,7 +236,7 @@ PDE.exportCsv = function exportCsv() {
             rows.push('teamSize,' + csvEscape(teamSizeRaw) + ',' + csvEscape(L.xlsTeamSizeUnit));
             rows.push('capex,' + csvEscape(capexRaw) + ',' + csvEscape(PDE.currentCurrency));
 
-            var advancedPairs = [
+            const advancedPairs = [
                 [L.erosionRateLabel, p.erosionRate.toFixed(2)],
                 [L.discountRateLabel, Math.round(p.discountRate * 100) + '%'],
                 [L.timeHorizonLabel, p.horizonYears + ' yr'],
@@ -255,8 +255,8 @@ PDE.exportCsv = function exportCsv() {
             rows.push('');
 
             rows.push(L.xlsResultsTitle);
-            var resultLabels = ['cWaste','cRisk','cOppDirect','totalImpact','capex','netDebt','potentialSavings','paybackMonths','IRR'];
-            var resultValues = [
+            const resultLabels = ['cWaste','cRisk','cOppDirect','totalImpact','capex','netDebt','potentialSavings','paybackMonths','IRR'];
+            const resultValues = [
                 Math.round(r.cWaste), Math.round(r.cRisk), Math.round(r.cOppDirect),
                 Math.round(r.totalImpact), Math.round(p.capex), Math.round(r.netDebt),
                 Math.round(r.potentialSavings), isFinite(r.paybackMonths) ? Math.round(r.paybackMonths * 10) / 10 : L.scenInfinity,
@@ -279,8 +279,8 @@ PDE.exportCsv = function exportCsv() {
 
             rows.push(L.xlsScenariosTitle);
             rows.push(L.xlsScenariosHeaders.map(function (h) { return csvEscape(h); }).join(','));
-            var scenC_cap = p.capex * PDE.COEFFICIENTS.SCEN_C_CAPEX_MULTIPLIER;
-            var scenValues = [
+            const scenC_cap = p.capex * PDE.COEFFICIENTS.SCEN_C_CAPEX_MULTIPLIER;
+            const scenValues = [
                 [Math.round(scenA.net), Math.round(r.totalImpact), Math.round(r.totalImpact)],
                 [0, Math.round(p.capex), Math.round(scenC_cap)],
                 [0, Math.round(scenB.net), Math.round(scenC.net)],
@@ -294,22 +294,22 @@ PDE.exportCsv = function exportCsv() {
 
             rows.push(L.xlsDoraTitle);
             rows.push(L.xlsDoraHeaders.map(function (h) { return csvEscape(h); }).join(','));
-            var doraValues = [q2Raw, p.manualPercent, p.failures];
-            var doraMetrics = ['leadTime', 'manual', 'errors'];
+            const doraValues = [q2Raw, p.manualPercent, p.failures];
+            const doraMetrics = ['leadTime', 'manual', 'errors'];
             L.xlsDoraRows.forEach(function (row, i) {
-                var band = PDE.getDoraBand(doraMetrics[i], doraValues[i]).band;
+                const band = PDE.getDoraBand(doraMetrics[i], doraValues[i]).band;
                 rows.push(csvEscape(row[0]) + ',' + csvEscape(doraValues[i]) + ',' + csvEscape(row[2]) + ',' + csvEscape(band));
             });
 
-            var now = new Date();
-            var pad = function (n) { return String(n).padStart(2, '0'); };
-            var ts = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + '_' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
-            var filename = 'Process-Debt-Engine_' + ts + '.csv';
+            const now = new Date();
+            const pad = function (n) { return String(n).padStart(2, '0'); };
+            const ts = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + '_' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+            const filename = 'Process-Debt-Engine_' + ts + '.csv';
 
-            var csvContent = '\uFEFF' + rows.join('\r\n');
-            var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
+            const csvContent = '\uFEFF' + rows.join('\r\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
             a.href = url;
             a.download = filename;
             document.body.appendChild(a);
@@ -387,11 +387,11 @@ PDE.exportPDF = async function exportPDF(mode) {
 
     // ── Pre-construction patch: override internal f2/f3 to never throw on NaN ──
     try {
-        var proto = jsPDF.prototype;
+        let proto = jsPDF.prototype;
         while (proto) {
             if (proto.__private__ && typeof proto.__private__.f3 === 'function') {
                 ['f2','f3'].forEach(function (fn) {
-                    var orig = proto.__private__[fn].bind(proto.__private__);
+                    const orig = proto.__private__[fn].bind(proto.__private__);
                     proto.__private__[fn] = function (num) {
                         if (typeof num !== 'number' || !Number.isFinite(num)) {
                             console.warn('[PDF ' + fn + '-safe] NaN intercepted:', num, '— using 0');
@@ -404,7 +404,7 @@ PDE.exportPDF = async function exportPDF(mode) {
             }
             proto = Object.getPrototypeOf(proto);
         }
-    } catch (_pf3e) { /* prototype patch not available */ }
+    } catch { /* prototype patch not available */ }
 
     const btn = document.getElementById(btnId);
     if (btn) { btn.disabled = true; btn.textContent = PDE.t(generatingKey); }
@@ -421,8 +421,8 @@ PDE.exportPDF = async function exportPDF(mode) {
         // ── Debug wrappers for NaN detection ──
         (function wrapPdfMethods() {
             function sanitizeArgs(args) {
-                for (var i = 0; i < args.length; i++) {
-                    var a = args[i];
+                for (let i = 0; i < args.length; i++) {
+                    const a = args[i];
                     if (a === null || a === undefined) {
                         console.warn('[PDF NaN] null/undefined arg[' + i + '] — replaced with 0');
                         args[i] = 0;
@@ -439,7 +439,7 @@ PDE.exportPDF = async function exportPDF(mode) {
             METHODS.forEach(function (m) {
                 const orig = pdf[m].bind(pdf);
                 pdf[m] = function () {
-                    var args = sanitizeArgs(Array.prototype.slice.call(arguments));
+                    const args = sanitizeArgs(Array.prototype.slice.call(arguments));
                     return orig.apply(null, args);
                 };
             });

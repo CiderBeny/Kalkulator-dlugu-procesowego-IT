@@ -248,13 +248,13 @@
                 <div class="q-card">
                     <label class="label" for="q1" data-i18n="q1label">1. Manual Effort (%)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q1desc">What percentage of the sprint capacity is consumed by repetitive manual tasks such as deployments, regression testing, or environment configuration?</p>
-                     <input type="number" id="q1" value="40" min="0" class="input-field">
+                     <input type="number" id="q1" value="40" min="0" max="100" class="input-field">
                 </div>
 
                 <div class="q-card">
                     <label class="label" for="q2" data-i18n="q2label">2. Lead Time (Hrs)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q2desc">What is the average 'Lead Time' for a single change, measured from the initial request or code commit to successful production deployment?</p>
-                    <input type="number" id="q2" value="72" min="0" class="input-field">
+                    <input type="number" id="q2" value="72" min="0" max="8760" class="input-field">
                 </div>
 
                 <div class="q-card">
@@ -266,7 +266,7 @@
                 <div class="q-card">
                     <label class="label" for="q5" data-i18n="q5label">4. Human Errors / Quarter</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q5desc">How many production incidents or rollbacks in the last quarter were directly caused by human error during manual execution steps?</p>
-                    <input type="number" id="q5" value="3" min="0" class="input-field">
+                    <input type="number" id="q5" value="3" min="0" max="9999" class="input-field">
                 </div>
 
                 <div class="q-card">
@@ -278,7 +278,7 @@
                 <div class="q-card">
                     <label class="label" for="q10" data-i18n="q10label">6. Employee Turnover (%)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q10desc">What is the annual turnover rate in teams heavily burdened by manual, repetitive work (burnout indicator)?</p>
-                    <input type="number" id="q10" value="15" min="0" class="input-field">
+                    <input type="number" id="q10" value="15" min="0" max="100" class="input-field">
                 </div>
 
             </div>
@@ -287,7 +287,7 @@
                 <div class="q-card">
                     <label class="label" for="teamSize" data-i18n="advancedTeamSizeLabel">7. Team Size (engineers)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="advancedTeamSizeDesc">Total number of engineers affected by process debt.</p>
-                    <input type="number" id="teamSize" value="10" min="1" class="input-field">
+                    <input type="number" id="teamSize" value="10" min="1" max="10000" class="input-field">
                 </div>
             </div>
 
@@ -316,7 +316,7 @@
                         <div class="q-card">
                             <label class="label" for="q7" data-i18n="q7label">9. Management Overhead (h/m)</label>
                             <p class="text-[10px] mb-2 leading-tight" data-i18n="q7desc">How many hours per month do managers spend coordinating communication and "chasing people" due to siloed processes?</p>
-                            <input type="number" id="q7" value="30" min="0" class="input-field">
+                            <input type="number" id="q7" value="30" min="0" max="744" class="input-field">
                         </div>
 
                         <div class="q-card">
@@ -342,7 +342,7 @@
                         <div class="q-card">
                             <label class="label" for="q11" data-i18n="q11label">12. MTTR (Hours)</label>
                             <p class="text-[10px] mb-2 leading-tight" data-i18n="q11desc">What is the average time (in hours) to restore a critical service after a production incident (Mean Time To Repair)?</p>
-                            <input type="number" id="q11" value="4" min="0" class="input-field">
+                            <input type="number" id="q11" value="4" min="0" max="168" class="input-field">
                         </div>
 
                     </div>
