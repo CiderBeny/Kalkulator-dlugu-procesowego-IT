@@ -445,38 +445,36 @@ PDE.exportPDF = async function exportPDF(mode) {
             });
         })();
 
-        // register Inter font (Polish character support) — desktop only
+        // register Inter font (Polish character support)
         let pdfFont = 'helvetica';
-        const fontItalic = isMobile ? 'normal' : 'italic';
-        if (!PDE.isMobileBrowser()) {
-            try {
-                const [regResp, bldResp] = await Promise.all([
-                    fetch('fonts/Inter-Regular.ttf', { cache: 'force-cache' }),
-                    fetch('fonts/Inter-Bold.ttf', { cache: 'force-cache' })
+        const fontItalic = 'normal';
+        try {
+            const [regResp, bldResp] = await Promise.all([
+                fetch('fonts/Inter-Regular.ttf', { cache: 'force-cache' }),
+                fetch('fonts/Inter-Bold.ttf', { cache: 'force-cache' })
+            ]);
+            if (regResp.ok && bldResp.ok) {
+                const [regBuf, bldBuf] = await Promise.all([
+                    regResp.arrayBuffer(),
+                    bldResp.arrayBuffer()
                 ]);
-                if (regResp.ok && bldResp.ok) {
-                    const [regBuf, bldBuf] = await Promise.all([
-                        regResp.arrayBuffer(),
-                        bldResp.arrayBuffer()
-                    ]);
-                    async function bufToB64(buf) {
-                        const blob = new Blob([buf]);
-                        return new Promise(function (resolve, reject) {
-                            const reader = new FileReader();
-                            reader.onload = function () { resolve(reader.result.split(',')[1]); };
-                            reader.onerror = function () { reject(new Error('FileReader failed')); };
-                            reader.readAsDataURL(blob);
-                        });
-                    }
-                    pdf.addFileToVFS('Inter-Regular.ttf', await bufToB64(regBuf));
-                    pdf.addFont('Inter-Regular.ttf', 'Inter', 'normal');
-                    pdf.addFileToVFS('Inter-Bold.ttf', await bufToB64(bldBuf));
-                    pdf.addFont('Inter-Bold.ttf', 'Inter', 'bold');
-                    pdfFont = 'Inter';
+                async function bufToB64(buf) {
+                    const blob = new Blob([buf]);
+                    return new Promise(function (resolve, reject) {
+                        const reader = new FileReader();
+                        reader.onload = function () { resolve(reader.result.split(',')[1]); };
+                        reader.onerror = function () { reject(new Error('FileReader failed')); };
+                        reader.readAsDataURL(blob);
+                    });
                 }
-            } catch (e) {
-                console.warn('Could not load Inter font for PDF:', e.message);
+                pdf.addFileToVFS('Inter-Regular.ttf', await bufToB64(regBuf));
+                pdf.addFont('Inter-Regular.ttf', 'Inter', 'normal');
+                pdf.addFileToVFS('Inter-Bold.ttf', await bufToB64(bldBuf));
+                pdf.addFont('Inter-Bold.ttf', 'Inter', 'bold');
+                pdfFont = 'Inter';
             }
+        } catch (e) {
+            console.warn('Could not load Inter font for PDF:', e.message);
         }
 
         // helpers
@@ -595,7 +593,7 @@ PDE.exportPDF = async function exportPDF(mode) {
 
         // Disclaimer
         needSpace(14);
-        pdf.setFontSize(6); pdf.setFont(pdfFont, 'italic'); pdf.setTextColor(180, 83, 9);
+        pdf.setFontSize(6); pdf.setFont(pdfFont, fontItalic); pdf.setTextColor(180, 83, 9);
         const discLines = pdf.splitTextToSize(PDE.t('toolDisclaimerBody'), UW - 4);
         discLines.forEach(function (line) { pdf.text(line, ML, cy); cy += 3.5; });
         cy += 4;
