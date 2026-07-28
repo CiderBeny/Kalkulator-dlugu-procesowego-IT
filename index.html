@@ -261,7 +261,7 @@
                 <div class="q-card">
                     <label class="label" for="q4" data-i18n="q4label">3. Downtime Cost ($/h)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q4desc">What is the estimated hourly revenue loss or operational penalty during a critical business system outage?</p>
-                    <input type="number" id="q4" value="10000" min="0" class="input-field">
+                    <input type="number" id="q4" value="10000" min="0" max="10000000" class="input-field">
                 </div>
 
                 <div class="q-card">
@@ -273,7 +273,7 @@
                 <div class="q-card">
                     <label class="label" for="q6" data-i18n="q6label">5. Blended Rate ($/h)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q6desc">What is the average hourly cost (Blended Rate) of an engineer, including gross salary, benefits, hardware, and overhead?</p>
-                    <input type="number" id="q6" value="150" min="0" class="input-field">
+                    <input type="number" id="q6" value="150" min="0" max="5000" class="input-field">
                 </div>
 
                 <div class="q-card">
@@ -323,7 +323,7 @@
                         <div class="q-card">
                             <label class="label" for="q8" data-i18n="q8label">10. Opportunity Margin ($)</label>
                             <p class="text-[10px] mb-2 leading-tight" data-i18n="q8desc">What is the projected gross margin from new projects or features that are currently delayed due to technical or process debt?</p>
-                            <input type="number" id="q8" value="200000" min="0" class="input-field">
+                            <input type="number" id="q8" value="200000" min="0" max="1000000000" class="input-field">
                         </div>
 
                         <div class="q-card">
@@ -403,7 +403,7 @@
                     </div>
                     <div>
                         <label class="label" for="capex" data-i18n="capexLabel">One-Time CAPEX Investment ($)</label>
-                        <input type="number" id="capex" value="50000" min="0" class="input-field">
+                        <input type="number" id="capex" value="50000" min="0" max="1000000000" class="input-field">
                         <span class="helper-text mt-1 block" data-i18n="capexHelper">Licenses, Implementation, and Training costs.</span>
                     </div>
                 </div>
