@@ -258,25 +258,25 @@
                 </div>
 
                 <div class="q-card">
-                    <label class="label" for="q4" data-i18n="q4label">4. Downtime Cost ($/h)</label>
+                    <label class="label" for="q4" data-i18n="q4label">3. Downtime Cost ($/h)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q4desc">What is the estimated hourly revenue loss or operational penalty during a critical business system outage?</p>
                     <input type="number" id="q4" value="10000" min="0" class="input-field">
                 </div>
 
                 <div class="q-card">
-                    <label class="label" for="q5" data-i18n="q5label">5. Human Errors / Quarter</label>
+                    <label class="label" for="q5" data-i18n="q5label">4. Human Errors / Quarter</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q5desc">How many production incidents or rollbacks in the last quarter were directly caused by human error during manual execution steps?</p>
                     <input type="number" id="q5" value="3" min="0" class="input-field">
                 </div>
 
                 <div class="q-card">
-                    <label class="label" for="q6" data-i18n="q6label">6. Blended Rate ($/h)</label>
+                    <label class="label" for="q6" data-i18n="q6label">5. Blended Rate ($/h)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q6desc">What is the average hourly cost (Blended Rate) of an engineer, including gross salary, benefits, hardware, and overhead?</p>
                     <input type="number" id="q6" value="150" min="0" class="input-field">
                 </div>
 
                 <div class="q-card">
-                    <label class="label" for="q10" data-i18n="q10label">10. Employee Turnover (%)</label>
+                    <label class="label" for="q10" data-i18n="q10label">6. Employee Turnover (%)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q10desc">What is the annual turnover rate in teams heavily burdened by manual, repetitive work (burnout indicator)?</p>
                     <input type="number" id="q10" value="15" min="0" class="input-field">
                 </div>
@@ -285,7 +285,7 @@
 
             <div class="mt-4">
                 <div class="q-card">
-                    <label class="label" for="teamSize" data-i18n="advancedTeamSizeLabel">Team Size (engineers)</label>
+                    <label class="label" for="teamSize" data-i18n="advancedTeamSizeLabel">7. Team Size (engineers)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="advancedTeamSizeDesc">Total number of engineers affected by process debt.</p>
                     <input type="number" id="teamSize" value="10" min="1" class="input-field">
                 </div>
@@ -299,7 +299,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                         <div class="q-card">
-                            <label class="label" for="q3" data-i18n="q3label">3. Documentation Standard (1–5)</label>
+                            <label class="label" for="q3" data-i18n="q3label">8. Documentation Standard (1–5)</label>
                             <p class="text-[10px] mb-2 leading-tight" data-i18n="q3desc">Does the organization maintain a unified process documentation standard, or is critical knowledge fragmented across tribal silos?</p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
@@ -314,19 +314,19 @@
                         </div>
 
                         <div class="q-card">
-                            <label class="label" for="q7" data-i18n="q7label">7. Management Overhead (h/m)</label>
+                            <label class="label" for="q7" data-i18n="q7label">9. Management Overhead (h/m)</label>
                             <p class="text-[10px] mb-2 leading-tight" data-i18n="q7desc">How many hours per month do managers spend coordinating communication and "chasing people" due to siloed processes?</p>
                             <input type="number" id="q7" value="30" min="0" class="input-field">
                         </div>
 
                         <div class="q-card">
-                            <label class="label" for="q8" data-i18n="q8label">8. Opportunity Margin ($)</label>
+                            <label class="label" for="q8" data-i18n="q8label">10. Opportunity Margin ($)</label>
                             <p class="text-[10px] mb-2 leading-tight" data-i18n="q8desc">What is the projected gross margin from new projects or features that are currently delayed due to technical or process debt?</p>
                             <input type="number" id="q8" value="200000" min="0" class="input-field">
                         </div>
 
                         <div class="q-card">
-                            <label class="label" for="q9" data-i18n="q9label">9. Scalability Bottleneck (1–5)</label>
+                            <label class="label" for="q9" data-i18n="q9label">11. Scalability Bottleneck (1–5)</label>
                             <p class="text-[10px] mb-2 leading-tight italic" data-i18n="q9desc">Impact on ability to scale growth?</p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
@@ -340,7 +340,7 @@
                         </div>
 
                         <div class="q-card">
-                            <label class="label" for="q11" data-i18n="q11label">11. MTTR (Hours)</label>
+                            <label class="label" for="q11" data-i18n="q11label">12. MTTR (Hours)</label>
                             <p class="text-[10px] mb-2 leading-tight" data-i18n="q11desc">What is the average time (in hours) to restore a critical service after a production incident (Mean Time To Repair)?</p>
                             <input type="number" id="q11" value="4" min="0" class="input-field">
                         </div>
@@ -414,6 +414,7 @@
                     <div>
                         <label class="label" for="erosionRate" data-i18n="erosionRateLabel">Pipeline Erosion Rate</label>
                         <span class="helper-text mt-1 block" data-i18n="erosionRateHelper">Cost of Delay — delayed projects lose ~25% value/yr (0.0–1.0). Default 0.25.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="erosionRateFill"></div>
@@ -424,6 +425,7 @@
                     <div>
                         <label class="label" for="discountRate" data-i18n="discountRateLabel">WACC (Discount Rate)</label>
                         <span class="helper-text mt-1 block" data-i18n="discountRateHelper">Weighted Average Cost of Capital (5%–20%). Default 10%.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="discountRateFill"></div>
@@ -434,6 +436,7 @@
                     <div>
                         <label class="label" for="timeHorizon" data-i18n="timeHorizonLabel">Time Horizon (years)</label>
                         <span class="helper-text mt-1 block" data-i18n="timeHorizonHelper">NPV / payback evaluation period (3–10 yr). Default 5.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="timeHorizonFill"></div>
@@ -444,6 +447,7 @@
                     <div>
                         <label class="label" for="leverAutomation" data-i18n="leverAutomationLabel">Automation Lever Recovery</label>
                         <span class="helper-text mt-1 block" data-i18n="leverAutomationHelper">Fraction of OPEX Waste recoverable via automation (10%–60%). Default 30%.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="leverAutomationFill"></div>
@@ -455,6 +459,7 @@
                     <div>
                         <label class="label" for="leverRisk" data-i18n="leverRiskLabel">Risk Lever Recovery</label>
                         <span class="helper-text mt-1 block" data-i18n="leverRiskHelper">Fraction of Risk Exposure recoverable via CMDB/Auto-Discovery (20%–80%). Default 60%.</span>
+                        <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                         <div class="slider-wrapper">
                             <div class="slider-track-bg"></div>
                             <div class="slider-track-fill" id="leverRiskFill"></div>
@@ -472,6 +477,7 @@
                         <div>
                             <label class="label" for="scenCAutoLevel" data-i18n="scenCAutoLevelLabel">Scenario C Auto Level</label>
                             <span class="helper-text mt-1 block" data-i18n="scenCAutoLevelHelper">Target automation level for full-transformation scenario (50–100%). Default 80%.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="scenCAutoLevelFill"></div>
@@ -482,6 +488,7 @@
                         <div>
                             <label class="label" for="scenCCapexMult" data-i18n="scenCCapexMultLabel">Scenario C CAPEX Multiplier</label>
                             <span class="helper-text mt-1 block" data-i18n="scenCCapexMultHelper">CAPEX multiplier for full-transformation scenario (1.0–3.0). Default 1.5.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="scenCCapexMultFill"></div>
@@ -492,6 +499,7 @@
                         <div>
                             <label class="label" for="annualHours" data-i18n="annualHoursLabel">Annual Hours / Engineer</label>
                             <span class="helper-text mt-1 block" data-i18n="annualHoursHelper">Working hours per engineer per year (1500–2500). Default 1800.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="annualHoursFill"></div>
@@ -509,6 +517,7 @@
                         <div>
                             <label class="label" for="leverInnovation" data-i18n="leverInnovationLabel">Innovation Lever Recovery</label>
                             <span class="helper-text mt-1 block" data-i18n="leverInnovationHelper">Fraction of pipeline margin recovered via innovation (10–80%). Default 50%.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="leverInnovationFill"></div>
@@ -520,6 +529,7 @@
                         <div>
                             <label class="label" for="leverManagement" data-i18n="leverManagementLabel">Management Lever Recovery</label>
                             <span class="helper-text mt-1 block" data-i18n="leverManagementHelper">Fraction of OPEX Waste recovered via management intervention (5–40%). Default 15%.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="leverManagementFill"></div>
@@ -531,6 +541,7 @@
                         <div>
                             <label class="label" for="leverTurnover" data-i18n="leverTurnoverLabel">Turnover Lever Recovery</label>
                             <span class="helper-text mt-1 block" data-i18n="leverTurnoverHelper">Fraction of turnover cost preventable (10–60%). Default 30%.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="leverTurnoverFill"></div>
@@ -569,6 +580,7 @@
                         <div>
                             <label class="label" for="correlationStrength" data-i18n="correlationStrengthLabel">Correlation Strength</label>
                             <span class="helper-text mt-1 block" data-i18n="correlationStrengthHelper">Global multiplier for all correlation effects (0.0–1.0). Default 0.3.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="correlationStrengthFill"></div>
@@ -665,6 +677,7 @@
                         <div>
                             <label class="label" for="riskSecurityWeight" data-i18n="riskSecurityWeightLabel">Security Risk Weight</label>
                             <span class="helper-text mt-1 block" data-i18n="riskSecurityWeightHelper">Scaling factor for security risk relative to operational (0.0–1.0). Default 0.4.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="riskSecurityWeightFill"></div>
@@ -675,6 +688,7 @@
                         <div>
                             <label class="label" for="riskRegulatoryWeight" data-i18n="riskRegulatoryWeightLabel">Regulatory Risk Weight</label>
                             <span class="helper-text mt-1 block" data-i18n="riskRegulatoryWeightHelper">Scaling factor for regulatory risk relative to operational (0.0–1.0). Default 0.25.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="riskRegulatoryWeightFill"></div>
@@ -689,6 +703,12 @@
 
         <!-- SECTION 2: RESULTS -->
         <div id="report-content" class="space-y-6">
+
+            <!-- BLOCK: Tool Estimates Disclaimer -->
+            <div class="card bg-amber-50 border border-amber-300 p-4">
+                <p class="text-xs font-bold uppercase tracking-wide text-amber-800" data-i18n="toolDisclaimerTitle">Model Estimates & Default Values</p>
+                <p class="text-xs mt-1 text-amber-700" data-i18n="toolDisclaimerBody">This model uses 12 user-configurable multipliers. Default values are directional estimates based on published research — see Methodology for specific sources. Change them in Advanced Parameters to match your context.</p>
+            </div>
 
             <!-- BLOCK 3: STAT CARDS -->
             <div id="pdf-block-3" class="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -723,7 +743,7 @@
                 <div class="card border-l-4 border-l-cyan-600">
                     <div class="label-row">
                         <p class="label" data-i18n="statNpvLabel">NPV Total Debt (5 yr)</p>
-                        <span class="formula-tip" tabindex="0" role="button" data-formula="(OPEX Waste + Risk + OPEX-adjusted Estimate) × PVIFA(10%,5yr) + Pipeline Erosion + CAPEX" aria-label="Formula: (OPEX Waste + Risk + OPEX-adjusted Estimate) × PVIFA(10%,5yr) + Pipeline Erosion + CAPEX">ⓘ</span>
+                        <span class="formula-tip" tabindex="0" role="button" data-formula="(OPEX Waste (×1.15 context-switching premium) + Risk) × PVIFA(10%,5yr) + Pipeline Erosion + CAPEX" aria-label="Formula: (OPEX Waste (×1.15 context-switching premium) + Risk) × PVIFA(10%,5yr) + Pipeline Erosion + CAPEX">ⓘ</span>
                     </div>
                     <p class="text-3xl font-black mt-1 stat-value" id="npvTotalDebt" data-i18n-formula="statNpvHelper">$0</p>
                 </div>
@@ -736,11 +756,11 @@
                 </div>
                 <div class="card border-l-4 border-l-green-600">
                     <div class="label-row">
-                        <p class="label" data-i18n="statNetLabel">Net Debt After Investment</p>
-                        <span class="formula-tip" tabindex="0" role="button" data-formula="Total Debt Impact − CAPEX Investment" aria-label="Formula: Total Debt Impact − CAPEX Investment" data-i18n-formula="formulaNet">ⓘ</span>
+                        <p class="label" data-i18n="statNetLabel">Net Drag After Investment</p>
+                        <span class="formula-tip" tabindex="0" role="button" data-formula="Estimated Annual Drag − CAPEX Investment" aria-label="Formula: Estimated Annual Drag − CAPEX Investment" data-i18n-formula="formulaNet">ⓘ</span>
                     </div>
                     <p class="text-3xl font-black mt-1 stat-value" id="statNet">$0</p>
-                    <span class="helper-text" data-i18n="statNetHelper">Total impact minus CAPEX</span>
+                    <span class="helper-text" data-i18n="statNetHelper">Estimated Annual Drag minus CAPEX</span>
                 </div>
             </div>
 
@@ -823,10 +843,10 @@
                     <span style="background:var(--accent);color:#0a0f1e;border-radius:8px;padding:0.4rem 0.7rem;font-family:'Space Grotesk',sans-serif;font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">⚡</span>
                     <div>
                         <h2 style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:800;text-transform:uppercase;letter-spacing:-0.02em;color:var(--text-primary);margin:0;" data-i18n="sensTitle">Sensitivity Analysis</h2>
-                        <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;" data-i18n="sensSubtitle">Which inputs drive NPV Total Debt the most? Each bar shows the swing from a ±20% input change.</p>
+                        <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;" data-i18n="sensSubtitle">Which inputs drive NPV Estimated Drag the most? Each bar shows the swing from a ±20% input change.</p>
                         <p style="font-size:0.65rem;color:var(--text-muted);margin:1px 0 0;" data-i18n="sensSortInfo">Sorted by impact (largest on top)</p>
                     </div>
-                    <span class="formula-tip" tabindex="0" role="button" data-formula="Each input is varied ±20% while holding others constant. Bars show the resulting swing in NPV Total Debt from the base value." aria-label="Sensitivity methodology: ±20% variation" data-i18n-formula="sensFormula">ⓘ</span>
+                    <span class="formula-tip" tabindex="0" role="button" data-formula="Each input is varied ±20% while holding others constant. Bars show the resulting swing in NPV Estimated Drag from the base value." aria-label="Sensitivity methodology: ±20% variation" data-i18n-formula="sensFormula">ⓘ</span>
                 </div>
                 <div class="h-[400px] md:h-[500px] lg:h-[600px]"><canvas id="tornadoChart"></canvas></div>
             </div>
@@ -899,13 +919,7 @@
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyOppSource">Exepron — "The True Cost of Delay" (2026). exepron.com.</span></p>
                 </div>
 
-                <!-- 4 -->
-                <div class="methodology-section" id="methodology-4">
-                    <h4 data-i18n="methodologyCascadeTitle">4. OPEX-adjusted Estimate</h4>
-                    <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code>OPEX Waste &times; 0.15</code></p>
-                    <p><strong>0.15 multiplier (tool estimate):</strong> <span data-i18n="methodologyOppFactor2">A conservative multiplier (0.15) applied to OPEX Waste to account for hidden downstream costs — rework, context switching, and cascading delays that propagate through dependent workflows. This replaces the earlier "Cascade Impact" approach which double-counted OPEX at 0.5&times;.</span></p>
-                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyOppSource">Exepron — "The True Cost of Delay" (2026). exepron.com.</span></p>
-                </div>
+                <!-- 4 (formerly "OPEX-adjusted Estimate" — merged into OPEX Waste ×1.15) -->
 
                 <!-- 5 -->
                 <div class="methodology-section" id="methodology-5">
@@ -972,22 +986,22 @@
 
                 <!-- 9 -->
                 <div class="methodology-section" id="methodology-9">
-                    <h4 data-i18n="methodologyTotalTitle">9. Total Debt Impact</h4>
-                    <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code data-i18n="methodologyTotalFormula">OPEX Waste + Risk Exposure + Pipeline Margin Erosion + OPEX-adjusted Estimate</code></p>
-                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Note:</span> <span data-i18n="methodologyTotalNote">Pipeline Margin Erosion (cOppDirect) is a one-time estimate reflecting margin lost in the first year of delay. All other components recur annually. The OPEX-adjusted Estimate is proportional to OPEX Waste — reducing manual waste automatically reduces this component.</span></p>
+                    <h4 data-i18n="methodologyTotalTitle">9. Estimated Annual Drag</h4>
+                    <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code data-i18n="methodologyTotalFormula">OPEX Waste (&times;1.15 context-switching premium) + Risk Exposure + Pipeline Margin Erosion</code></p>
+                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Note:</span> <span data-i18n="methodologyTotalNote">Pipeline Margin Erosion (cOppDirect) is a one-time estimate reflecting margin lost in the first year of delay. OPEX Waste includes a built-in 15% context-switching premium (&times;1.15). All other components recur annually.</span></p>
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyTotalSource">Economic model synthesised from BLS ATUS (2024), OECD Annual Hours (2024), Exepron "True Cost of Delay" (2026), COSO ERM (2017), and SHRM Retention Framework (2025).</span></p>
                 </div>
 
                 <div class="methodology-section" id="methodology-10">
-                    <h4 data-i18n="methodologyNpvTitle">10. NPV & IRR Economic Model</h4>
-                    <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code data-i18n="methodologyNpvFormula">NPV = One-Time Costs + PVIFA × Annual Recurring | IRR = rate where Σ(CFₜ/(1+r)^(t/12)) = 0</code></p>
-                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Note:</span> <span data-i18n="methodologyNpvNote">One-time costs = Pipeline Margin Erosion + CAPEX. Annual recurring = OPEX Waste + Risk + OPEX-adjusted Estimate. PVIFA discounts the recurring stream using a 10% WACC over a 5-year horizon. Discounted Payback uses monthly DCF to find the break-even month. IRR (Internal Rate of Return) is computed via binary search over monthly cash flows — the rate at which NPV = 0. IRR > WACC (10%) indicates value creation.</span></p>
-                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyNpvSource">Brealey, Myers & Allen — Principles of Corporate Finance. COSO ERM 2017. Damodaran — Cost of Capital by Sector (2025).</span></p>
+                    <h4 data-i18n="methodologyNpvTitle">10. NPV &amp; IRR Economic Model</h4>
+                    <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code data-i18n="methodologyNpvFormula">NPV = One-Time Costs + PVIFA &times; Annual Recurring | IRR = rate where &Sigma;(CF&#8347;/(1+r)^(t/12)) = 0</code></p>
+                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Note:</span> <span data-i18n="methodologyNpvNote">One-time costs = Pipeline Margin Erosion + CAPEX. Annual recurring = OPEX Waste (incl. 15% context-switching premium) + Risk. PVIFA discounts the recurring stream using a 10% WACC over a 5-year horizon. Discounted Payback uses monthly DCF to find the break-even month. IRR (Internal Rate of Return) is computed via binary search over monthly cash flows — the rate at which NPV = 0. IRR &gt; WACC (10%) indicates value creation. This aligns with standard capital budgeting (Brealey, Myers &amp; Allen) and COSO ERM 2017 guidance on multi-period risk assessment.</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyNpvSource">Brealey, R.A., Myers, S.C. &amp; Allen, F. — Principles of Corporate Finance (14th ed., McGraw-Hill). COSO — Enterprise Risk Management — Integrating with Strategy and Performance (2017). WACC benchmark: Damodaran, A. — Cost of Capital by Sector (2025), IT infrastructure median ~9.3%.</span></p>
                 </div>
 
                 <div class="methodology-section" id="methodology-11">
                     <h4 data-i18n="methodologyAdvancedTitle">11. Configurable Advanced Parameters</h4>
-                    <p><span data-i18n="methodologyAdvancedBody">Six parameters in the "Advanced Parameters" panel let you override default coefficients in real time: OPEX-adjusted Estimate (0.0–0.3), Pipeline Erosion Rate (0.0–1.0), WACC / Discount Rate (5–20%), NPV Time Horizon (3–10 years), Automation Lever Recovery (10–60%), and Risk Lever Recovery (20–80%). Changing any slider immediately recalculates all dependent metrics. Defaults are restored on page reload.</span></p>
+                    <p><span data-i18n="methodologyAdvancedBody">Five parameters in the "Advanced Parameters" panel let you override default coefficients in real time: Pipeline Erosion Rate (0.0–1.0), WACC / Discount Rate (5–20%), NPV Time Horizon (3–10 years), Automation Lever Recovery (10–60%), and Risk Lever Recovery (20–80%). Changing any slider immediately recalculates all dependent metrics. Defaults are restored on page reload.</span></p>
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyAdvancedSource">User-configurable — overrides the Economic Model defaults (Section 10) in real time.</span></p>
                 </div>
 
@@ -999,14 +1013,14 @@
 
                 <div class="methodology-section" id="methodology-13">
                     <h4 data-i18n="methodologyNonlinearTitle">13. Nonlinear Cost Model</h4>
-                    <p><span data-i18n="methodologyNonlinearBody">Three non-linear adjustments applied when enabled: (1) Economies of scale — effective team size = actual team size ^ 0.9, meaning a 100-engineer team costs less than 10x a 10-engineer team. (2) Cascade threshold — a sigmoid function (2/(1+exp(-cWaste/0.5M)) - 1) scales the cascade multiplier up for high-waste organisations and down for low-waste ones, reflecting the idea that small manual inefficiencies have low cascade impact but large ones amplify non-linearly. (3) Diminishing automation returns — the effective automation level = 1 - (1 - target)^1.2, so the first 30% of automation yields more savings than the last 30%. Disabled by default.</span></p>
-                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyNonlinearSource">Economies of scale: standard production function (Cobb-Douglas with a=0.9). Cascade sigmoid: original design assumption. Diminishing returns: common observation in process automation literature — initial quick wins taper off.</span></p>
+                    <p><span data-i18n="methodologyNonlinearBody">Two non-linear adjustments applied when enabled: (1) Economies of scale — effective team size = actual team size ^ 0.9, meaning a 100-engineer team costs less than 10x a 10-engineer team. (2) Diminishing automation returns — the effective automation level = 1 - (1 - target)^1.2, so the first 30% of automation yields more savings than the last 30%. Disabled by default.</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyNonlinearSource">Economies of scale: standard production function (Cobb-Douglas with a=0.9). Diminishing returns: common observation in process automation literature — initial quick wins taper off.</span></p>
                 </div>
 
                 <div class="methodology-section" id="methodology-14">
                     <h4 data-i18n="methodologyMcTitle">14. Monte Carlo Confidence Intervals</h4>
                     <p><span data-i18n="methodologyMcBody">When enabled, runs 1,000 iterations of the full model with perturbed inputs. Each input (except riskLevel which is discrete 1-5) is sampled from a triangular distribution centred on the user's value with +/-15% spread. MTTR uses a log-normal distribution (Box-Muller transform) with +/-25% spread, reflecting the heavy-tailed nature of incident recovery times. Outputs are reported as median with 90% confidence interval [p5, p95]. A seeded PRNG (LCG, seed=42) ensures reproducibility across sessions. Disabled by default.</span></p>
-                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyMcSource">Standard Monte Carlo method (Metropolis & Ulam 1949). Box-Muller transform for log-normal MTTR. 90% CI is a common regulatory reporting standard (Basel II/III, Solvency II).</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyMcSource">Standard Monte Carlo method (Metropolis &amp; Ulam 1949). Box-Muller transform for log-normal MTTR. 90% CI is a common regulatory reporting standard (Basel II/III, Solvency II).</span></p>
                 </div>
 
                 <div class="methodology-section" id="methodology-15">
