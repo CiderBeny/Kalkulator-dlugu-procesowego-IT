@@ -32,6 +32,14 @@ export default [
     },
   },
   {
+    files: ['src/gen-og-image.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     files: ['src/**/*.test.js'],
     languageOptions: {
       globals: {
