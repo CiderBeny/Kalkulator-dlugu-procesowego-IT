@@ -199,6 +199,7 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+        .tool-estimate-note { display: none !important; }
     </style>
 </head>
 <body>
@@ -250,10 +251,16 @@
 
             <div class="mb-6 pb-4 border-b border-border">
                 <p class="text-xs font-bold uppercase tracking-wider mb-3" data-i18n="quickStartTitle">Quick Start — Select a profile</p>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 items-center">
                     <button class="preset-btn" data-preset="low" data-i18n="presetLow">🔴 Low Automation</button>
                     <button class="preset-btn" data-preset="medium" data-i18n="presetMedium">🟡 Medium Maturity</button>
                     <button class="preset-btn" data-preset="high" data-i18n="presetHigh">🟢 High Maturity</button>
+                    <span class="text-[10px] text-gray-500 mx-1">|</span>
+                    <select id="regionSelect" class="bg-[#0f1a2a] text-[#e2e8f0] border border-[#1e3a52] rounded px-2 py-1 text-xs font-bold uppercase tracking-wider cursor-pointer focus:outline-none focus:border-[#06b6d4]">
+                        <option value="US" data-i18n="regionUS">US</option>
+                        <option value="EU" data-i18n="regionEU">Europe</option>
+                        <option value="PL" data-i18n="regionPL">Poland</option>
+                    </select>
                 </div>
             </div>
 
@@ -520,6 +527,28 @@
                                 <input type="range" id="annualHours" min="1500" max="2500" value="1800" step="10" class="slider">
                             </div>
                             <p class="text-center text-xs mt-1"><span id="annualHoursVal">1800</span></p>
+                        </div>
+                        <div>
+                            <label class="label" for="contextPremium" data-i18n="contextPremiumLabel">Context-Switching Premium</label>
+                            <span class="helper-text mt-1 block" data-i18n="contextPremiumHelper">Hidden cost of task switching (0%–30%). Default 15%.</span>
+                            <p class="tool-estimate-note mt-1 text-[10px] italic text-amber-700" data-i18n="toolEstimateNote"></p>
+                            <div class="slider-wrapper">
+                                <div class="slider-track-bg"></div>
+                                <div class="slider-track-fill" id="contextPremiumFill"></div>
+                                <input type="range" id="contextPremium" min="0" max="30" value="15" class="slider">
+                            </div>
+                            <p class="text-center text-xs mt-1"><span id="contextPremiumVal">15</span>%</p>
+                            <span class="source-text mt-1 block" data-i18n="contextPremiumSource"></span>
+                        </div>
+                        <div>
+                            <label class="label" for="taxRate" data-i18n="taxRateLabel">Corporate Tax Rate (%)</label>
+                            <span class="helper-text mt-1 block" data-i18n="taxRateHelper">For CAPEX depreciation tax shield (0%–50%). 0 = disabled.</span>
+                            <div class="slider-wrapper">
+                                <div class="slider-track-bg"></div>
+                                <div class="slider-track-fill" id="taxRateFill"></div>
+                                <input type="range" id="taxRate" min="0" max="50" value="0" class="slider">
+                            </div>
+                            <p class="text-center text-xs mt-1"><span id="taxRateVal">0</span>%</p>
                         </div>
                     </div>
                 </div>
@@ -800,7 +829,7 @@
                     </div>
                     <span id="calibToggleIcon" style="font-size:0.75rem;color:var(--text-muted);transition:transform 0.2s;">&#9654;</span>
                 </div>
-                <div id="calibrationBody" style="display:none;margin-top:1rem;">
+                <div id="calibrationBody" style="display:block;margin-top:1rem;">
                     <div id="calibrationGrid" style="display:grid;grid-template-columns:1fr;gap:0.5rem;"></div>
                     <div id="calibrationFooter" style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border-subtle);">
                         <div id="calibrationScore" style="font-size:0.8rem;font-weight:700;color:var(--text-primary);"></div>

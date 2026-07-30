@@ -63,6 +63,8 @@ PDE.computeModel = function computeModel(params) {
     const leverTurnoverL  = params.leverTurnover   || PDE.COEFFICIENTS.LEVER_TURNOVER;
     const riskSecurityWeight = params.riskSecurityWeight !== undefined ? params.riskSecurityWeight : PDE.RISK_WEIGHT_DEFAULTS.securityWeight;
     const riskRegulatoryWeight = params.riskRegulatoryWeight !== undefined ? params.riskRegulatoryWeight : PDE.RISK_WEIGHT_DEFAULTS.regulatoryWeight;
+    const contextPremium = params.contextPremium !== undefined ? params.contextPremium : PDE.COEFFICIENTS.CONTEXT_PREMIUM_DEFAULT;
+    const taxRate = params.taxRate !== undefined ? params.taxRate : PDE.COEFFICIENTS.TAX_RATE_DEFAULT;
 
     if (correlationsEnabled) {
         const cMult = params.correlationMultiplier || PDE.CORRELATION_DEFAULTS.correlationMultiplier;
@@ -99,7 +101,7 @@ PDE.computeModel = function computeModel(params) {
         effectiveTeamSize = Math.pow(teamSize, 0.9);
     }
 
-    const cWaste     = (manualAnnualHrs + chasingAnnualHrs) * rate * effectiveTeamSize * 1.15;
+    const cWaste     = (manualAnnualHrs + chasingAnnualHrs) * rate * effectiveTeamSize * (1 + contextPremium);
     let cRisk      = (failures * mttr * downCost) * (riskLevel / PDE.COEFFICIENTS.RISK_SCALE_MAX);
     const cOppDirect = opportunityVal * erosionRate;
 
@@ -130,13 +132,23 @@ PDE.computeModel = function computeModel(params) {
     const ny = horizonYears;
     const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
     const npvRecurring = annualRecurring * pvifa;
-    const npvTotalDebt = oneTimeCosts + npvRecurring;
+    let npvTotalDebt = oneTimeCosts + npvRecurring;
+    if (taxRate > 0 && capex > 0) {
+        const taxShield = capex * (taxRate / 100) * 0.2 * pvifa;
+        npvTotalDebt = npvTotalDebt - taxShield;
+    }
 
     const potentialSavings = (cWaste + cRisk) * autoLevel;
     const paybackMonths    = PDE.discountedPayback(potentialSavings, capex);
 
     const irrCashFlows = [-capex];
-    for (let mi = 1; mi <= ny * 12; mi++) irrCashFlows.push(potentialSavings / 12);
+    for (let mi = 1; mi <= ny * 12; mi++) {
+        let rampFactor;
+        if (mi <= 3) rampFactor = 0;
+        else if (mi <= 6) rampFactor = 0.5;
+        else rampFactor = 1;
+        irrCashFlows.push((potentialSavings / 12) * rampFactor);
+    }
     const irr = PDE.calculateIRR(irrCashFlows);
 
     const turnoverCost = (turnover / 100) * teamSize * rate * PDE.COEFFICIENTS.TURNOVER_REF_HOURS;

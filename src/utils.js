@@ -143,6 +143,8 @@ PDE.updateSliderFills = function updateSliderFills() {
     setSliderFill('timeHorizon',   'timeHorizonFill',   3, 10);
     setSliderFill('leverAutomation','leverAutomationFill',10, 60);
     setSliderFill('leverRisk',     'leverRiskFill',     20, 80);
+    setSliderFill('contextPremium','contextPremiumFill', 0, 30);
+    setSliderFill('taxRate',       'taxRateFill',       0, 50);
 };
 
 PDE.readAdvanced = function readAdvanced(id, defaultVal, divisor) {
@@ -243,6 +245,8 @@ PDE.getParams = function getParams() {
         leverInnovation: PDE.readAdvanced('leverInnovation', PDE.COEFFICIENTS.LEVER_INNOVATION, 100),
         leverManagement: PDE.readAdvanced('leverManagement', PDE.COEFFICIENTS.LEVER_MANAGEMENT, 100),
         leverTurnover:   PDE.readAdvanced('leverTurnover',   PDE.COEFFICIENTS.LEVER_TURNOVER, 100),
+        contextPremium:  PDE.readAdvanced('contextPremium',  PDE.COEFFICIENTS.CONTEXT_PREMIUM_DEFAULT, 100),
+        taxRate:         PDE.readAdvanced('taxRate',         PDE.COEFFICIENTS.TAX_RATE_DEFAULT, 1),
         mcIterations:    PDE.readAdvanced('mcIterations',    PDE.MC_DEFAULTS.iterations, 1),
         mcConfidence:    PDE.readAdvanced('mcConfidence',    PDE.MC_DEFAULTS.confidenceLevel, 100),
         mcUncertaintyPct: PDE.readAdvanced('mcUncertaintyPct', PDE.MC_DEFAULTS.uncertaintyPct, 100),

@@ -19,13 +19,16 @@ PDE.COEFFICIENTS = {
     MONTHS_PER_YEAR:           12,
     QUARTERS_PER_YEAR:         4,
 
+    // Context-switching premium (default 15%, configurable 0–30%)
+    CONTEXT_PREMIUM_DEFAULT: 0.15,
+
     // Opportunity & Cascade
-    PIPELINE_EROSION_RATE_DEFAULT: 0.25,  // Cost of Delay heuristic — delayed projects lose ~25% value/yr (Reinertsen 2009 · Product Development Flow) · configurable
+    PIPELINE_EROSION_RATE_DEFAULT: 0.25,  // Reinertsen 2009 (Product Development Flow) — Cost of Delay ~2%/mo ≈ 25%/yr · configurable
 
 
     // Scenario C thresholds
     SCEN_C_AUTO_LEVEL:         0.8,    // 80 % full automation                        · confidence: medium
-    SCEN_C_CAPEX_MULTIPLIER:   1.5,    // +50 % CAPEX for full automation              · confidence: medium
+    SCEN_C_CAPEX_MULTIPLIER:   1.5,    // +50 % CAPEX for full automation — conservatively assumes additional tooling, migration, and change management costs · confidence: medium
 
     // Lever recovery rates
     LEVER_AUTOMATION_DEFAULT:  0.3,    // overridden by #leverAutomation              · configurable
@@ -55,8 +58,11 @@ PDE.COEFFICIENTS = {
     REC_RISK_MIN_EXPOSURE:     0,      // $                                           · confidence: removed
     REC_INNOVATION_MIN:        0,      // $                                           · confidence: removed
 
+    // Tax shield (simplified straight-line 5yr depreciation)
+    TAX_RATE_DEFAULT:           0,      // 0 = disabled · configurable
+
     // Economic model (NPV / DCF)
-    DISCOUNT_RATE_DEFAULT:      0.10,   // overridden by #discountRate                · configurable
+    DISCOUNT_RATE_DEFAULT:      0.093,  // IT Infrastructure median (Damodaran 2025) · overridden by #discountRate · configurable
     TIME_HORIZON_YEARS_DEFAULT: 5,      // overridden by #timeHorizon                 · configurable
 };
 
@@ -81,6 +87,13 @@ PDE.CORRELATION_DEFAULTS = {
 PDE.RISK_WEIGHT_DEFAULTS = {
     securityWeight: 0.4,
     regulatoryWeight: 0.25,
+};
+
+// ── Region-specific default inputs ──
+PDE.REGION_DEFAULTS = {
+    US: { q4: 10000, q6: 150,  q10: 15, teamSize: 10, capex: 50000   },
+    EU: { q4: 8000,  q6: 110,  q10: 12, teamSize: 10, capex: 40000   },
+    PL: { q4: 3000,  q6: 50,   q10: 18, teamSize: 10, capex: 200000  },
 };
 
 // ── Calibration panel defaults ──
@@ -125,7 +138,8 @@ PDE.CHART_OPTS = {
 // ── URL hash security constraints ──
 PDE.ALLOWED_HASH_KEYS = new Set(
     ['q1','q2','q3','q4','q5','q11','q6','q7','q8','q9','q10','autoLevel','capex','teamSize',
-     'erosionRate','discountRate','timeHorizon','leverAutomation','leverRisk']
+     'erosionRate','discountRate','timeHorizon','leverAutomation','leverRisk',
+     'contextPremium','taxRate']
 );
 
 PDE.HASH_CONSTRAINTS = {
@@ -148,4 +162,6 @@ PDE.HASH_CONSTRAINTS = {
     timeHorizon:     { min: 3,   max: 10   },  // years
     leverAutomation: { min: 10,  max: 60   },  // 10%–60%
     leverRisk:       { min: 20,  max: 80   },  // 20%–80%
+    contextPremium:  { min: 0,   max: 30   },  // 0%–30% (×100)
+    taxRate:         { min: 0,   max: 50   },  // 0%–50%
 };

@@ -76,7 +76,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const calcIds = ['q1','q2','q3','q4','q5','q11','q6','q7','q8','q9','q10','autoLevel','teamSize','capex','erosionRate','discountRate','timeHorizon','leverAutomation','leverRisk'];
+    // ── Region select ──
+    const regionSelect = document.getElementById('regionSelect');
+    if (regionSelect) {
+        regionSelect.addEventListener('change', function () {
+            const region = this.value;
+            const r = PDE.REGION_DEFAULTS[region];
+            if (!r) return;
+            Object.keys(r).forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el) { el.value = r[id]; PDE.validateField(id); }
+            });
+            PDE.calculate();
+        });
+    }
+
+    const calcIds = ['q1','q2','q3','q4','q5','q11','q6','q7','q8','q9','q10','autoLevel','teamSize','capex','erosionRate','discountRate','timeHorizon','leverAutomation','leverRisk','contextPremium','taxRate'];
     calcIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', function () { PDE.validateField(id); PDE.calculate(); });
@@ -107,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sliderIds = [
         'scenCAutoLevel','scenCCapexMult','annualHours',
         'leverInnovation','leverManagement','leverTurnover',
+        'contextPremium','taxRate',
         'correlationStrength','corrQ3Q1','corrQ1Q5','corrQ1Q7','corrQ3Q7',
         'riskSecurityWeight','riskRegulatoryWeight',
         'mcIterations','mcConfidence','mcUncertaintyPct','mcMttrUncertaintyPct',
