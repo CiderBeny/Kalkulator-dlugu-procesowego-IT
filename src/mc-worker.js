@@ -11,6 +11,8 @@ const C = {
     MONTHS_PER_YEAR: 12,
     QUARTERS_PER_YEAR: 4,
     PIPELINE_EROSION_RATE_DEFAULT: 0.25,
+    CONTEXT_PREMIUM_DEFAULT: 0.15,
+    TAX_RATE_DEFAULT: 0,
     SCEN_C_AUTO_LEVEL: 0.8,
     SCEN_C_CAPEX_MULTIPLIER: 1.5,
     LEVER_AUTOMATION_DEFAULT: 0.3,
@@ -21,7 +23,7 @@ const C = {
     TURNOVER_REF_HOURS: 1800,
     RISK_SCALE_MAX: 5,
     AUTOMATABLE_SHARE: 0.6,
-    DISCOUNT_RATE_DEFAULT: 0.10,
+    DISCOUNT_RATE_DEFAULT: 0.093,
     TIME_HORIZON_YEARS_DEFAULT: 5,
 };
 
@@ -94,6 +96,8 @@ function computeModel(params, coeffs) {
     const teamSize       = params.teamSize       || 0;
     const erosionRate    = params.erosionRate    !== undefined ? params.erosionRate    : coeffs.PIPELINE_EROSION_RATE_DEFAULT;
     const discountRate   = params.discountRate   !== undefined ? params.discountRate   : coeffs.DISCOUNT_RATE_DEFAULT;
+    const contextPremium = params.contextPremium !== undefined ? params.contextPremium : coeffs.CONTEXT_PREMIUM_DEFAULT;
+    const taxRate        = params.taxRate        !== undefined ? params.taxRate        : coeffs.TAX_RATE_DEFAULT;
     const horizonYears   = params.horizonYears   || coeffs.TIME_HORIZON_YEARS_DEFAULT;
     const correlationsEnabled = params.correlationsEnabled || false;
     const docStandard    = params.docStandard    || 3;
@@ -134,7 +138,7 @@ function computeModel(params, coeffs) {
         effectiveTeamSize = Math.pow(teamSize, 0.9);
     }
 
-    const cWaste     = (manualAnnualHrs + chasingAnnualHrs) * rate * effectiveTeamSize * 1.15;
+    const cWaste     = (manualAnnualHrs + chasingAnnualHrs) * rate * effectiveTeamSize * (1 + contextPremium);
     let cRisk      = (failures * mttr * downCost) * (riskLevel / coeffs.RISK_SCALE_MAX);
     const cOppDirect = opportunityVal * erosionRate;
 
@@ -164,13 +168,23 @@ function computeModel(params, coeffs) {
     const ny = horizonYears;
     const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
     const npvRecurring = annualRecurring * pvifa;
-    const npvTotalDebt = oneTimeCosts + npvRecurring;
+    let npvTotalDebt = oneTimeCosts + npvRecurring;
+    if (taxRate > 0 && capex > 0) {
+        const taxShield = capex * (taxRate / 100) * 0.2 * pvifa;
+        npvTotalDebt = npvTotalDebt - taxShield;
+    }
 
     const potentialSavings = (cWaste + cRisk) * autoLevel;
     const paybackMonths    = discountedPayback(potentialSavings, capex);
 
     const irrCashFlows = [-capex];
-    for (let mi = 1; mi <= ny * 12; mi++) irrCashFlows.push(potentialSavings / 12);
+    for (let mi = 1; mi <= ny * 12; mi++) {
+        let rampFactor;
+        if (mi <= 3) rampFactor = 0;
+        else if (mi <= 6) rampFactor = 0.5;
+        else rampFactor = 1;
+        irrCashFlows.push((potentialSavings / 12) * rampFactor);
+    }
     const irr = calculateIRR(irrCashFlows);
 
     return {

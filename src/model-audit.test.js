@@ -9,6 +9,8 @@ const COEFFICIENTS = {
     MONTHS_PER_YEAR:           12,
     QUARTERS_PER_YEAR:         4,
     PIPELINE_EROSION_RATE_DEFAULT: 0.25,
+    CONTEXT_PREMIUM_DEFAULT: 0.15,
+    TAX_RATE_DEFAULT: 0,
     SCEN_C_AUTO_LEVEL:         0.8,
     SCEN_C_CAPEX_MULTIPLIER:   1.5,
     LEVER_AUTOMATION_DEFAULT:  0.3,
@@ -25,7 +27,7 @@ const COEFFICIENTS = {
     REC_AUTO_MIN_WASTE:        0,
     REC_RISK_MIN_EXPOSURE:     0,
     REC_INNOVATION_MIN:        0,
-    DISCOUNT_RATE_DEFAULT:      0.10,
+    DISCOUNT_RATE_DEFAULT:      0.093,
     TIME_HORIZON_YEARS_DEFAULT: 5,
 };
 
@@ -152,8 +154,8 @@ describe('Known Issue #3 — Hardcoded coefficients without direct empirical bas
 // ── Known Issue #4 (mitigated): NPV + Discounted Payback ──────
 describe('Known Issue #4 (mitigated) — NPV model verifies fix is in place', () => {
     it('COEFFICIENTS contains DISCOUNT_RATE_DEFAULT and TIME_HORIZON_YEARS_DEFAULT', () => {
-        assert.strictEqual(COEFFICIENTS.DISCOUNT_RATE_DEFAULT, 0.10,
-            'Discount rate = 10% (WACC benchmark for IT infra)');
+        assert.strictEqual(COEFFICIENTS.DISCOUNT_RATE_DEFAULT, 0.093,
+            'Discount rate = 9.3% (Damodaran 2025 IT Infrastructure median)');
         assert.strictEqual(COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT, 5,
             'Time horizon = 5 years (standard investment horizon)');
     });
@@ -267,7 +269,7 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
         const chasingAnnualHrs = s.managerHrs * COEFFICIENTS.MONTHS_PER_YEAR;
         const annualFailures = s.failures * COEFFICIENTS.QUARTERS_PER_YEAR;
 
-        const cWaste = (manualAnnualHrs + chasingAnnualHrs) * s.rate * s.teamSize * 1.15;
+        const cWaste = (manualAnnualHrs + chasingAnnualHrs) * s.rate * s.teamSize * (1 + (s.contextPremium !== undefined ? s.contextPremium : COEFFICIENTS.CONTEXT_PREMIUM_DEFAULT));
         const cRisk = (annualFailures * s.mttr * s.downCost) * (s.riskLevel / COEFFICIENTS.RISK_SCALE_MAX);
         const cOppDirect = s.opportunityVal * s.erosionRate;
         const totalImpact = cWaste + cRisk + cOppDirect;
@@ -348,5 +350,228 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
         const rHigh = calcRuntime({ discountRate: 0.15 });
         assert.ok(rHigh.npvTotalDebt < rLow.npvTotalDebt,
             'NPV at 15% WACC < NPV at 5% WACC — higher discount rate reduces present value');
+    });
+});
+
+// ── Known Issue #7: configurable context premium, tax shield, IRR ramp ──
+describe('Known Issue #7 — Configurable context premium, tax shield, IRR ramp', () => {
+    function calcNew(sample) {
+        const s = Object.assign({
+            manualPercent: 40,
+            downCost: 5000,
+            failures: 8,
+            mttr: 4,
+            rate: 150,
+            managerHrs: 40,
+            opportunityVal: 100000,
+            riskLevel: 3,
+            autoLevel: 0.6,
+            teamSize: 10,
+            capex: 50000,
+            erosionRate: COEFFICIENTS.PIPELINE_EROSION_RATE_DEFAULT,
+            contextPremium: COEFFICIENTS.CONTEXT_PREMIUM_DEFAULT,
+            taxRate: COEFFICIENTS.TAX_RATE_DEFAULT,
+            discountRate: COEFFICIENTS.DISCOUNT_RATE_DEFAULT,
+            horizonYears: COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT,
+        }, sample);
+
+        const manualAnnualHrs = COEFFICIENTS.SPRINT_HOURS * COEFFICIENTS.SPRINTS_PER_YEAR * (s.manualPercent / 100);
+        const chasingAnnualHrs = s.managerHrs * COEFFICIENTS.MONTHS_PER_YEAR;
+        const annualFailures = s.failures * COEFFICIENTS.QUARTERS_PER_YEAR;
+
+        const cWaste = (manualAnnualHrs + chasingAnnualHrs) * s.rate * s.teamSize * (1 + s.contextPremium);
+        const cRisk = (annualFailures * s.mttr * s.downCost) * (s.riskLevel / COEFFICIENTS.RISK_SCALE_MAX);
+        const cOppDirect = s.opportunityVal * s.erosionRate;
+        const annualRecurring = cWaste + cRisk;
+        const oneTimeCosts = cOppDirect + s.capex;
+        const dr = s.discountRate;
+        const ny = s.horizonYears;
+        const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
+        let npvTotalDebt = oneTimeCosts + annualRecurring * pvifa;
+        if (s.taxRate > 0 && s.capex > 0) {
+            const taxShield = s.capex * (s.taxRate / 100) * 0.2 * pvifa;
+            npvTotalDebt = npvTotalDebt - taxShield;
+        }
+        const potentialSavings = (cWaste + cRisk) * s.autoLevel;
+
+        const irrCashFlows = [-s.capex];
+        for (let mi = 1; mi <= ny * 12; mi++) {
+            let rampFactor;
+            if (mi <= 3) rampFactor = 0;
+            else if (mi <= 6) rampFactor = 0.5;
+            else rampFactor = 1;
+            irrCashFlows.push((potentialSavings / 12) * rampFactor);
+        }
+        const irr = calculateIRR(irrCashFlows);
+
+        return { cWaste, cRisk, cOppDirect, npvTotalDebt, potentialSavings, irr, irrCashFlows };
+    }
+
+    it('context premium default = 15% — configurable 0–30%', () => {
+        assert.strictEqual(COEFFICIENTS.CONTEXT_PREMIUM_DEFAULT, 0.15);
+    });
+
+    it('cWaste applies (1 + contextPremium) multiplier', () => {
+        const base = calcNew({ contextPremium: 0 });
+        const withPremium = calcNew({ contextPremium: 0.15 });
+        assert.strictEqual(withPremium.cWaste, base.cWaste * 1.15,
+            'Premium 15% scales OPEX waste by ×1.15 vs 0% premium');
+        const high = calcNew({ contextPremium: 0.30 });
+        assert.strictEqual(high.cWaste, base.cWaste * 1.30,
+            'Premium 30% scales OPEX waste by ×1.30 vs 0% premium');
+    });
+
+    it('tax shield default 0 — NPV unchanged', () => {
+        const r = calcNew({ taxRate: 0 });
+        const dr = COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
+        const ny = COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT;
+        const pvifa = (1 - Math.pow(1 + dr, -ny)) / dr;
+        const annualRecurring = r.cWaste + r.cRisk;
+        const expected = r.cOppDirect + 50000 + annualRecurring * pvifa;
+        assert.ok(Math.abs(r.npvTotalDebt - expected) < 0.01,
+            'taxRate=0 → npvTotalDebt = oneTime + annualRecurring × PVIFA');
+    });
+
+    it('tax shield reduces NPV by capex × rate × 0.2 × PVIFA (5yr straight-line)', () => {
+        const noTax = calcNew({ taxRate: 0 });
+        const withTax = calcNew({ taxRate: 30 });
+        const dr = COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
+        const ny = COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT;
+        const pvifa = (1 - Math.pow(1 + dr, -ny)) / dr;
+        const expectedShield = 50000 * 0.30 * 0.2 * pvifa;
+        assert.ok(Math.abs((noTax.npvTotalDebt - withTax.npvTotalDebt) - expectedShield) < 0.01,
+            'Tax shield = capex(50k) × 30% × 20% × PVIFA ≈ $' + expectedShield.toFixed(0));
+    });
+
+    it('IRR assumes a 6-month ramp (3mo zero savings, 3mo 50%)', () => {
+        const r = calcNew({});
+        assert.strictEqual(r.irrCashFlows[1], 0, 'Month 1 savings = 0');
+        assert.strictEqual(r.irrCashFlows[3], 0, 'Month 3 savings = 0');
+        assert.strictEqual(r.irrCashFlows[4], (r.potentialSavings / 12) * 0.5, 'Month 4 savings = 50%');
+        assert.strictEqual(r.irrCashFlows[6], (r.potentialSavings / 12) * 0.5, 'Month 6 savings = 50%');
+        assert.strictEqual(r.irrCashFlows[7], r.potentialSavings / 12, 'Month 7 savings = 100%');
+    });
+
+    it('ramped IRR is lower than instant-savings IRR (conservative)', () => {
+        const s = {
+            manualPercent: 10, downCost: 3000, failures: 1, mttr: 4, rate: 60,
+            managerHrs: 20, opportunityVal: 100000, riskLevel: 3, autoLevel: 0.5,
+            teamSize: 5, capex: 300000, contextPremium: 0.15, taxRate: 0,
+        };
+        const ramped = calcNew(s);
+        const instantFlows = [-300000];
+        for (let mi = 1; mi <= COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT * 12; mi++) instantFlows.push(ramped.potentialSavings / 12);
+        const instantIrr = calculateIRR(instantFlows);
+        assert.ok(instantIrr !== null && ramped.irr !== null,
+            'IRR should be computable for both flows');
+        assert.ok(ramped.irr < instantIrr,
+            'Ramped IRR (' + (ramped.irr * 100).toFixed(1) + '%) < instant IRR (' + (instantIrr * 100).toFixed(1) + '%)');
+    });
+
+    it('WACC default = 9.3% (Damodaran 2025 IT Infrastructure median)', () => {
+        assert.strictEqual(COEFFICIENTS.DISCOUNT_RATE_DEFAULT, 0.093);
+    });
+});
+
+// ── Known Issue #8: real-source integration (config + i18n + utils + model) ──
+describe('Known Issue #8 — Real source integration (config + model)', () => {
+    // Independent replication of PDE.computeModel — autoLevel passed as percent
+    function replicateModel(p) {
+        const S = COEFFICIENTS;
+        const manualPercent = p.manualPercent || 0;
+        const failures = (p.failures || 0) * S.QUARTERS_PER_YEAR;
+        const rate = p.rate || 0;
+        const managerHrs = p.managerHrs || 0;
+        const opportunityVal = p.opportunityVal || 0;
+        const capex = p.capex || 0;
+        const autoLevel = (p.autoLevel || 0) / 100;
+        const teamSize = p.teamSize || 0;
+        const erosionRate = p.erosionRate !== undefined ? p.erosionRate : S.PIPELINE_EROSION_RATE_DEFAULT;
+        const discountRate = p.discountRate !== undefined ? p.discountRate : S.DISCOUNT_RATE_DEFAULT;
+        const horizonYears = p.horizonYears || S.TIME_HORIZON_YEARS_DEFAULT;
+        const contextPremium = p.contextPremium !== undefined ? p.contextPremium : S.CONTEXT_PREMIUM_DEFAULT;
+        const taxRate = p.taxRate !== undefined ? p.taxRate : S.TAX_RATE_DEFAULT;
+
+        const manualAnnualHrs = S.SPRINT_HOURS * S.SPRINTS_PER_YEAR * (manualPercent / 100);
+        const chasingAnnualHrs = managerHrs * S.MONTHS_PER_YEAR;
+        const cWaste = (manualAnnualHrs + chasingAnnualHrs) * rate * teamSize * (1 + contextPremium);
+        const cRisk = (failures * p.mttr * p.downCost) * (p.riskLevel / S.RISK_SCALE_MAX);
+        const cOppDirect = opportunityVal * erosionRate;
+        const totalImpact = cWaste + cRisk + cOppDirect;
+        const netDebt = totalImpact - capex;
+        const annualRecurring = cWaste + cRisk;
+        const oneTimeCosts = cOppDirect + capex;
+        const dr = discountRate;
+        const ny = horizonYears;
+        const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
+        let npvTotalDebt = oneTimeCosts + annualRecurring * pvifa;
+        if (taxRate > 0 && capex > 0) {
+            npvTotalDebt -= capex * (taxRate / 100) * 0.2 * pvifa;
+        }
+        const potentialSavings = annualRecurring * autoLevel;
+        const paybackMonths = discountedPayback(potentialSavings, capex, 0.093, 5);
+        const irrCashFlows = [-capex];
+        for (let mi = 1; mi <= ny * 12; mi++) {
+            let rampFactor;
+            if (mi <= 3) rampFactor = 0;
+            else if (mi <= 6) rampFactor = 0.5;
+            else rampFactor = 1;
+            irrCashFlows.push((potentialSavings / 12) * rampFactor);
+        }
+        const irr = calculateIRR(irrCashFlows);
+        return { cWaste, cRisk, cOppDirect, totalImpact, netDebt, annualRecurring, oneTimeCosts, npvTotalDebt, potentialSavings, paybackMonths, irr };
+    }
+
+    let realPDE = null;
+    const sample = {
+        manualPercent: 10, downCost: 3000, failures: 1, mttr: 4, rate: 60,
+        managerHrs: 20, opportunityVal: 100000, riskLevel: 3, autoLevel: 50,
+        teamSize: 5, capex: 300000, erosionRate: 0.25, discountRate: 0.093,
+        horizonYears: 5, contextPremium: 0.15, taxRate: 19,
+    };
+
+    it('loads real config/i18n/utils/model under a Node shim', () => {
+        global.window = global;
+        global.document = {
+            getElementById: (id) => {
+                const els = { discountRate: { value: '9.3' }, timeHorizon: { value: '5' } };
+                return els[id] || null;
+            },
+        };
+        require('./config.js');
+        require('./i18n.js');
+        require('./utils.js');
+        require('./model.js');
+        realPDE = global.window.PDE;
+        assert.ok(realPDE && realPDE.COEFFICIENTS, 'PDE namespace loaded from real source');
+        assert.strictEqual(realPDE.COEFFICIENTS.DISCOUNT_RATE_DEFAULT, 0.093,
+            'Real config: WACC default 9.3%');
+        assert.strictEqual(realPDE.COEFFICIENTS.CONTEXT_PREMIUM_DEFAULT, 0.15,
+            'Real config: context premium default 15%');
+        assert.strictEqual(realPDE.COEFFICIENTS.TAX_RATE_DEFAULT, 0,
+            'Real config: tax shield default off');
+    });
+
+    it('real computeModel matches independent replication (incl. premium, tax shield, ramp IRR)', () => {
+        const real = realPDE.computeModel(sample);
+        const exp = replicateModel(sample);
+        const fields = ['cWaste', 'cRisk', 'cOppDirect', 'totalImpact', 'netDebt',
+            'annualRecurring', 'oneTimeCosts', 'npvTotalDebt', 'potentialSavings', 'paybackMonths'];
+        fields.forEach((f) => {
+            assert.ok(Math.abs(real[f] - exp[f]) < 0.01,
+                'real ' + f + ' (' + real[f] + ') matches replication (' + exp[f] + ')');
+        });
+        assert.ok(real.irr !== null && Math.abs(real.irr - exp.irr) < 1e-6,
+            'real IRR (' + (real.irr * 100).toFixed(2) + '%) matches ramp replication (' + (exp.irr * 100).toFixed(2) + '%)');
+    });
+
+    it('real computeModel applies context premium and tax shield', () => {
+        const base = realPDE.computeModel(Object.assign({}, sample, { contextPremium: 0, taxRate: 0 }));
+        const prem = realPDE.computeModel(Object.assign({}, sample, { contextPremium: 0.15, taxRate: 0 }));
+        assert.ok(Math.abs(prem.cWaste - base.cWaste * 1.15) < 0.01,
+            'Real cWaste scales by ×1.15 when premium = 15%');
+        const taxed = realPDE.computeModel(Object.assign({}, sample, { contextPremium: 0, taxRate: 30 }));
+        assert.ok(taxed.npvTotalDebt < base.npvTotalDebt,
+            'Real tax shield reduces npvTotalDebt');
     });
 });

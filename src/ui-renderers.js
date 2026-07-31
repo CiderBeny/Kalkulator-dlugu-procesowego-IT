@@ -9,7 +9,7 @@ PDE.calculate = function calculate() {
 
     document.getElementById('autoLevelVal').textContent = Math.round(p.autoLevel);
     document.getElementById('erosionRateVal').textContent  = p.erosionRate.toFixed(2);
-    document.getElementById('discountRateVal').textContent = Math.round(p.discountRate * 100);
+    document.getElementById('discountRateVal').textContent = (Math.round(p.discountRate * 1000) / 10);
     document.getElementById('timeHorizonVal').textContent  = p.horizonYears;
     document.getElementById('leverAutomationVal').textContent = Math.round(p.leverAuto * 100);
     document.getElementById('leverRiskVal').textContent    = Math.round(p.leverRisk * 100);

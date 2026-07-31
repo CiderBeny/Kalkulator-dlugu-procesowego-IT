@@ -83,9 +83,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const region = this.value;
             const r = PDE.REGION_DEFAULTS[region];
             if (!r) return;
+            const rate = PDE.EXCHANGE_RATES[PDE.currentCurrency];
+            const monetaryIds = ['q4', 'q6', 'capex'];
             Object.keys(r).forEach(function (id) {
                 const el = document.getElementById(id);
-                if (el) { el.value = r[id]; PDE.validateField(id); }
+                if (!el) return;
+                const val = monetaryIds.indexOf(id) !== -1 ? (r[id] * rate).toFixed(2) : r[id];
+                el.value = val;
+                PDE.validateField(id);
             });
             PDE.calculate();
         });
