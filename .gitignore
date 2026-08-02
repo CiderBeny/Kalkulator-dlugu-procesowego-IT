@@ -1,4 +1,6 @@
 .playwright-mcp/
 node_modules/
-package-lock.json
 .vscode/
+test-results.csv
+test-results.xls
+pde-screenshot.png
