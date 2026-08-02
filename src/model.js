@@ -3,7 +3,13 @@
 // ═══════════════════════════════════════════════════════════════
 window.PDE = window.PDE || {};
 
-PDE.discountedPayback = function discountedPayback(annualSavings, investment, rate, maxYears) {
+PDE.rampFactor = function rampFactor(month) {
+    if (month <= 3) return 0;
+    if (month <= 6) return 0.5;
+    return 1;
+};
+
+PDE.discountedPayback = function discountedPayback(annualSavings, investment, rate, maxYears, ramp) {
     if (annualSavings <= 0 || investment <= 0) return Infinity;
     if (rate === undefined) rate = PDE.readAdvanced('discountRate', PDE.COEFFICIENTS.DISCOUNT_RATE_DEFAULT, 100);
     if (maxYears === undefined) maxYears = PDE.readAdvanced('timeHorizon', PDE.COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT, 1);
@@ -11,7 +17,7 @@ PDE.discountedPayback = function discountedPayback(annualSavings, investment, ra
     let cumulative = 0;
     const maxMonths = maxYears * 12;
     for (let m = 1; m <= maxMonths; m++) {
-        cumulative += monthly / Math.pow(1 + rate, m / 12);
+        cumulative += (monthly * (ramp ? PDE.rampFactor(m) : 1)) / Math.pow(1 + rate, m / 12);
         if (cumulative >= investment) return m;
     }
     return Infinity;
@@ -139,15 +145,11 @@ PDE.computeModel = function computeModel(params) {
     }
 
     const potentialSavings = (cWaste + cRisk) * autoLevel;
-    const paybackMonths    = PDE.discountedPayback(potentialSavings, capex);
+    const paybackMonths    = PDE.discountedPayback(potentialSavings, capex, dr, ny, true);
 
     const irrCashFlows = [-capex];
     for (let mi = 1; mi <= ny * 12; mi++) {
-        let rampFactor;
-        if (mi <= 3) rampFactor = 0;
-        else if (mi <= 6) rampFactor = 0.5;
-        else rampFactor = 1;
-        irrCashFlows.push((potentialSavings / 12) * rampFactor);
+        irrCashFlows.push((potentialSavings / 12) * PDE.rampFactor(mi));
     }
     const irr = PDE.calculateIRR(irrCashFlows);
 
@@ -197,11 +199,11 @@ PDE.scenCalc = function scenCalc(al, cx, annualRecurring, dr, ny) {
     const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
     const npvSavings = annualSavings * pvifa;
     const net = npvSavings - cx;
-    const pb = PDE.discountedPayback(annualSavings, cx, dr, ny);
+    const pb = PDE.discountedPayback(annualSavings, cx, dr, ny, true);
     let irrVal = null;
     if (annualSavings > 0 && cx > 0) {
         const cf = [-cx];
-        for (let m = 1; m <= ny * 12; m++) cf.push(annualSavings / 12);
+        for (let m = 1; m <= ny * 12; m++) cf.push((annualSavings / 12) * PDE.rampFactor(m));
         irrVal = PDE.calculateIRR(cf);
     } else if (al === 0) {
         irrVal = 0;

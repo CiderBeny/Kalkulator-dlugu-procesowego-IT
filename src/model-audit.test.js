@@ -31,7 +31,13 @@ const COEFFICIENTS = {
     TIME_HORIZON_YEARS_DEFAULT: 5,
 };
 
-function discountedPayback(annualSavings, investment, rate, maxYears) {
+function rampFactor(month) {
+    if (month <= 3) return 0;
+    if (month <= 6) return 0.5;
+    return 1;
+}
+
+function discountedPayback(annualSavings, investment, rate, maxYears, ramp) {
     if (annualSavings <= 0 || investment <= 0) return Infinity;
     if (rate === undefined) rate = COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
     if (maxYears === undefined) maxYears = COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT;
@@ -39,7 +45,7 @@ function discountedPayback(annualSavings, investment, rate, maxYears) {
     let cumulative = 0;
     const maxMonths = maxYears * 12;
     for (let m = 1; m <= maxMonths; m++) {
-        cumulative += monthly / Math.pow(1 + rate, m / 12);
+        cumulative += (monthly * (ramp ? rampFactor(m) : 1)) / Math.pow(1 + rate, m / 12);
         if (cumulative >= investment) return m;
     }
     return Infinity;
@@ -468,6 +474,31 @@ describe('Known Issue #7 — Configurable context premium, tax shield, IRR ramp'
             'Ramped IRR (' + (ramped.irr * 100).toFixed(1) + '%) < instant IRR (' + (instantIrr * 100).toFixed(1) + '%)');
     });
 
+    it('ramped payback is longer than instant-savings payback (conservative, consistent with IRR)', () => {
+        const r = calcNew({});
+        const dr = COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
+        const ny = COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT;
+        const instant = discountedPayback(r.potentialSavings, 50000, dr, ny, false);
+        const ramped = discountedPayback(r.potentialSavings, 50000, dr, ny, true);
+        assert.ok(instant !== Infinity && ramped !== Infinity,
+            'Both paybacks should be finite for a profitable scenario');
+        assert.ok(ramped > instant,
+            'Ramped payback (' + ramped.toFixed(1) + ' mo) > instant payback (' + instant.toFixed(1) + ' mo)');
+    });
+
+    it('ramped payback uses the same 6-month profile as IRR (3mo zero savings, 3mo 50%)', () => {
+        const annualSavings = 348000;
+        const capex = 200000;
+        const dr = COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
+        const ny = COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT;
+        const manual = discountedPayback(annualSavings, capex, dr, ny, false);
+        const ramped = discountedPayback(annualSavings, capex, dr, ny, true);
+        assert.ok(ramped >= 4,
+            'Ramped payback (' + ramped.toFixed(1) + ' mo) can never be < 4 months (3 months of zero savings)');
+        assert.ok(ramped >= manual,
+            'Ramped payback (' + ramped.toFixed(1) + ' mo) ≥ instant payback (' + manual.toFixed(1) + ' mo)');
+    });
+
     it('WACC default = 9.3% (Damodaran 2025 IT Infrastructure median)', () => {
         assert.strictEqual(COEFFICIENTS.DISCOUNT_RATE_DEFAULT, 0.093);
     });
@@ -509,7 +540,7 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
             npvTotalDebt -= capex * (taxRate / 100) * 0.2 * pvifa;
         }
         const potentialSavings = annualRecurring * autoLevel;
-        const paybackMonths = discountedPayback(potentialSavings, capex, 0.093, 5);
+        const paybackMonths = discountedPayback(potentialSavings, capex, 0.093, 5, true);
         const irrCashFlows = [-capex];
         for (let mi = 1; mi <= ny * 12; mi++) {
             let rampFactor;
@@ -573,5 +604,17 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
         const taxed = realPDE.computeModel(Object.assign({}, sample, { contextPremium: 0, taxRate: 30 }));
         assert.ok(taxed.npvTotalDebt < base.npvTotalDebt,
             'Real tax shield reduces npvTotalDebt');
+    });
+
+    it('scenario B (scenCalc) matches headline computeModel IRR and payback (both ramped)', () => {
+        const real = realPDE.computeModel(sample);
+        const annualRecurring = real.cWaste + real.cRisk;
+        const scenB = realPDE.scenCalc(0.5, 300000, annualRecurring, 0.093, 5);
+        assert.ok(real.irr !== null && scenB.irr !== null,
+            'Both IRRs should be computable');
+        assert.ok(Math.abs(real.irr - scenB.irr) < 1e-6,
+            'Scenario B IRR (' + (scenB.irr * 100).toFixed(2) + '%) matches headline IRR (' + (real.irr * 100).toFixed(2) + '%)');
+        assert.ok(Math.abs(real.paybackMonths - scenB.pb) < 1e-6,
+            'Scenario B payback (' + scenB.pb.toFixed(1) + ' mo) matches headline payback (' + real.paybackMonths.toFixed(1) + ' mo)');
     });
 });

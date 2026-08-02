@@ -15,7 +15,7 @@ W świecie IT Service Managementu często trudno jest przekonać zarząd do inwe
 * **Kalkulacja Kosztu Chaosu:** OPEX waste, Risk Exposure, Opportunity Loss, Net Debt, Payback Period — wyliczenia oparte na 10 pytaniach diagnostycznych (Manual Effort, Lead Time, Documentation Standard, Downtime Cost, Human Errors, itd.).
 * **Model Finansowy Multi-Czynnikowy:** NPV/IRR oparte na 14 konfigurowalnych mnożnikach — premia kontekstu, szybkość erozji, stopa dyskonta, horyzont inwestycji, lewary, współczynniki scenariuszy i parametry Monte Carlo.
 * **WACC 9.3% (Damodaran 2025):** domyślna stopa dyskonta dla branży Software (edytowalna — suwak 5–20%).
-* **IRR z 6-miesięcznym ramp-upem:** przychody ze scenariusza inwestycyjnego narastają stopniowo przez pierwsze 6 miesięcy — realistyczny rollout.
+* **IRR i Payback z 6-miesięcznym ramp-upem:** przepływy ze scenariusza inwestycyjnego narastają stopniowo przez pierwsze 6 miesięcy (3 miesiące 0 oszczędności, 3 miesiące 50%) — realistyczny, spójny rollout dla NPV, IRR i payback.
 * **Tax Shield:** wartość odpisów amortyzacyjnych CAPEX włączona do NPV (zależna od stawki CIT).
 * **Region Presets (PL/EU/US):** predefiniowane stawki (wynagrodzenie, CAPEX, WACC) z automatycznym przeliczeniem walut wg aktualnych kursów NBP.
 * **Benchmark DORA:** 3 metryki (Lead Time, Manual Effort, Human Error Rate) klasyfikowane według standardu DORA (Elite / High / Medium / Low) z kolorowaniem i opisem.
@@ -52,7 +52,7 @@ In the world of IT Service Management, it's often difficult to convince the boar
 * **Chaos Cost Calculation:** OPEX waste, Risk Exposure, Opportunity Loss, Net Debt, Payback Period — based on 10 diagnostic questions (Manual Effort, Lead Time, Documentation Standard, Downtime Cost, Human Errors, etc.).
 * **Multi-Factor Financial Model:** NPV/IRR built on 14 configurable multipliers — context premium, erosion rate, discount rate, investment horizon, levers, scenario coefficients and Monte Carlo parameters.
 * **WACC 9.3% (Damodaran 2025):** default discount rate for the Software industry (editable — 5–20% slider).
-* **IRR with 6-Month Ramp-Up:** scenario cash flows build up gradually over the first 6 months — a realistic rollout assumption.
+* **IRR & Payback with 6-Month Ramp-Up:** scenario cash flows build up gradually over the first 6 months (3 months at 0% savings, 3 months at 50%) — a realistic, consistent rollout assumption for NPV, IRR and payback.
 * **Tax Shield:** CAPEX depreciation value included in NPV (dependent on the CIT rate).
 * **Region Presets (PL/EU/US):** predefined rates (salary, CAPEX, WACC) with automatic currency conversion using live NBP FX rates.
 * **DORA Benchmark:** 3 metrics (Lead Time, Manual Effort, Human Error Rate) classified by DORA standards (Elite / High / Medium / Low) with color coding and descriptions.

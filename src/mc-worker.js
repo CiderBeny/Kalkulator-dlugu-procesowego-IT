@@ -47,8 +47,15 @@ function randn(rng) {
     return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }
 
+// ── Implementation ramp (mirrors PDE.rampFactor) ──
+function rampFactor(month) {
+    if (month <= 3) return 0;
+    if (month <= 6) return 0.5;
+    return 1;
+}
+
 // ── Discounted payback (mirrors PDE.discountedPayback) ──
-function discountedPayback(annualSavings, investment, rate, maxYears) {
+function discountedPayback(annualSavings, investment, rate, maxYears, ramp) {
     if (annualSavings <= 0 || investment <= 0) return Infinity;
     if (rate === undefined) rate = C.DISCOUNT_RATE_DEFAULT;
     if (maxYears === undefined) maxYears = C.TIME_HORIZON_YEARS_DEFAULT;
@@ -56,7 +63,7 @@ function discountedPayback(annualSavings, investment, rate, maxYears) {
     let cumulative = 0;
     const maxMonths = maxYears * 12;
     for (let m = 1; m <= maxMonths; m++) {
-        cumulative += monthly / Math.pow(1 + rate, m / 12);
+        cumulative += (monthly * (ramp ? rampFactor(m) : 1)) / Math.pow(1 + rate, m / 12);
         if (cumulative >= investment) return m;
     }
     return Infinity;
@@ -175,15 +182,11 @@ function computeModel(params, coeffs) {
     }
 
     const potentialSavings = (cWaste + cRisk) * autoLevel;
-    const paybackMonths    = discountedPayback(potentialSavings, capex);
+    const paybackMonths    = discountedPayback(potentialSavings, capex, dr, ny, true);
 
     const irrCashFlows = [-capex];
     for (let mi = 1; mi <= ny * 12; mi++) {
-        let rampFactor;
-        if (mi <= 3) rampFactor = 0;
-        else if (mi <= 6) rampFactor = 0.5;
-        else rampFactor = 1;
-        irrCashFlows.push((potentialSavings / 12) * rampFactor);
+        irrCashFlows.push((potentialSavings / 12) * rampFactor(mi));
     }
     const irr = calculateIRR(irrCashFlows);
 
