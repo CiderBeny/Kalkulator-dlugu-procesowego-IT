@@ -449,6 +449,21 @@ describe('Known Issue #7 — Configurable context premium, tax shield, IRR ramp'
             'Tax shield = capex(50k) × 30% × 20% × PVIFA ≈ $' + expectedShield.toFixed(0));
     });
 
+    it('tax shield affects NPV only — payback and IRR unchanged by tax rate (pre-tax flows)', () => {
+        const noTax = calcNew({ taxRate: 0 });
+        const withTax = calcNew({ taxRate: 30 });
+        assert.strictEqual(withTax.irr, noTax.irr,
+            'IRR is pre-tax — identical regardless of tax rate');
+        const dr = COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
+        const ny = COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT;
+        const pbNoTax = discountedPayback(noTax.potentialSavings, 50000, dr, ny, true);
+        const pbWithTax = discountedPayback(withTax.potentialSavings, 50000, dr, ny, true);
+        assert.strictEqual(pbWithTax, pbNoTax,
+            'Payback is pre-tax — identical regardless of tax rate');
+        assert.notStrictEqual(noTax.npvTotalDebt, withTax.npvTotalDebt,
+            'NPV does change with tax rate (tax shield applies to NPV only)');
+    });
+
     it('IRR assumes a 6-month ramp (3mo zero savings, 3mo 50%)', () => {
         const r = calcNew({});
         assert.strictEqual(r.irrCashFlows[1], 0, 'Month 1 savings = 0');
