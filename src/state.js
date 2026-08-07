@@ -21,7 +21,10 @@ PDE.decodeState = function decodeState() {
 
         if (!PDE.ALLOWED_HASH_KEYS.has(key)) return;
 
-        const num = parseFloat(decodeURIComponent(raw));
+        let decoded;
+        try { decoded = decodeURIComponent(raw); } catch { return; }
+
+        const num = parseFloat(decoded);
         if (!isFinite(num)) return;
 
         const { min, max } = PDE.HASH_CONSTRAINTS[key];

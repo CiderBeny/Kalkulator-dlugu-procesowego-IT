@@ -216,3 +216,26 @@ describe('HASH_CONSTRAINTS — input bounds validation', () => {
         });
     });
 });
+
+describe('decodeState — malformed hash do not break initialization', () => {
+    it('tolerates malformed percent-encoding (e.g. %zz) without throwing', () => {
+        global.window = global;
+        const els = { q2: { value: '' } };
+        global.document = {
+            getElementById: (id) => els[id] || null,
+        };
+        global.location = { hash: '#q1=%zz&q2=100&unknown=1' };
+        global.history = { replaceState: () => {} };
+
+        require('./config.js');
+        require('./i18n.js');
+        require('./utils.js');
+        require('./state.js');
+
+        assert.doesNotThrow(() => PDE.decodeState(), 'decodeState must not throw on malformed hash');
+
+        const q2 = els.q2 ? els.q2.value : null;
+        assert.strictEqual(q2, 100, 'valid pair after malformed pair still decoded');
+        assert.strictEqual(els.q1, undefined, 'malformed q1 element untouched');
+    });
+});
