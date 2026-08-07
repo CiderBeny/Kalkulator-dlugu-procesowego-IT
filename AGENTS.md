@@ -50,9 +50,8 @@
 ## How to Run
 ```sh
 # No dev server needed — just open index.html in a browser.
-# For full functionality (fetch, fonts), serve via local HTTP:
-python -m http.server 8080          # or:
-npx serve .
+# For full functionality (fetch, fonts), serve via the hardened local server:
+node scripts/dev-server.js 8080   # binds 127.0.0.1; blocks .git/ dotfiles, package.json, README
 ```
 
 ## How to Build CSS (optional, Tailwind changes only)

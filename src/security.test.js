@@ -239,3 +239,47 @@ describe('decodeState — malformed hash do not break initialization', () => {
         assert.strictEqual(els.q1, undefined, 'malformed q1 element untouched');
     });
 });
+
+describe('dev-server serveAllowedPath — never expose repository internals', () => {
+    const { serveAllowedPath } = require('../scripts/dev-server.js');
+
+    it('serves root and normal app resources', () => {
+        assert.strictEqual(serveAllowedPath('/'), 'index.html');
+        assert.strictEqual(serveAllowedPath('index.html'), 'index.html');
+        assert.strictEqual(serveAllowedPath('output.css'), 'output.css');
+        assert.strictEqual(serveAllowedPath('src/model.js'), 'src/model.js');
+        assert.strictEqual(serveAllowedPath('fonts/Inter-Regular.ttf'), 'fonts/Inter-Regular.ttf');
+    });
+
+    it('blocks dotfiles and dot-directories at any depth', () => {
+        assert.strictEqual(serveAllowedPath('.git/config'), null);
+        assert.strictEqual(serveAllowedPath('.git/HEAD'), null);
+        assert.strictEqual(serveAllowedPath('.hidden'), null);
+        assert.strictEqual(serveAllowedPath('src/.hidden.js'), null);
+        assert.strictEqual(serveAllowedPath('.nojekyll'), null);
+        assert.strictEqual(serveAllowedPath('src'), 'src');
+    });
+
+    it('blocks traversal attempts', () => {
+        assert.strictEqual(serveAllowedPath('../etc/passwd'), null);
+        assert.strictEqual(serveAllowedPath('src/../../../file'), null);
+        assert.strictEqual(serveAllowedPath('..%2f..%2fetc%2fpasswd'), null);
+    });
+
+    it('rejects malformed percent-encoding', () => {
+        assert.strictEqual(serveAllowedPath('%zz'), null);
+    });
+
+    it('rejects tooling manifests and node_modules', () => {
+        assert.strictEqual(serveAllowedPath('package.json'), null);
+        assert.strictEqual(serveAllowedPath('package-lock.json'), null);
+        assert.strictEqual(serveAllowedPath('README.md'), null);
+        assert.strictEqual(serveAllowedPath('AGENTS.md'), null);
+        assert.strictEqual(serveAllowedPath('node_modules/x/y.js'), null);
+        assert.strictEqual(serveAllowedPath('_headers'), null);
+    });
+
+    it('still serves the Tailwind source input only via blocked path', () => {
+        assert.strictEqual(serveAllowedPath('src/input.css'), null);
+    });
+});

@@ -1,8 +1,20 @@
 /* ── Framebusting ──────────────────────────────────────────────────────────
    Clickjacking defence: frame-ancestors 'none' in <meta> CSP is ignored by
    all browsers (per W3C spec). This runs before any content renders.
+
+   Primary sink: top.location.href (works cross-origin where allowed).
+   Fallback: detect a navigation attempt to this page and forcibly adopt
+   self — defensive when the sandbox blocks top navigation.
 ────────────────────────────────────────────────────────────────────────── */
-if (top !== self) { top.location.href = self.location.href; }
+(function() {
+    if (top !== self) {
+        try {
+            top.location.href = self.location.href;
+        } catch {
+            top.location.replace(self.location.href);
+        }
+    }
+})();
 
 /* ── Font cache bootstrap (runs before any stylesheet) ───────────────────
    On first load: fonts come from Google CDN (or system fallback).

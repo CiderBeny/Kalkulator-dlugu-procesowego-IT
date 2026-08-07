@@ -83,12 +83,17 @@ In the world of IT Service Management, it's often difficult to convince the boar
 ## 🚀 Jak uruchomić / How to run
 1. Sklonuj repozytorium / Clone the repository.
 2. Otwórz `index.html` w dowolnej przeglądarce / Open `index.html` in any web browser.
-3. Projekt jest gotowy do hostowania na **GitHub Pages**.
+3. Dla pełnej funkcjonalności (kursy NBP, fonty) użyj lokalnego serwera w trybie deweloperskim / For full functionality (NBP rates, fonts) use the local dev server:
+   ```
+   node scripts/dev-server.js 8080   # binds 127.0.0.1, nie serwuje .git/ ani metaplików
+   ```
+4. Projekt jest gotowy do hostowania na **GitHub Pages**.
 
 ## 🌐 Deployment na GitHub Pages / GitHub Pages deployment
 * W ustawieniach repozytorium (Settings → Pages) wybierz branch `main` jako źródło deployu / In repository Settings → Pages select branch `main` as the deploy source.
 * `.nojekyll` jest już dodany, więc pliki są serwowane bez przetwarzania Jekyll / `.nojekyll` is already present, so files are served without Jekyll processing.
 * Po aktualizacji zawartości odśwież podgląd linku na LinkedIn (Post Inspector), aby wyczyścić cache obrazu OG / After content updates, refresh the LinkedIn link preview (Post Inspector) to clear the OG image cache.
+* Uwaga o bezpieczeństwie / Security note: GitHub Pages nie pozwala ustawić nagłówków HTTP, więc blokada clickjacking opiera się na `frame-ancestors 'none'` w meta-CSP (egzekwowanym przez Chrome) oraz framebusting JS. Pełne nagłówki `X-Frame-Options`/HSTS wymagają warstwy Cloudflare/Netlify. / GitHub Pages does not allow custom HTTP headers, so clickjacking protection relies on `frame-ancestors 'none'` in the meta CSP (enforced by Chrome) plus JS framebusting. Full `X-Frame-Options`/HSTS headers require a Cloudflare/Netlify layer.
 
 ## 👤 Autor / Author
 **Marcin Bendkowski** — Senior Delivery Manager
