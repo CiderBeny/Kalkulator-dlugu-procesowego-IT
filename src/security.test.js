@@ -240,6 +240,52 @@ describe('decodeState — malformed hash do not break initialization', () => {
     });
 });
 
+describe('CDN SRI integrity hashes — pinned to verified values', () => {
+    const fs = require('node:fs');
+    const path = require('node:path');
+    const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+
+    // Pin the exact sha384 base64 for each CDN script tag (verified against the
+    // live bytes served by each CDN). Update these only when bumping versions.
+    const SRI_PINS = {
+        'https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js':
+            'sha384-G436+Z2nlA8+PNoeRvWdxKbvOf8E/y+lYxqht2iBwNHTQDV5CJr3+AGVj8fGZi5t',
+        'https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js':
+            'sha384-qovJwSBbRDPP5cEjCp8S0UP66wrvnjaa60XMOGzTNanrThcrGfXfnZkvgY8N1KT3',
+        'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js':
+            'sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H',
+        'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js':
+            'sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT',
+    };
+
+    it('every CDN script tag carries an integrity attribute', () => {
+        Object.keys(SRI_PINS).forEach(src => {
+            const re = new RegExp('<script[^>]*src="' + src.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"');
+            assert.ok(re.test(html), `script tag for ${src} not found in index.html`);
+            const tagRe = new RegExp('<script[^>]*src="' + src.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"[^>]*integrity="([^"]+)"');
+            assert.ok(tagRe.test(html), `missing integrity attribute on <script> for ${src}`);
+        });
+    });
+
+    it('pinned SRI hashes are exactly 64 base64 chars (SHA-384)', () => {
+        Object.entries(SRI_PINS).forEach(([src, hash]) => {
+            const b64 = hash.slice('sha384-'.length);
+            assert.strictEqual(b64.length, 64, `SHA-384 base64 must be 64 chars for ${src}`);
+            assert.ok(/^[A-Za-z0-9+/]+={0,2}$/.test(b64), `invalid base64 in pinned hash for ${src}`);
+        });
+    });
+
+    it('integrity attribute values in index.html match the pinned hashes', () => {
+        Object.entries(SRI_PINS).forEach(([src, hash]) => {
+            const escaped = src.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const re = new RegExp('<script[^>]*src="' + escaped + '"[^>]*integrity="([^"]+)"');
+            const m = html.match(re);
+            assert.ok(m, `no integrity attr found for ${src}`);
+            assert.strictEqual(m[1], hash, `SRI hash mismatch for ${src} — verify against live CDN bytes`);
+        });
+    });
+});
+
 describe('dev-server serveAllowedPath — never expose repository internals', () => {
     const { serveAllowedPath } = require('../scripts/dev-server.js');
 
