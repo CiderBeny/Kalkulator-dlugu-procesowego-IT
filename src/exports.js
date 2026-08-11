@@ -851,21 +851,41 @@ PDE.exportPDF = async function exportPDF(mode) {
                 cy += 50;
 
                 // Verdict bar
-                needSpace(18);
-                drawRect(ML, cy, UW, 16, [255,255,255], [214,201,184]);
-                pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(180,83,9);
-                pdf.text(L.verdictRecoveryLabel.toUpperCase(), ML + 6, cy + 5);
-                pdf.setFontSize(11); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28,20,16);
-                pdf.text(PDE.formatCurrency(totalRecovery), ML + 6, cy + 14);
-                pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(180,83,9);
-                pdf.text(L.verdictPaybackLabel.toUpperCase(), ML + UW / 2, cy + 5);
-                pdf.setFontSize(11); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28,20,16);
                 const pbStr = !isFinite(r.paybackMonths) || r.paybackMonths <= 0 ? L.scenInfinity : (r.paybackMonths < 1 ? '< 1' : r.paybackMonths.toFixed(1)) + ' ' + L.verdictPaybackUnit;
-                pdf.text(pbStr, ML + UW / 2, cy + 14);
+                const heroCapex   = (p.capex || 0) > 0 ? PDE.formatCurrencyWhole(p.capex) : '';
+                const heroSavings = (r.potentialSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.potentialSavings) : '';
+                let heroStr = '';
+                if (heroCapex && heroSavings && isFinite(r.paybackMonths) && r.paybackMonths > 0) {
+                    heroStr = L.verdictHero(heroCapex, heroSavings, pbStr);
+                } else if (heroCapex && heroSavings) {
+                    heroStr = L.verdictHeroNoReturn(heroCapex, heroSavings);
+                } else if (!heroCapex && heroSavings) {
+                    heroStr = L.verdictHeroNoInvest(heroSavings);
+                }
+                heroStr = heroStr.replace(/<[^>]+>/g, '');
+                let heroRows = 0;
+                if (heroStr) {
+                    pdf.setFontSize(7); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28,20,16);
+                    const heroLines = wrapText(heroStr, ML + 6, UW - 12);
+                    heroLines.slice(0, 2).forEach(function (ln, i) { pdf.text(ln, ML + 6, cy + 5 + i * 3.6); });
+                    heroRows = Math.min(heroLines.length, 2);
+                }
+                const barH   = 15 + heroRows * 4;
+                const statsY = cy + 5 + heroRows * 3.6;
+                needSpace(barH + 2);
+                drawRect(ML, cy, UW, barH, [255,255,255], [214,201,184]);
+                pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(180,83,9);
+                pdf.text(L.verdictRecoveryLabel.toUpperCase(), ML + 6, statsY);
+                pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28,20,16);
+                pdf.text(PDE.formatCurrency(totalRecovery), ML + 6, statsY + 7);
+                pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(180,83,9);
+                pdf.text(L.verdictPaybackLabel.toUpperCase(), ML + UW / 2, statsY);
+                pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28,20,16);
+                pdf.text(pbStr, ML + UW / 2, statsY + 7);
                 pdf.setFontSize(5.5); pdf.setFont(pdfFont, fontItalic); pdf.setTextColor(140,123,110);
                 const noteLines = wrapText(L.verdictNote, ML + 6, UW - 12);
-                pdf.text(noteLines[0] || '', ML + 6, cy + 12);
-                cy += 22;
+                pdf.text(noteLines[0] || '', ML + 6, statsY + 13);
+                cy += barH + 2;
             }
 
             function renderSimpleDora() {

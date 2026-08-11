@@ -127,7 +127,7 @@ PDE.calculate = function calculate() {
     PDE.updateSliderFills();
 
     PDE.updateCharts(r.totalAnnualHrs, r.manualAnnualHrs, r.chasingAnnualHrs, r.cWaste, p.capex, r.potentialSavings, p.riskLevel, p.manualPercent, p.autoLevel / 100);
-    PDE.updateRecs(r.cWaste, r.cRisk, r.cOppDirect, r.paybackMonths, r.leverAuto, r.leverRisk);
+    PDE.updateRecs(r.cWaste, r.cRisk, r.cOppDirect, r.paybackMonths, r.leverAuto, r.leverRisk, p.capex, r.potentialSavings);
     PDE.updateDoraBenchmark();
     PDE.updateScenarios(r.cWaste, r.cRisk, p.capex, p.autoLevel / 100, r.totalImpact, p.discountRate, p.horizonYears, r.scenCAutoLevel, r.scenCCapexMult);
     const sensResult = PDE.runSensitivity(p);
@@ -135,7 +135,7 @@ PDE.calculate = function calculate() {
     PDE.updateCalibration(r);
 };
 
-PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk) {
+PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capexUSD, annualSavingsUSD) {
     const L = PDE.TRANSLATIONS[PDE.currentLang];
     if (leverAuto === undefined) leverAuto = PDE.readAdvanced('leverAutomation', PDE.COEFFICIENTS.LEVER_AUTOMATION_DEFAULT, 100);
     if (leverRisk === undefined) leverRisk = PDE.readAdvanced('leverRisk', PDE.COEFFICIENTS.LEVER_RISK_DEFAULT, 100);
@@ -204,18 +204,38 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk) {
     });
     document.getElementById('leverCards').innerHTML = cards;
 
+    const heroCapex   = (capexUSD || 0) > 0 ? PDE.formatCurrencyWhole(capexUSD) : '';
+    const heroSavings = (annualSavingsUSD || 0) > 0 ? PDE.formatCurrencyWhole(annualSavingsUSD) : '';
+    const heroFinite  = isFinite(pb) && pb > 0;
+    const heroMonths  = !heroFinite ? '' : ((pb < 1 ? '< 1' : pb.toFixed(1)) + ' ' + L.verdictPaybackUnit);
+
+    let heroHtml = '';
+    if (heroCapex && heroSavings && heroMonths) {
+        heroHtml = L.verdictHero(heroCapex, heroSavings, heroMonths);
+    } else if (heroCapex && heroSavings && !heroMonths) {
+        heroHtml = L.verdictHeroNoReturn(heroCapex, heroSavings);
+    } else if (!heroCapex && heroSavings) {
+        heroHtml = L.verdictHeroNoInvest(heroSavings);
+    }
+    if (heroHtml) {
+        heroHtml = heroHtml.replace(/<strong>/g, '<strong style="color:var(--accent);">');
+    }
+
     document.getElementById('verdictBar').innerHTML = `
-        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;">
-            <div>
-                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:0 0 4px;">${PDE.esc(L.verdictRecoveryLabel)}</p>
-                <p style="font-size:1.5rem;font-weight:900;color:var(--text-primary);margin:0;">${PDE.formatCompactCurrency(totalRecovery)}</p>
-            </div>
-            <div style="text-align:right;">
-                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:0 0 4px;">${PDE.esc(L.verdictPaybackLabel)}</p>
-                <p style="font-size:1.5rem;font-weight:900;color:var(--text-primary);margin:0;">${!isFinite(pb) || pb <= 0 ? PDE.esc(L.scenInfinity) : (pb < 1 ? '< 1' : pb.toFixed(1))} ${PDE.esc(L.verdictPaybackUnit)}</p>
-            </div>
-            <div style="flex:1;min-width:200px;">
-                <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;font-style:italic;">${PDE.esc(L.verdictNote)}</p>
+        <div style="display:flex;flex-direction:column;gap:0.9rem;">
+            ${heroHtml ? '<p style="font-family:\'Space Grotesk\',sans-serif;font-size:1.35rem;font-weight:900;line-height:1.25;color:var(--text-primary);margin:0;">' + heroHtml + '</p>' : ''}
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;">
+                <div>
+                    <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:0 0 4px;">${PDE.esc(L.verdictRecoveryLabel)}</p>
+                    <p style="font-size:1.15rem;font-weight:900;color:var(--text-primary);margin:0;">${PDE.formatCompactCurrency(totalRecovery)}</p>
+                </div>
+                <div style="text-align:right;">
+                    <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:0 0 4px;">${PDE.esc(L.verdictPaybackLabel)}</p>
+                    <p style="font-size:1.15rem;font-weight:900;color:var(--text-primary);margin:0;">${!isFinite(pb) || pb <= 0 ? PDE.esc(L.scenInfinity) : (pb < 1 ? '< 1' : pb.toFixed(1))} ${PDE.esc(L.verdictPaybackUnit)}</p>
+                </div>
+                <div style="flex:1;min-width:200px;">
+                    <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;font-style:italic;">${PDE.esc(L.verdictNote)}</p>
+                </div>
             </div>
         </div>`;
 };
