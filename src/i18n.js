@@ -177,6 +177,7 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 doraErrorsBand:    'Strong 0 · Moderate ≤1 · Weak ≤3 · Critical >3',
                 doraAdaptedLabel: '† Adapted — not an official DORA metric',
                 doraBandHeader: 'Efficiency Band',
+                doraPosHeader:  'Position',
                 // Tool estimates disclaimer
                 toolDisclaimerTitle: 'Model Estimates & Default Values',
                 toolDisclaimerBody:  'This model uses 14 user-configurable multipliers. Default values are directional estimates based on published research — see Methodology for specific sources. Change them in Advanced Parameters to match your context.',
@@ -603,6 +604,7 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 doraErrorsBand:    'Silny 0 · Umiarkowany ≤1 · Słaby ≤3 · Krytyczny >3',
                 doraAdaptedLabel: '† Adaptacja — nieoficjalna metryka DORA',
                 doraBandHeader: 'Pasmo Efektywności',
+                doraPosHeader:  'Pozycja',
                 // Tool estimates disclaimer
                 toolDisclaimerTitle: 'Szacunki Modelu i Wartości Domyślne',
                 toolDisclaimerBody:  'Ten model używa 14 konfigurowalnych mnożników. Wartości domyślne to szacunki kierunkowe oparte na opublikowanych badaniach — zobacz Metodologię po konkretne źródła. Zmień je w parametrach Advanced, aby dopasować do swojego kontekstu.',

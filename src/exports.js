@@ -917,7 +917,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                     pdf.text(String(m.value), ML + colW + 2, cy + 5.5);
                     pdf.setFontSize(5.5); pdf.setTextColor(140,123,110);
                     pdf.text(String(m.bandDesc), ML + colW * 2 + 2, cy + 5.5);
-                    pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor.apply(pdf, m.result.color === 'var(--green)' ? [22,163,74] : m.result.color === 'var(--orange)' ? [234,88,12] : m.result.color === 'var(--red)' ? [220,38,38] : [180,83,9]);
+                    pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor.apply(pdf, m.result.color === 'var(--green)' ? [22,163,74] : m.result.color === 'var(--yellow)' ? [202,138,4] : m.result.color === 'var(--orange)' ? [234,88,12] : m.result.color === 'var(--red)' ? [220,38,38] : [180,83,9]);
                     pdf.text(String(m.result.band), ML + colW * 3 + 2, cy + 5.5);
                     cy += 10;
                 });

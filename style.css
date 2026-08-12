@@ -684,12 +684,69 @@ section h2 {
 .dora-badge {
   font-size: 0.6rem;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 2px 10px;
   border-radius: 999px;
-  border: 1px solid;
-  background: transparent;
+  background: var(--accent);
+  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  display: inline-block;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* ── DORA position bar ── */
+.dora-bar {
+  position: relative;
+  display: flex;
+  height: 8px;
+  border-radius: 999px;
+  overflow: visible;
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+.dora-bar-seg {
+  height: 100%;
+  display: block;
+}
+
+.dora-bar-seg:first-child { border-radius: 999px 0 0 999px; }
+.dora-bar-seg:last-child  { border-radius: 0 999px 999px 0; }
+
+.dora-marker {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 14px;
+  margin-left: -2px;
+  background: var(--text-primary);
+  border: 1px solid #fff;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.dora-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
+}
+
+.dora-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dora-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
   display: inline-block;
 }
 

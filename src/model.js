@@ -218,19 +218,19 @@ PDE.getDoraBand = function getDoraBand(metric, value) {
     const bands = {
         leadTime: [
             { max: 1,        band: L.doraBandElite,  color: 'var(--green)'  },
-            { max: 24,       band: L.doraBandHigh,   color: 'var(--accent)' },
+            { max: 24,       band: L.doraBandHigh,   color: 'var(--yellow)' },
             { max: 168,      band: L.doraBandMedium, color: 'var(--orange)' },
             { max: Infinity, band: L.doraBandLow,    color: 'var(--red)'    },
         ],
         manual: [
             { max: 5,        band: L.doraBandElite,  color: 'var(--green)'  },
-            { max: 15,       band: L.doraBandHigh,   color: 'var(--accent)' },
+            { max: 15,       band: L.doraBandHigh,   color: 'var(--yellow)' },
             { max: 30,       band: L.doraBandMedium, color: 'var(--orange)' },
             { max: Infinity, band: L.doraBandLow,    color: 'var(--red)'    },
         ],
         errors: [
             { max: 0,        band: L.doraBandElite,  color: 'var(--green)'  },
-            { max: 1,        band: L.doraBandHigh,   color: 'var(--accent)' },
+            { max: 1,        band: L.doraBandHigh,   color: 'var(--yellow)' },
             { max: 3,        band: L.doraBandMedium, color: 'var(--orange)' },
             { max: Infinity, band: L.doraBandLow,    color: 'var(--red)'    },
         ],

@@ -516,24 +516,61 @@ PDE.updateDoraBenchmark = function updateDoraBenchmark() {
     const q2 = PDE.clamp('q2');
     const q5 = PDE.clamp('q5');
 
-    const rows = [
-        { metric: L.doraMetricLeadTime, value: L.doraLeadTimeDesc(q2), bandDesc: L.doraLeadTimeBand, result: PDE.getDoraBand('leadTime', q2), adapted: true },
-        { metric: L.doraMetricManual,   value: L.doraManualDesc(q1),   bandDesc: L.doraManualBand,   result: PDE.getDoraBand('manual', q1), adapted: true  },
-        { metric: L.doraMetricErrors,   value: L.doraErrorsDesc(q5),   bandDesc: L.doraErrorsBand,   result: PDE.getDoraBand('errors', q5), adapted: true  },
+    const bands = [
+        { name: L.doraBandElite,  color: 'var(--green)'  },
+        { name: L.doraBandHigh,   color: 'var(--yellow)' },
+        { name: L.doraBandMedium, color: 'var(--orange)' },
+        { name: L.doraBandLow,    color: 'var(--red)'    },
     ];
 
+    const rows = [
+        { metric: L.doraMetricLeadTime, value: L.doraLeadTimeDesc(q2), bandDesc: L.doraLeadTimeBand, result: PDE.getDoraBand('leadTime', q2), adapted: true, raw: q2, thresholds: [1, 24, 168] },
+        { metric: L.doraMetricManual,   value: L.doraManualDesc(q1),   bandDesc: L.doraManualBand,   result: PDE.getDoraBand('manual', q1), adapted: true,  raw: q1, thresholds: [5, 15, 30] },
+        { metric: L.doraMetricErrors,   value: L.doraErrorsDesc(q5),   bandDesc: L.doraErrorsBand,   result: PDE.getDoraBand('errors', q5), adapted: true,  raw: q5, thresholds: [0, 1, 3] },
+    ];
+
+    function markerStyle(raw, thresholds) {
+        const scaleMax = thresholds[thresholds.length - 1] * 1.2;
+        const pos = Math.max(0, Math.min(1, raw / scaleMax)) * 100;
+        return 'left:' + pos.toFixed(2) + '%;';
+    }
+
+    function barHTML(thresholds, raw) {
+        const scaleMax = thresholds[thresholds.length - 1] * 1.2;
+        const segs = bands.map(function (b, i) {
+            const prev = i === 0 ? 0 : thresholds[i - 1];
+            const tl = i === 0 ? thresholds[0] : thresholds[i];
+            const high = i === thresholds.length - 1 ? scaleMax : tl;
+            const w = Math.max(0, (high - prev) / scaleMax) * 100;
+            return '<span class="dora-bar-seg" style="background:' + b.color + ';width:' + w.toFixed(2) + '%;"></span>';
+        }).join('');
+        return '<div class="dora-bar">' + segs + '<span class="dora-marker" style="' + markerStyle(raw, thresholds) + '"></span></div>';
+    }
+
     const tbody = document.getElementById('doraTableBody');
-    tbody.innerHTML = rows.map((r, i) => `
+    tbody.innerHTML = rows.map((r, i) => {
+        const badgeText = r.result.color === 'var(--yellow)' ? 'var(--text-primary)' : '#fff';
+        return `
         <tr style="border-bottom:1px solid var(--border-subtle);${i % 2 === 0 ? 'background:var(--bg-elevated);' : ''}">
             <td style="padding:0.65rem 0.75rem;font-size:0.75rem;font-weight:600;color:var(--text-primary);">
                 ${PDE.esc(r.metric)}
                 ${r.adapted ? '<span class="dora-adapted">' + PDE.esc(L.doraAdaptedLabel) + '</span>' : ''}
             </td>
-            <td style="padding:0.65rem 0.75rem;font-size:0.75rem;font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--accent);">${PDE.esc(r.value)}</td>
+            <td style="padding:0.65rem 0.75rem;font-size:0.75rem;font-family:'Space Grotesk',sans-serif;font-weight:700;color:${r.result.color};">${PDE.esc(r.value)}</td>
             <td style="padding:0.65rem 0.75rem;font-size:0.6rem;color:var(--text-muted);line-height:1.5;">${PDE.esc(r.bandDesc)}</td>
+            <td style="padding:0.65rem 0.75rem;min-width:120px;">${barHTML(r.thresholds, r.raw)}</td>
             <td style="padding:0.65rem 0.75rem;">
-                <span class="dora-badge" style="color:${r.result.color};border-color:${r.result.color};">${PDE.esc(r.result.band)}</span>
+                <span class="dora-badge" style="background:${r.result.color};color:${badgeText};">${PDE.esc(r.result.band)}</span>
             </td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('') + `
+        <tr style="background:transparent;">
+            <td colspan="5" style="padding:0.5rem 0.75rem 0.25rem;">
+                <div class="dora-legend">
+                    ${bands.map(function (b) {
+                        return '<span class="dora-legend-item"><span class="dora-legend-swatch" style="background:' + b.color + ';"></span>' + PDE.esc(b.name) + '</span>';
+                    }).join('')}
+                </div>
+            </td>
+        </tr>`;
 };
