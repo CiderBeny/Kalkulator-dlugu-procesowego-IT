@@ -1093,6 +1093,12 @@
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyCalibSource">Built-in calibration tool — user-provided actuals stored in localStorage.</span></p>
                 </div>
 
+                <div class="methodology-section" id="methodology-17">
+                    <h4 data-i18n="methodologySensViewsTitle">17. Sensitivity Views (Worst / Base / Best Case)</h4>
+                    <p><span data-i18n="methodologySensViewsBody">The Sensitivity Views panel recalculates scenarios B (Targeted Investment) and C (Full Automation 80%) under three coordinated assumption sets while keeping the measured cost baseline (Q1, Q4, Q6, Q7, Q8, Q9) authoritative. Conservative (worst case): automation recovers less of the debt (autoLevel x 0.75, automation &amp; risk recovery levers x 0.70), incidents are 15% more frequent and MTTR 25% longer, opportunity erodes 15% faster, CAPEX overruns by 20%, and the discount rate rises x 1.30 (to 12.1% at the default WACC). Aggressive (best case): the mirror image — autoLevel x 1.15, levers x 1.30, failures x 0.85, MTTR x 0.80, erosion x 0.85, CAPEX x 0.90, discount rate x 0.80. Base perturbs nothing and always equals the headline model. This complements the tornado chart (per-input x 20% swings) and Monte Carlo (full probability distributions) rather than replacing them.</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologySensViewsSource">Scenario planning conventions (BASE case / WORST / BEST) as used in project finance sensitivity analysis; multipliers defined in PDE.SENSITIVITY_VIEWS (src/config.js). Recovery-dominant design avoids the paradox where scaling the cost baseline up inflates the savings an investment can claim.</span></p>
+                </div>
+
                 <p class="methodology-footer" id="methodology-footer" data-i18n="methodologyFooter">Methodology references last updated July 2026. All estimates labelled "tool estimate" should be calibrated against your organisation's own data for greatest accuracy.</p>
 
             </div>
