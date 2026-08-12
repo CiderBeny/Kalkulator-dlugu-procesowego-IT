@@ -159,6 +159,29 @@ PDE.exportExcel = function exportExcel() {
             wsScen['!cols'] = [{wch:24},{wch:20},{wch:28},{wch:28}];
             XLSX.utils.book_append_sheet(wb, wsScen, L.xlsSheetScenarios);
 
+            const sensViews = PDE.scenSensitivity(p);
+            const senValue = (get) => sensViews.map(v => get(v.metrics));
+            const sensRows = [
+                [L.sensViewsDragLabel, ...senValue(m => Math.round(m.drag))],
+                [L.scenarioBTitle],
+                [L.scenLabelNet,    ...senValue(m => Math.round(m.scenB.net))],
+                [L.scenLabelPayback,...senValue(m => isFinite(m.scenB.pb) ? Math.round(m.scenB.pb * 10) / 10 : L.scenInfinity)],
+                ['IRR',             ...senValue(m => m.scenB.irr !== null ? (m.scenB.irr * 100).toFixed(1) + '%' : '\u2014')],
+                [L.scenarioCTitle],
+                [L.scenLabelNet,    ...senValue(m => Math.round(m.scenC.net))],
+                [L.scenLabelPayback,...senValue(m => isFinite(m.scenC.pb) ? Math.round(m.scenC.pb * 10) / 10 : L.scenInfinity)],
+                ['IRR',             ...senValue(m => m.scenC.irr !== null ? (m.scenC.irr * 100).toFixed(1) + '%' : '\u2014')],
+            ];
+            const sensData = [
+                [L.xlsSensitivityTitle],
+                [],
+                L.xlsSensitivityHeaders,
+                ...sensRows,
+            ];
+            const wsSens = XLSX.utils.aoa_to_sheet(sanitizeSheetData(sensData));
+            wsSens['!cols'] = [{wch:26},{wch:18},{wch:14},{wch:18}];
+            XLSX.utils.book_append_sheet(wb, wsSens, L.xlsSheetSensitivity);
+
             const doraValues = [q2Raw, p.manualPercent, p.failures];
             const doraData = [
                 [L.xlsDoraTitle],
@@ -812,6 +835,68 @@ PDE.exportPDF = async function exportPDF(mode) {
                 cy += 58;
             }
 
+            function renderSimpleSensitivity() {
+                const sens = PDE.scenSensitivity(p);
+                needSpace(12);
+                drawRect(ML - 2, cy - 4, UW + 4, 10, [124,58,237]);
+                pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(255,255,255);
+                pdf.text(L.sensViewsTitle.toUpperCase(), ML + 2, cy + 3);
+                pdf.setFontSize(6); pdf.setFont(pdfFont, 'normal'); pdf.setTextColor(250,247,242);
+                pdf.text(L.sensViewsSubtitle, ML + 2, cy + 9);
+                cy += 16;
+
+                const accents = {
+                    conservative: [220,38,38],
+                    base:         [180,83,9],
+                    aggressive:   [22,163,74],
+                };
+                const signNum = n => (n >= 0 ? '+' : '-') + PDE.formatCurrency(Math.abs(n));
+                const formatPb = pb => !isFinite(pb) || pb <= 0 ? L.scenInfinity : pb.toFixed(1) + ' ' + L.scenMonths;
+                const formatIrr = irr => irr !== null ? (irr * 100).toFixed(1) + '%' : '\u2014';
+
+                const cw = (UW - 6) / 3;
+                sens.forEach((v, i) => {
+                    try {
+                        const x = ML + i * (cw + 3);
+                        needSpace(122);
+                        const h = 120;
+                        const m = v.metrics;
+                        drawRect(x, cy, cw, h, [255,255,255], [214,201,184]);
+                        drawRect(x, cy, cw, 2, accents[v.key]);
+                        pdf.setFontSize(7); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(...accents[v.key]);
+                        pdf.text(String(L[v.labelKey] || v.labelKey).toUpperCase(), x + 4, cy + 8);
+
+                        const rows = [
+                            [L.sensViewsDragLabel, PDE.formatCurrency(m.drag), [220,38,38]],
+                            ['', '', [0,0,0]],
+                            [L.scenarioBTitle, '', [124,58,237]],
+                            [L.scenLabelNet,      signNum(m.scenB.net), m.scenB.net >= 0 ? [22,163,74] : [220,38,38]],
+                            [L.scenLabelPayback,  formatPb(m.scenB.pb), [180,83,9]],
+                            ['IRR',               formatIrr(m.scenB.irr), [124,58,237]],
+                            ['', '', [0,0,0]],
+                            [L.scenarioCTitle, '', [124,58,237]],
+                            [L.scenLabelNet,      signNum(m.scenC.net), m.scenC.net >= 0 ? [22,163,74] : [220,38,38]],
+                            [L.scenLabelPayback,  formatPb(m.scenC.pb), [180,83,9]],
+                            ['IRR',               formatIrr(m.scenC.irr), [124,58,237]],
+                        ];
+                        rows.forEach((rowArr, ri) => {
+                            const ry = cy + 13 + ri * 8.5;
+                            if (rowArr[0] === '') return;
+                            pdf.setFontSize(5); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(140,123,110);
+                            pdf.text(String(rowArr[0]), x + 4, ry);
+                            if (rowArr[1] === '') return;
+                            pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(...rowArr[2]);
+                            const rv = String(rowArr[1]);
+                            if (pdf.getTextWidth(rv) > cw - 8) pdf.setFontSize(5);
+                            pdf.text(rv, x + cw - 4, ry, { align: 'right' });
+                        });
+                    } catch (e) {
+                        console.error('[PDF Sensitivity View ' + i + ']', e, 'key:', v.key, 'cy:', cy);
+                    }
+                });
+                cy += 126;
+            }
+
             function renderSimpleLevers() {
                 const sorted = leversRaw.slice().sort((a, b) => b.recovery - a.recovery);
                 const top3 = sorted.slice(0, 3);
@@ -980,6 +1065,9 @@ PDE.exportPDF = async function exportPDF(mode) {
             console.debug('[PDF] Section: Scenarios | cy =', cy);
             try { renderSimpleScenarios(); } catch (e) { console.error('[PDF Sec: Scenarios]', e); }
 
+            console.debug('[PDF] Section: Sensitivity Views | cy =', cy);
+            try { renderSimpleSensitivity(); } catch (e) { console.error('[PDF Sec: Sensitivity Views]', e); }
+
             console.debug('[PDF] Section: Levers | cy =', cy);
             try { renderSimpleLevers(); } catch (e) { console.error('[PDF Sec: Levers]', e); }
 
@@ -1003,8 +1091,8 @@ PDE.exportPDF = async function exportPDF(mode) {
         } else {
             // Desktop path — html2canvas screenshots
             const mainIds = mode === 'simple'
-                ? ['pdf-block-3','scenario-compare']
-                : ['pdf-block-3','scenario-compare','pdf-block-sa','pdf-block-4','pdf-block-5','pdf-block-6'];
+                ? ['pdf-block-3','scenario-compare','sens-views']
+                : ['pdf-block-3','scenario-compare','sens-views','pdf-block-sa','pdf-block-4','pdf-block-5','pdf-block-6'];
 
             async function captureBlock(id) {
                 const el = document.getElementById(id);

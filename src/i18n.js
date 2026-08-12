@@ -273,6 +273,9 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 xlsSheetLevers:   'Top 3 Levers',
                 xlsSheetScenarios:'Scenarios',
                 xlsSheetDora:     'DORA Benchmark',
+                xlsSensitivityTitle:  'Sensitivity Views (Worst / Base / Best Case)',
+                xlsSensitivityHeaders: ['Metric', 'Conservative', 'Base', 'Aggressive'],
+                xlsSheetSensitivity:   'Sensitivity Views',
                 xlsAdvancedTitle:  'Advanced Parameters',
                 xlsToggleTitle:    'Model Enhancement Toggles',
                 // ── Methodology & Sources (EN) ──
@@ -432,6 +435,14 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 sensTeam:       'Team Size',
                 sensAuto:       'Target Automation',
                 sensDisc:       'Discount Rate',
+                sensViewsTitle:      'Sensitivity Views',
+                sensViewsSubtitle:   'Same strategy under three assumption sets \u2014 worst, base and best case.',
+                sensViewsFormula:    'Recovery-dominant worst/base/best case. Conservative: automation recovers less of the debt (autoLevel and recovery levers down), incidents are more frequent and slower to resolve, opportunity erodes faster, CAPEX overruns and money is more expensive. Aggressive: the mirror image. The measured cost baseline stays authoritative.',
+                sensViewsFootnote:   'Coordinated worst/base/best case. For per-input impact see the tornado chart below; for full probability distributions enable the Monte Carlo simulation in Advanced Settings.',
+                sensViewConservative: 'Conservative',
+                sensViewBase:         'Base',
+                sensViewAggressive:   'Aggressive',
+                sensViewsDragLabel:   'Annual Operating Drag',
             },
             pl: {
                 navSubtitle:      'Biznesowe Uzasadnienie Automatyzacji',
@@ -699,6 +710,9 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 xlsSheetLevers:    'Top 3 Dźwignie',
                 xlsSheetScenarios: 'Scenariusze',
                 xlsSheetDora:      'Benchmark DORA',
+                xlsSensitivityTitle:  'Widoki Wra\u017Cliwo\u015Bci (Pesymistyczny / Bazowy / Optymistyczny)',
+                xlsSensitivityHeaders: ['Metryka', 'Pesymistyczny', 'Bazowy', 'Optymistyczny'],
+                xlsSheetSensitivity:   'Widoki Wra\u017Cliwo\u015Bci',
                 xlsAdvancedTitle:  'Parametry Zaawansowane',
                 xlsToggleTitle:    'Przełączniki Modelu',
                 // ── Methodology & Sources (PL) ──
@@ -858,6 +872,14 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 sensTeam:       'Liczba Inżynierów',
                 sensAuto:       'Docelowa Automatyzacja',
                 sensDisc:       'Stopa Dyskontowa',
+                sensViewsTitle:      'Widoki Wra\u017Cliwo\u015Bci',
+                sensViewsSubtitle:   'Ta sama strategia przy trzech zestawach za\u0142o\u017Ce\u0144 \u2014 pesymistycznym, bazowym i optymistycznym.',
+                sensViewsFormula:    'Pesymistyczny/optymistyczny wariant zdominowany przez odzysk wydajno\u015Bci. Pesymistyczny: automatyzacja odzyskuje mniej d\u0142ugu (ni\u017Csze autoLevel i d\u017Awignie odzysku), incydenty cz\u0119stsze i wolniej rozwi\u0105zywane, szansa eroduje szybciej, CAPEX przekracza bud\u017Cet, a pieni\u0105dz jest dro\u017Cszy. Optymistyczny: lustrzane odbicie. Zmierzona linia bazowa koszt\u00F3w pozostaje autorytatywna.',
+                sensViewsFootnote:   'Skoordynowany pesymistyczny/bazowy/optymistyczny wariant. Szczeg\u00F3\u0142owy wp\u0142yw pojedynczych parametr\u00F3w pokazuje wykres tornado poni\u017Cej; pe\u0142ne rozk\u0142ady prawdopodobie\u0144stwa zapewnia symulacja Monte Carlo w Ustawieniach Zaawansowanych.',
+                sensViewConservative: 'Pesymistyczny',
+                sensViewBase:         'Bazowy',
+                sensViewAggressive:   'Optymistyczny',
+                sensViewsDragLabel:   'Roczny Drag Operacyjny',
             }
         };
 

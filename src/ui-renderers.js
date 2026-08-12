@@ -130,6 +130,7 @@ PDE.calculate = function calculate() {
     PDE.updateRecs(r.cWaste, r.cRisk, r.cOppDirect, r.paybackMonths, r.leverAuto, r.leverRisk, p.capex, r.potentialSavings);
     PDE.updateDoraBenchmark();
     PDE.updateScenarios(r.cWaste, r.cRisk, p.capex, p.autoLevel / 100, r.totalImpact, p.discountRate, p.horizonYears, r.scenCAutoLevel, r.scenCCapexMult);
+    PDE.updateSensitivityViews(p);
     const sensResult = PDE.runSensitivity(p);
     PDE.renderTornado(sensResult);
     PDE.updateCalibration(r);
@@ -388,6 +389,67 @@ PDE.updateScenarios = function updateScenarios(cWaste, cRisk, capex, autoLevel, 
         scenCard({ title: L.scenarioCTitle, desc: L.scenarioCDesc, accentColor: 'var(--green)', capexAmt: capex * 1.5, calcResult: scenC, showBadge: isRecommendedC, badgeText: L.scenRecommended });
 
     PDE.encodeState();
+};
+
+PDE.updateSensitivityViews = function updateSensitivityViews(params) {
+    const L = PDE.TRANSLATIONS[PDE.currentLang];
+    const grid = document.getElementById('sensViewsGrid');
+    if (!grid || !params) return;
+
+    const views = PDE.scenSensitivity(params);
+    const fmt = (n) => PDE.formatCompactCurrency(Math.abs(n));
+
+    const pbStr = (pb) => {
+        if (!isFinite(pb) || pb <= 0) return L.scenInfinity;
+        if (pb < 1) return '< 1 ' + L.scenMonths;
+        return pb.toFixed(1) + ' ' + L.scenMonths;
+    };
+    const pbColor = (pb) => {
+        if (!isFinite(pb) || pb <= 0) return 'var(--red)';
+        if (pb < PDE.COEFFICIENTS.PAYBACK_GREEN) return 'var(--green)';
+        if (pb < PDE.COEFFICIENTS.PAYBACK_YELLOW) return 'var(--yellow)';
+        return 'var(--orange)';
+    };
+    const netStr = (net, hasSavings) => {
+        if (!hasSavings) return '\u2014';
+        return net >= 0 ? '+' + fmt(net) : '-' + fmt(net);
+    };
+    const netColor = (net) => net >= 0 ? 'var(--green)' : 'var(--red)';
+    const irrStr = (irr) => irr !== null ? (irr * 100).toFixed(1) + '%' : '\u2014';
+
+    function row(label, value, valueStyle) {
+        return `
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.28rem 0;">
+            <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);">${PDE.esc(label)}</span>
+            <span style="font-size:0.85rem;font-weight:900;font-family:'Space Grotesk',sans-serif;${valueStyle ? valueStyle : ''}">${value}</span>
+        </div>`;
+    }
+
+    function subTitle(txt) {
+        return `<p style="font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-secondary);margin:0.6rem 0 0.2rem;padding-top:0.5rem;border-top:1px dashed var(--border-subtle);">${PDE.esc(txt)}</p>`;
+    }
+
+    const html = views.map(v => {
+        const m = v.metrics;
+        return `
+        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-top:3px solid ${v.accent};border-radius:var(--radius-lg);padding:1.1rem;display:flex;flex-direction:column;gap:0.2rem;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.4rem;">
+                <span style="width:10px;height:10px;border-radius:99px;background:${v.accent};flex-shrink:0;"></span>
+                <span style="font-family:'Space Grotesk',sans-serif;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-primary);">${PDE.esc(L[v.labelKey] || v.labelKey)}</span>
+            </div>
+            ${row(L.sensViewsDragLabel, fmt(m.drag), `color:var(--red);`)}
+            ${subTitle(L.scenarioBTitle)}
+            ${row(L.scenLabelNet, netStr(m.scenB.net, m.scenB.savings > 0), `color:${netColor(m.scenB.net)};`)}
+            ${row(L.scenLabelPayback, pbStr(m.scenB.pb), `color:${pbColor(m.scenB.pb)};`)}
+            ${row('IRR', irrStr(m.scenB.irr), `color:${m.scenB.irr !== null && m.scenB.irr > params.discountRate ? 'var(--green)' : 'var(--red)'};`)}
+            ${subTitle(L.scenarioCTitle)}
+            ${row(L.scenLabelNet, netStr(m.scenC.net, m.scenC.savings > 0), `color:${netColor(m.scenC.net)};`)}
+            ${row(L.scenLabelPayback, pbStr(m.scenC.pb), `color:${pbColor(m.scenC.pb)};`)}
+            ${row('IRR', irrStr(m.scenC.irr), `color:${m.scenC.irr !== null && m.scenC.irr > params.discountRate ? 'var(--green)' : 'var(--red)'};`)}
+        </div>`;
+    }).join('');
+
+    grid.innerHTML = html;
 };
 
 PDE.updateCalibration = function updateCalibration(r) {

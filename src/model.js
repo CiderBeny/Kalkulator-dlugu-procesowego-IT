@@ -213,6 +213,56 @@ PDE.scenCalc = function scenCalc(al, cx, annualRecurring, dr, ny) {
 
 // runMonteCarlo migrated to src/mc-worker.js (Web Worker)
 
+// ── Sensitivity views — worst/base/best case for scenarios B & C ──
+// Pure computation: clones params per view, perturbs with PDE.SENSITIVITY_VIEWS
+// multipliers, runs computeModel + scenCalc. No DOM access, deterministic.
+PDE.scenSensitivity = function scenSensitivity(params) {
+    if (!params) return [];
+    const viewOrder = ['conservative', 'base', 'aggressive'];
+    const views = [];
+
+    function buildViewParams(base, mult) {
+        const pv = Object.assign({}, base);
+        Object.keys(mult).forEach(function (k) {
+            if (pv[k] === undefined || pv[k] === null) return;
+            const c = PDE.SENSITIVITY_VIEW_CLAMPS[k];
+            if (!c) return;
+            let v = pv[k] * mult[k];
+            if (c[2] === 'round') v = Math.round(v);
+            v = Math.min(c[1], Math.max(c[0], v));
+            pv[k] = v;
+        });
+        return pv;
+    }
+
+    for (let i = 0; i < viewOrder.length; i++) {
+        const key = viewOrder[i];
+        const def = PDE.SENSITIVITY_VIEWS[key];
+        const pv = buildViewParams(params, def.mult);
+        const r = PDE.computeModel(pv);
+
+        const annualRecurring = r.cWaste + r.cRisk;
+        const scenB = PDE.scenCalc(pv.autoLevel / 100, pv.capex, annualRecurring, pv.discountRate, pv.horizonYears);
+        const scenC = PDE.scenCalc(pv.scenCAutoLevel, pv.capex * pv.scenCCapexMult, annualRecurring, pv.discountRate, pv.horizonYears);
+
+        views.push({
+            key: key,
+            labelKey: def.labelKey,
+            accent: def.accent,
+            params: pv,
+            metrics: {
+                drag:          annualRecurring,
+                npv:           r.npvTotalDebt,
+                paybackMonths: r.paybackMonths,
+                irr:           r.irr,
+                scenB:         scenB,
+                scenC:         scenC,
+            },
+        });
+    }
+    return views;
+};
+
 PDE.getDoraBand = function getDoraBand(metric, value) {
     const L = PDE.TRANSLATIONS[PDE.currentLang];
     const bands = {

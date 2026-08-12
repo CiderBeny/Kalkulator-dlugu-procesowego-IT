@@ -66,6 +66,65 @@ PDE.COEFFICIENTS = {
     TIME_HORIZON_YEARS_DEFAULT: 5,      // overridden by #timeHorizon                 · configurable
 };
 
+// ── Sensitivity views (Worst / Base / Best case) ──
+// Multipliers applied to the SAME strategy's base params to answer "how bad /
+// how good could it get if the recovery assumptions move together?".
+// Recovery-dominant by design: forecast uncertainty concentrates on how much of
+// the debt is actually recovered (autoLevel + recovery levers), how events
+// unfold (failures/MTTR), how opportunity leaks (erosion), plus funding terms
+// (discount rate) and CAPEX overruns. The measured cost baseline (q1/q4/q6/q7/
+// q8/riskLevel) stays authoritative — scaling it up would paradoxically inflate
+// the savings the investment can claim. conservative is pessimistic, aggressive
+// is its mirror image, base perturbs nothing.
+PDE.SENSITIVITY_VIEWS = {
+    conservative: {
+        labelKey: 'sensViewConservative',
+        accent:   'var(--red)',
+        mult: {
+            failures:        1.15,
+            mttr:            1.25,
+            erosionRate:     1.15,
+            autoLevel:       0.75,
+            leverAutomation: 0.70,
+            leverRisk:       0.70,
+            discountRate:    1.30,
+            capex:           1.20,
+        },
+    },
+    base: {
+        labelKey: 'sensViewBase',
+        accent:   'var(--accent)',
+        mult:     {},
+    },
+    aggressive: {
+        labelKey: 'sensViewAggressive',
+        accent:   'var(--green)',
+        mult: {
+            failures:        0.85,
+            mttr:            0.80,
+            erosionRate:     0.85,
+            autoLevel:       1.15,
+            leverAutomation: 1.30,
+            leverRisk:       1.30,
+            discountRate:    0.80,
+            capex:           0.90,
+        },
+    },
+};
+
+// ── Sensitivity view clamps & rounding per param ──
+// [min, max, mode] where mode is 'round' (integer) or 'none' (keep float)
+PDE.SENSITIVITY_VIEW_CLAMPS = {
+    failures:        [0, 9999, 'none'],
+    mttr:            [0, 168,  'none'],
+    erosionRate:     [0, 1,    'none'],
+    autoLevel:       [0, 100,  'none'],
+    leverAutomation: [0, 1,    'none'],
+    leverRisk:       [0, 1,    'none'],
+    discountRate:    [0.02, 0.40, 'none'],
+    capex:           [0, 1e9,  'none'],
+};
+
 // ── Monte Carlo defaults ──
 PDE.MC_DEFAULTS = {
     iterations:       1000,

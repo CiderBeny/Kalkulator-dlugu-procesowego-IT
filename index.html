@@ -820,6 +820,20 @@
                 <div id="scenarioGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;"></div>
             </div>
 
+            <!-- SENSITIVITY VIEWS — WORST / BASE / BEST CASE -->
+            <div id="sens-views" class="card mb-6" style="border-color:var(--border);">
+                <div class="flex items-center gap-3 mb-5">
+                    <span style="background:var(--accent);color:#0a0f1e;border-radius:8px;padding:0.4rem 0.7rem;font-family:'Space Grotesk',sans-serif;font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">🛟</span>
+                    <div style="flex:1;">
+                        <h2 style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:800;text-transform:uppercase;letter-spacing:-0.02em;color:var(--text-primary);margin:0;" data-i18n="sensViewsTitle">Sensitivity Views</h2>
+                        <p style="font-size:0.62rem;color:var(--text-muted);margin:2px 0 0;" data-i18n="sensViewsSubtitle">Same strategy under three assumption sets — worst, base and best case.</p>
+                    </div>
+                    <span class="formula-tip" tabindex="0" role="button" data-formula="Recovery-dominant worst/base/best case. Conservative: automation recovers less of the debt (autoLevel and recovery levers down), incidents are more frequent and slower to resolve, opportunity erodes faster, CAPEX overruns and money is more expensive. Aggressive: the mirror image. The measured cost baseline stays authoritative." aria-label="Sensitivity views methodology" data-i18n-formula="sensViewsFormula">ⓘ</span>
+                </div>
+                <div id="sensViewsGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;"></div>
+                <p style="font-size:0.62rem;color:var(--text-muted);margin:0.9rem 0 0;font-style:italic;" data-i18n="sensViewsFootnote">Coordinated worst/base/best case. For per-input impact see the tornado chart below; for full probability distributions enable the Monte Carlo simulation in Advanced Settings.</p>
+            </div>
+
             <!-- CALIBRATION PANEL -->
             <div id="calibrationSection" class="card mb-6">
                 <div id="calibrationHeader" style="display:flex;align-items:center;gap:12px;padding:0.5rem 0;cursor:pointer;user-select:none;">
