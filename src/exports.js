@@ -1181,19 +1181,19 @@ PDE.exportPDF = async function exportPDF(mode) {
                 });
                 el.style.paddingBottom = savedPb;
 
-                const imgData = canvas.toDataURL('image/png');
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
                 const bH = (canvas.height * UW) / canvas.width;
 
                 if (bH > PH - MT - 10) {
                     if (cy > MT) newPage();
                     const sH = PH - MT - 10;
                     const sW = (canvas.width * sH) / canvas.height;
-                    pdf.addImage(imgData, 'PNG', ML + (UW - sW) / 2, cy, sW, sH);
+                    pdf.addImage(imgData, 'JPEG', ML + (UW - sW) / 2, cy, sW, sH);
                     newPage();
                     cy = MT;
                 } else {
                     if (cy + bH > PH - 10) { newPage(); cy = MT; }
-                    pdf.addImage(imgData, 'PNG', ML, cy, UW, bH);
+                    pdf.addImage(imgData, 'JPEG', ML, cy, UW, bH);
                     cy += bH + 5;
                 }
             }
