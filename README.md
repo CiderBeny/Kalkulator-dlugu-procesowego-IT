@@ -67,13 +67,13 @@ In the world of IT Service Management, it's often difficult to convince the boar
 * **Bilingual:** Full EN/PL toggle (~140 translation keys each).
 * **Offline Font Cache:** Space Grotesk + Inter cached as base64 in localStorage — renders with proper fonts even offline.
 * **Security:** Content-Security-Policy (CSP), SRI hashes on all CDNs, localStorage validation before CSS injection, Excel formula injection guard.
-* **Testing:** 87 automated tests (security + model audit) verifying the actual source code, not a replicated copy of the logic.
+* **Testing:** 104 automated tests (security + model audit + sensitivity views) verifying the actual source code, not a replicated copy of the logic.
 
 ### Tech Stack
 * **Frontend:** HTML5, Tailwind CSS + custom CSS (dark theme, CSS custom properties).
 * **Logic:** Vanilla JavaScript (ES6+).
 * **Financial model:** framework-free plain JS — easy to audit, test and verify.
-* **Testing:** Node.js built-in test runner (`node:test`) — 87 tests (security + model audit).
+* **Testing:** Node.js built-in test runner (`node:test`) — 104 tests (security + model audit + sensitivity views).
 * **Libraries:** Chart.js (charts), jsPDF + html2canvas (PDF), SheetJS/XLSX (Excel), Google Fonts Space Grotesk + Inter.
 * **Data sources:** Damodaran (2025 WACC), Weinberg (1992), Mark et al. UC Irvine (2008), Parnin & DeLine IEEE (2010), NBP FX (currency rates).
 * **Hosting:** GitHub Pages (ready to deploy — no backend, everything in a single `index.html`).

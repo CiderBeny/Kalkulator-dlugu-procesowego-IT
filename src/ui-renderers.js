@@ -462,6 +462,7 @@ PDE.updateCalibration = function updateCalibration(r) {
     if (!grid) return;
     let rows = '';
     let withinTol = 0;
+    let filledCount = 0;
     const total = cal.METRICS.length;
 
     cal.METRICS.forEach(function (m) {
@@ -474,6 +475,7 @@ PDE.updateCalibration = function updateCalibration(r) {
         if (actualVal === undefined || actualVal === null) actualVal = '';
         const actualNum = parseFloat(actualVal);
         const isFilled = isFinite(actualNum);
+        if (isFilled) filledCount++;
 
         const variance = isFilled ? actualNum - predicted : 0;
         const varPct = (isFilled && predicted !== 0) ? (variance / predicted) : 0;
@@ -533,10 +535,14 @@ PDE.updateCalibration = function updateCalibration(r) {
 
     const scoreEl = document.getElementById('calibrationScore');
     if (scoreEl) {
-        const scorePct = total > 0 ? Math.round(withinTol / total * 100) : 0;
-        const scoreColor = scorePct >= 80 ? 'var(--green)' : (scorePct >= 50 ? 'var(--amber)' : 'var(--red)');
-        scoreEl.innerHTML = '<span style="color:' + scoreColor + ';">' + scorePct + '%</span> ' +
-            PDE.esc(L.calibScore) + ' \u2014 ' + withinTol + ' ' + PDE.esc(L.calibMetricsOn) + ' ' + total + ' ' + PDE.esc(L.calibWithinTol);
+        if (filledCount === 0) {
+            scoreEl.innerHTML = '<span style="color:var(--text-muted);">\u2014</span> ' + PDE.esc(L.calibNoData);
+        } else {
+            const scorePct = total > 0 ? Math.round(withinTol / total * 100) : 0;
+            const scoreColor = scorePct >= 80 ? 'var(--green)' : (scorePct >= 50 ? 'var(--amber)' : 'var(--red)');
+            scoreEl.innerHTML = '<span style="color:' + scoreColor + ';">' + scorePct + '%</span> ' +
+                PDE.esc(L.calibScore) + ' \u2014 ' + withinTol + ' ' + PDE.esc(L.calibMetricsOn) + ' ' + total + ' ' + PDE.esc(L.calibWithinTol);
+        }
     }
 };
 
