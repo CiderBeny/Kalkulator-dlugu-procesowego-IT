@@ -285,9 +285,10 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
         const ny = s.horizonYears;
         const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
         const npvTotalDebt = oneTimeCosts + annualRecurring * pvifa;
-        const potentialSavings = (cWaste + cRisk) * s.autoLevel;
+        const recoverable = cWaste * s.leverAuto + cRisk * s.leverRisk;
+        const potentialSavings = recoverable * s.autoLevel;
 
-        return { cWaste, cRisk, cOppDirect, totalImpact, npvTotalDebt, potentialSavings };
+        return { cWaste, cRisk, cOppDirect, totalImpact, npvTotalDebt, recoverable, potentialSavings };
     }
 
     // ── Test 1: MTTR is used as hours in cRisk ──
@@ -379,6 +380,8 @@ describe('Known Issue #7 — Configurable context premium, tax shield, IRR ramp'
             taxRate: COEFFICIENTS.TAX_RATE_DEFAULT,
             discountRate: COEFFICIENTS.DISCOUNT_RATE_DEFAULT,
             horizonYears: COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT,
+            leverAuto: COEFFICIENTS.LEVER_AUTOMATION_DEFAULT,
+            leverRisk: COEFFICIENTS.LEVER_RISK_DEFAULT,
         }, sample);
 
         const manualAnnualHrs = COEFFICIENTS.SPRINT_HOURS * COEFFICIENTS.SPRINTS_PER_YEAR * (s.manualPercent / 100);
@@ -398,7 +401,8 @@ describe('Known Issue #7 — Configurable context premium, tax shield, IRR ramp'
             const taxShield = s.capex * (s.taxRate / 100) * 0.2 * pvifa;
             npvTotalDebt = npvTotalDebt - taxShield;
         }
-        const potentialSavings = (cWaste + cRisk) * s.autoLevel;
+        const recoverable = cWaste * s.leverAuto + cRisk * s.leverRisk;
+        const potentialSavings = recoverable * s.autoLevel;
 
         const irrCashFlows = [-s.capex];
         for (let mi = 1; mi <= ny * 12; mi++) {
@@ -410,7 +414,7 @@ describe('Known Issue #7 — Configurable context premium, tax shield, IRR ramp'
         }
         const irr = calculateIRR(irrCashFlows);
 
-        return { cWaste, cRisk, cOppDirect, npvTotalDebt, potentialSavings, irr, irrCashFlows };
+        return { cWaste, cRisk, cOppDirect, npvTotalDebt, recoverable, potentialSavings, irr, irrCashFlows };
     }
 
     it('context premium default = 15% — configurable 0–30%', () => {
@@ -537,6 +541,8 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
         const horizonYears = p.horizonYears || S.TIME_HORIZON_YEARS_DEFAULT;
         const contextPremium = p.contextPremium !== undefined ? p.contextPremium : S.CONTEXT_PREMIUM_DEFAULT;
         const taxRate = p.taxRate !== undefined ? p.taxRate : S.TAX_RATE_DEFAULT;
+        const leverAuto = p.leverAuto !== undefined ? p.leverAuto : S.LEVER_AUTOMATION_DEFAULT;
+        const leverRisk = p.leverRisk !== undefined ? p.leverRisk : S.LEVER_RISK_DEFAULT;
 
         const manualAnnualHrs = S.SPRINT_HOURS * S.SPRINTS_PER_YEAR * (manualPercent / 100);
         const chasingAnnualHrs = managerHrs * S.MONTHS_PER_YEAR;
@@ -554,7 +560,8 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
         if (taxRate > 0 && capex > 0) {
             npvTotalDebt -= capex * (taxRate / 100) * 0.2 * pvifa;
         }
-        const potentialSavings = annualRecurring * autoLevel;
+        const recoverable = cWaste * leverAuto + cRisk * leverRisk;
+        const potentialSavings = recoverable * autoLevel;
         const paybackMonths = discountedPayback(potentialSavings, capex, 0.093, 5, true);
         const irrCashFlows = [-capex];
         for (let mi = 1; mi <= ny * 12; mi++) {
@@ -565,15 +572,16 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
             irrCashFlows.push((potentialSavings / 12) * rampFactor);
         }
         const irr = calculateIRR(irrCashFlows);
-        return { cWaste, cRisk, cOppDirect, totalImpact, netDebt, annualRecurring, oneTimeCosts, npvTotalDebt, potentialSavings, paybackMonths, irr };
+        return { cWaste, cRisk, cOppDirect, totalImpact, netDebt, annualRecurring, oneTimeCosts, npvTotalDebt, recoverable, potentialSavings, paybackMonths, irr };
     }
 
     let realPDE = null;
     const sample = {
         manualPercent: 10, downCost: 3000, failures: 1, mttr: 4, rate: 60,
-        managerHrs: 20, opportunityVal: 100000, riskLevel: 3, autoLevel: 50,
-        teamSize: 5, capex: 300000, erosionRate: 0.25, discountRate: 0.093,
+        managerHrs: 20, opportunityVal: 100000, riskLevel: 3, autoLevel: 80,
+        teamSize: 5, capex: 150000, erosionRate: 0.25, discountRate: 0.093,
         horizonYears: 5, contextPremium: 0.15, taxRate: 19,
+        leverAuto: 0.3, leverRisk: 0.6,
     };
 
     it('loads real config/i18n/utils/model under a Node shim', () => {
@@ -623,13 +631,28 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
 
     it('scenario B (scenCalc) matches headline computeModel IRR and payback (both ramped)', () => {
         const real = realPDE.computeModel(sample);
-        const annualRecurring = real.cWaste + real.cRisk;
-        const scenB = realPDE.scenCalc(0.5, 300000, annualRecurring, 0.093, 5);
+        const scenB = realPDE.scenCalc(0.8, 150000, real.recoverable, 0.093, 5);
         assert.ok(real.irr !== null && scenB.irr !== null,
             'Both IRRs should be computable');
         assert.ok(Math.abs(real.irr - scenB.irr) < 1e-6,
             'Scenario B IRR (' + (scenB.irr * 100).toFixed(2) + '%) matches headline IRR (' + (real.irr * 100).toFixed(2) + '%)');
         assert.ok(Math.abs(real.paybackMonths - scenB.pb) < 1e-6,
             'Scenario B payback (' + scenB.pb.toFixed(1) + ' mo) matches headline payback (' + real.paybackMonths.toFixed(1) + ' mo)');
+    });
+
+    it('potentialSavings = recoverable × autoLevel (lever-weighted recovery)', () => {
+        const r = realPDE.computeModel(sample);
+        const recoverable = r.cWaste * sample.leverAuto + r.cRisk * sample.leverRisk;
+        assert.ok(Math.abs(r.recoverable - recoverable) < 0.01,
+            'recoverable = cWaste×leverAuto + cRisk×leverRisk (' + r.recoverable + ' vs ' + recoverable + ')');
+        assert.ok(Math.abs(r.potentialSavings - recoverable * (sample.autoLevel / 100)) < 0.01,
+            'potentialSavings = recoverable × autoLevel (' + r.potentialSavings + ' vs ' + (recoverable * (sample.autoLevel / 100)) + ')');
+    });
+
+    it('potentialSavings never exceeds full lever recovery', () => {
+        const r = realPDE.computeModel(sample);
+        const leverRecoveryTotal = r.cWaste * sample.leverAuto + r.cRisk * sample.leverRisk;
+        assert.ok(r.potentialSavings <= leverRecoveryTotal + 0.01,
+            'potentialSavings (' + r.potentialSavings + ') ≤ full lever recovery (' + leverRecoveryTotal + ')');
     });
 });

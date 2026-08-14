@@ -41,7 +41,7 @@ PDE.updateCharts = function updateCharts(total, manual, chase, waste, capex, sav
         data: {
             labels: L.chartBridgeLabels,
             datasets: [{
-                data: [waste, -capex, (waste * auto) - capex],
+                data: [waste, -capex, savings - capex],
                 backgroundColor: [PDE.DARK.red, PDE.DARK.cyan, PDE.DARK.green],
                 borderRadius: 6, borderSkipped: false
             }]

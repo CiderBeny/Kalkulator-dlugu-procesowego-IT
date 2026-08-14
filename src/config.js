@@ -151,7 +151,7 @@ PDE.RISK_WEIGHT_DEFAULTS = {
 // ── Region-specific default inputs (USD base — converted to active currency on apply) ──
 // q4 = downtime cost ($/h) · q6 = blended rate ($/h) · q10 = employee turnover (%) · capex ($)
 PDE.REGION_DEFAULTS = {
-    US: { q4: 10000, q6: 150, q10: 15, teamSize: 10, capex: 50000 },
+    US: { q4: 5000, q6: 120, q10: 12, q8: 150000, teamSize: 10, capex: 50000 },
     EU: { q4: 8000,  q6: 110, q10: 12, teamSize: 10, capex: 40000 },
     PL: { q4: 3000,  q6: 50,  q10: 18, teamSize: 10, capex: 40000 },
 };

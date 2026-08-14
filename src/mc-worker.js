@@ -110,6 +110,8 @@ function computeModel(params, coeffs) {
     const docStandard    = params.docStandard    || 3;
     const riskSecurityWeight   = params.riskSecurityWeight   !== undefined ? params.riskSecurityWeight   : RD.securityWeight;
     const riskRegulatoryWeight = params.riskRegulatoryWeight !== undefined ? params.riskRegulatoryWeight : RD.regulatoryWeight;
+    const leverAuto      = params.leverAuto      !== undefined ? params.leverAuto      : coeffs.LEVER_AUTOMATION_DEFAULT;
+    const leverRisk      = params.leverRisk      !== undefined ? params.leverRisk      : coeffs.LEVER_RISK_DEFAULT;
 
     if (correlationsEnabled) {
         const cMult = params.correlationMultiplier !== undefined ? params.correlationMultiplier : CD.correlationMultiplier;
@@ -181,7 +183,8 @@ function computeModel(params, coeffs) {
         npvTotalDebt = npvTotalDebt - taxShield;
     }
 
-    const potentialSavings = (cWaste + cRisk) * autoLevel;
+    const recoverable      = cWaste * leverAuto + cRisk * leverRisk;
+    const potentialSavings = recoverable * autoLevel;
     const paybackMonths    = discountedPayback(potentialSavings, capex, dr, ny, true);
 
     const irrCashFlows = [-capex];

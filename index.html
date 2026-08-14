@@ -269,37 +269,37 @@
                 <div class="q-card">
                     <label class="label" for="q1" data-i18n="q1label">1. Manual Effort (%)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q1desc">What percentage of the sprint capacity is consumed by repetitive manual tasks such as deployments, regression testing, or environment configuration?</p>
-                     <input type="number" id="q1" value="40" min="0" max="100" class="input-field">
+                     <input type="number" id="q1" value="25" min="0" max="100" class="input-field">
                 </div>
 
                 <div class="q-card">
                     <label class="label" for="q2" data-i18n="q2label">2. Lead Time (Hrs)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q2desc">What is the average 'Lead Time' for a single change, measured from the initial request or code commit to successful production deployment?</p>
-                    <input type="number" id="q2" value="72" min="0" max="8760" class="input-field">
+                    <input type="number" id="q2" value="48" min="0" max="8760" class="input-field">
                 </div>
 
                 <div class="q-card">
                     <label class="label" for="q4" data-i18n="q4label">3. Downtime Cost ($/h)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q4desc">What is the estimated hourly revenue loss or operational penalty during a critical business system outage?</p>
-                    <input type="number" id="q4" value="10000" min="0" max="10000000" class="input-field">
+                    <input type="number" id="q4" value="5000" min="0" max="10000000" class="input-field">
                 </div>
 
                 <div class="q-card">
                     <label class="label" for="q5" data-i18n="q5label">4. Human Errors / Quarter</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q5desc">How many production incidents or rollbacks in the last quarter were directly caused by human error during manual execution steps?</p>
-                    <input type="number" id="q5" value="3" min="0" max="9999" class="input-field">
+                    <input type="number" id="q5" value="2" min="0" max="9999" class="input-field">
                 </div>
 
                 <div class="q-card">
                     <label class="label" for="q6" data-i18n="q6label">5. Blended Rate ($/h)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q6desc">What is the average hourly cost (Blended Rate) of an engineer, including gross salary, benefits, hardware, and overhead?</p>
-                    <input type="number" id="q6" value="150" min="0" max="5000" class="input-field">
+                    <input type="number" id="q6" value="120" min="0" max="5000" class="input-field">
                 </div>
 
                 <div class="q-card">
                     <label class="label" for="q10" data-i18n="q10label">6. Employee Turnover (%)</label>
                     <p class="text-[10px] mb-2 leading-tight" data-i18n="q10desc">What is the annual turnover rate in teams heavily burdened by manual, repetitive work (burnout indicator)?</p>
-                    <input type="number" id="q10" value="15" min="0" max="100" class="input-field">
+                    <input type="number" id="q10" value="12" min="0" max="100" class="input-field">
                 </div>
 
             </div>
@@ -325,7 +325,7 @@
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="q3Fill"></div>
-                                <input type="range" id="q3" min="1" max="5" value="2" class="slider">
+                                <input type="range" id="q3" min="1" max="5" value="3" class="slider">
                             </div>
                             <div class="flex justify-between mt-1 px-0.5">
                                 <span class="text-[10px]" style="color:var(--text-muted)" data-i18n="q3min">1 — Fragmented</span>
@@ -337,13 +337,13 @@
                         <div class="q-card">
                             <label class="label" for="q7" data-i18n="q7label">9. Management Overhead (h/m)</label>
                             <p class="text-[10px] mb-2 leading-tight" data-i18n="q7desc">How many hours per month do managers spend coordinating communication and "chasing people" due to siloed processes?</p>
-                            <input type="number" id="q7" value="30" min="0" max="744" class="input-field">
+                            <input type="number" id="q7" value="20" min="0" max="744" class="input-field">
                         </div>
 
                         <div class="q-card">
                             <label class="label" for="q8" data-i18n="q8label">10. Opportunity Margin ($)</label>
                             <p class="text-[10px] mb-2 leading-tight" data-i18n="q8desc">What is the projected gross margin from new projects or features that are currently delayed due to technical or process debt?</p>
-                            <input type="number" id="q8" value="200000" min="0" max="1000000000" class="input-field">
+                            <input type="number" id="q8" value="150000" min="0" max="1000000000" class="input-field">
                         </div>
 
                         <div class="q-card">
@@ -352,7 +352,7 @@
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="q9Fill"></div>
-                                <input type="range" id="q9" min="1" max="5" value="4" class="slider">
+                                <input type="range" id="q9" min="1" max="5" value="3" class="slider">
                             </div>
                             <div class="text-center mt-2">
                                 <span id="q9Val" class="text-xs font-bold">4</span>

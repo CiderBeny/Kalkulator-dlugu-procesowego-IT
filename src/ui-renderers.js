@@ -87,7 +87,7 @@ PDE.calculate = function calculate() {
                 const irrMc = mcResults.irr;
                 if (irrMc && irrMc.median !== undefined) {
                     document.getElementById('statIrr').textContent =
-                        (irrMc.median >= 0.999 ? '>99.9%' : (irrMc.median * 100).toFixed(1) + '%')
+                        PDE.formatIRR(irrMc.median)
                         + ' [' + (irrMc.p5 * 100).toFixed(1) + '% \u2013 ' + (irrMc.p95 * 100).toFixed(1) + '%]';
                 }
                 const pbMc = mcResults.paybackMonths;
@@ -117,7 +117,7 @@ PDE.calculate = function calculate() {
         document.getElementById('statOpp').textContent     = PDE.formatCompactCurrency(r.cOppDirect);
         document.getElementById('totalImpact').textContent = PDE.formatCompactCurrency(r.totalImpact);
         document.getElementById('npvTotalDebt').textContent = PDE.formatCompactCurrency(r.npvTotalDebt);
-        document.getElementById('statIrr').textContent     = r.irr !== null ? (r.irr >= 0.999 ? '>99.9%' : (r.irr * 100).toFixed(1) + '%') : '\u2014';
+        document.getElementById('statIrr').textContent     = PDE.formatIRR(r.irr);
         document.getElementById('statNet').textContent     = PDE.formatCompactCurrency(r.netDebt);
     }
 
@@ -129,7 +129,7 @@ PDE.calculate = function calculate() {
     PDE.updateCharts(r.totalAnnualHrs, r.manualAnnualHrs, r.chasingAnnualHrs, r.cWaste, p.capex, r.potentialSavings, p.riskLevel, p.manualPercent, p.autoLevel / 100);
     PDE.updateRecs(r.cWaste, r.cRisk, r.cOppDirect, r.paybackMonths, r.leverAuto, r.leverRisk, p.capex, r.potentialSavings);
     PDE.updateDoraBenchmark();
-    PDE.updateScenarios(r.cWaste, r.cRisk, p.capex, p.autoLevel / 100, r.totalImpact, p.discountRate, p.horizonYears, r.scenCAutoLevel, r.scenCCapexMult);
+    PDE.updateScenarios(r.recoverable, p.capex, p.autoLevel / 100, r.totalImpact, p.discountRate, p.horizonYears, r.scenCAutoLevel, r.scenCCapexMult);
     PDE.updateSensitivityViews(p);
     const sensResult = PDE.runSensitivity(p);
     PDE.renderTornado(sensResult);
@@ -299,7 +299,7 @@ PDE.updateRoadmap = function updateRoadmap(top3) {
     document.getElementById('roadmapGrid').innerHTML = html;
 };
 
-PDE.updateScenarios = function updateScenarios(cWaste, cRisk, capex, autoLevel, totalImpact, dr, ny, scenCAutoLevel, scenCCapexMult) {
+PDE.updateScenarios = function updateScenarios(recoverable, capex, autoLevel, totalImpact, dr, ny, scenCAutoLevel, scenCCapexMult) {
     const L = PDE.TRANSLATIONS[PDE.currentLang];
     const fmt = (n) => PDE.formatCompactCurrency(Math.abs(n));
     if (dr === undefined) dr = PDE.readAdvanced('discountRate', PDE.COEFFICIENTS.DISCOUNT_RATE_DEFAULT, 100);
@@ -307,11 +307,9 @@ PDE.updateScenarios = function updateScenarios(cWaste, cRisk, capex, autoLevel, 
     if (scenCAutoLevel === undefined) scenCAutoLevel = PDE.readAdvanced('scenCAutoLevel', PDE.COEFFICIENTS.SCEN_C_AUTO_LEVEL, 100);
     if (scenCCapexMult === undefined) scenCCapexMult = PDE.readAdvanced('scenCCapexMult', PDE.COEFFICIENTS.SCEN_C_CAPEX_MULTIPLIER, 10);
 
-    const annualRecurring = cWaste + cRisk;
-
-    const scenA = PDE.scenCalc(0,    0,                            annualRecurring, dr, ny);
-    const scenB = PDE.scenCalc(autoLevel, capex,                   annualRecurring, dr, ny);
-    const scenC = PDE.scenCalc(scenCAutoLevel,  capex * scenCCapexMult, annualRecurring, dr, ny);
+    const scenA = PDE.scenCalc(0,    0,                            recoverable, dr, ny);
+    const scenB = PDE.scenCalc(autoLevel, capex,                   recoverable, dr, ny);
+    const scenC = PDE.scenCalc(scenCAutoLevel,  capex * scenCCapexMult, recoverable, dr, ny);
 
     function netColor(val) { return val >= 0 ? 'var(--green)' : 'var(--red)'; }
     function netSign(val)  { return val >= 0 ? '+' : '-'; }
@@ -374,7 +372,7 @@ PDE.updateScenarios = function updateScenarios(cWaste, cRisk, capex, autoLevel, 
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:baseline;">
                     <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);">IRR</span>
-                    <span style="font-size:0.9rem;font-weight:900;color:${calcResult.irr !== null && calcResult.irr > dr ? 'var(--green)' : 'var(--red)'};font-family:'Space Grotesk',sans-serif;">${calcResult.irr !== null ? (calcResult.irr * 100).toFixed(1) + '%' : '\u2014'}</span>
+                    <span style="font-size:0.9rem;font-weight:900;color:${calcResult.irr !== null && calcResult.irr > dr ? 'var(--green)' : 'var(--red)'};font-family:'Space Grotesk',sans-serif;">${PDE.formatIRR(calcResult.irr)}</span>
                 </div>
             </div>
         </div>`;
@@ -415,7 +413,7 @@ PDE.updateSensitivityViews = function updateSensitivityViews(params) {
         return net >= 0 ? '+' + fmt(net) : '-' + fmt(net);
     };
     const netColor = (net) => net >= 0 ? 'var(--green)' : 'var(--red)';
-    const irrStr = (irr) => irr !== null ? (irr * 100).toFixed(1) + '%' : '\u2014';
+    const irrStr = (irr) => PDE.formatIRR(irr);
 
     function row(label, value, valueStyle) {
         return `

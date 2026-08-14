@@ -144,7 +144,8 @@ PDE.computeModel = function computeModel(params) {
         npvTotalDebt = npvTotalDebt - taxShield;
     }
 
-    const potentialSavings = (cWaste + cRisk) * autoLevel;
+    const recoverable      = cWaste * leverAuto + cRisk * leverRisk;
+    const potentialSavings = recoverable * autoLevel;
     const paybackMonths    = PDE.discountedPayback(potentialSavings, capex, dr, ny, true);
 
     const irrCashFlows = [-capex];
@@ -171,6 +172,7 @@ PDE.computeModel = function computeModel(params) {
         oneTimeCosts:      oneTimeCosts,
         npvRecurring:      npvRecurring,
         npvTotalDebt:      npvTotalDebt,
+        recoverable:       recoverable,
         potentialSavings:  potentialSavings,
         paybackMonths:     paybackMonths,
         irr:               irr,
@@ -194,8 +196,8 @@ PDE.computeModel = function computeModel(params) {
     };
 };
 
-PDE.scenCalc = function scenCalc(al, cx, annualRecurring, dr, ny) {
-    const annualSavings = annualRecurring * al;
+PDE.scenCalc = function scenCalc(al, cx, recoverable, dr, ny) {
+    const annualSavings = recoverable * al;
     const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
     const npvSavings = annualSavings * pvifa;
     const net = npvSavings - cx;
@@ -242,8 +244,8 @@ PDE.scenSensitivity = function scenSensitivity(params) {
         const r = PDE.computeModel(pv);
 
         const annualRecurring = r.cWaste + r.cRisk;
-        const scenB = PDE.scenCalc(pv.autoLevel / 100, pv.capex, annualRecurring, pv.discountRate, pv.horizonYears);
-        const scenC = PDE.scenCalc(pv.scenCAutoLevel, pv.capex * pv.scenCCapexMult, annualRecurring, pv.discountRate, pv.horizonYears);
+        const scenB = PDE.scenCalc(pv.autoLevel / 100, pv.capex, r.recoverable, pv.discountRate, pv.horizonYears);
+        const scenC = PDE.scenCalc(pv.scenCAutoLevel, pv.capex * pv.scenCCapexMult, r.recoverable, pv.discountRate, pv.horizonYears);
 
         views.push({
             key: key,

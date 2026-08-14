@@ -175,6 +175,12 @@ PDE.isMobileBrowser = function isMobileBrowser() {
     return false;
 };
 
+PDE.formatIRR = function formatIRR(irr) {
+    if (irr === null || irr === undefined || !isFinite(irr)) return '\u2014';
+    if (irr >= 0.999) return '>100%';
+    return (irr * 100).toFixed(1) + '%';
+};
+
 PDE.clamp = function clamp(id) {
     const c = PDE.HASH_CONSTRAINTS[id];
     const raw = parseFloat(document.getElementById(id)?.value);

@@ -36,12 +36,11 @@ PDE.exportExcel = function exportExcel() {
             const top3 = leversRaw.slice(0, 3);
             const totalRecovery = top3.reduce((s, l) => s + l.recovery, 0);
 
-            const annualRecurring = r.cWaste + r.cRisk;
             const dr = p.discountRate;
             const ny = p.horizonYears;
-            const scenA = PDE.scenCalc(0,    0,                            annualRecurring, dr, ny);
-            const scenB = PDE.scenCalc(p.autoLevel / 100, p.capex,         annualRecurring, dr, ny);
-            const scenC = PDE.scenCalc(r.scenCAutoLevel,  p.capex * r.scenCCapexMult, annualRecurring, dr, ny);
+            const scenA = PDE.scenCalc(0,    0,                            r.recoverable, dr, ny);
+            const scenB = PDE.scenCalc(p.autoLevel / 100, p.capex,         r.recoverable, dr, ny);
+            const scenC = PDE.scenCalc(r.scenCAutoLevel,  p.capex * r.scenCCapexMult, r.recoverable, dr, ny);
 
             const q1Raw = PDE.clamp('q1'), q2Raw = PDE.clamp('q2'), q3Raw = PDE.clamp('q3'),
                 q4Raw = PDE.currencyToUsd(PDE.clamp('q4')), q5Raw = PDE.clamp('q5'), q11Raw = PDE.clamp('q11'),
@@ -111,7 +110,7 @@ PDE.exportExcel = function exportExcel() {
                 Math.round(r.cWaste), Math.round(r.cRisk), Math.round(r.cOppDirect),
                 Math.round(r.totalImpact), Math.round(p.capex), Math.round(r.netDebt),
                 Math.round(r.potentialSavings), isFinite(r.paybackMonths) ? Math.round(r.paybackMonths * 10) / 10 : L.scenInfinity,
-                r.irr !== null ? (r.irr * 100).toFixed(1) + '%' : '\u2014',
+                r.irr !== null ? PDE.formatIRR(r.irr) : '\u2014',
             ];
             const resultsData = [
                 [L.xlsResultsTitle],
@@ -145,9 +144,9 @@ PDE.exportExcel = function exportExcel() {
                 ['\u221e',
                  isFinite(scenB.pb) ? Math.round(scenB.pb * 10)/10 : '\u221e',
                  isFinite(scenC.pb) ? Math.round(scenC.pb * 10)/10 : '\u221e'],
-                [scenA.irr !== null ? (scenA.irr * 100).toFixed(1) + '%' : '\u2014',
-                 scenB.irr !== null ? (scenB.irr * 100).toFixed(1) + '%' : '\u2014',
-                 scenC.irr !== null ? (scenC.irr * 100).toFixed(1) + '%' : '\u2014'],
+                [scenA.irr !== null ? PDE.formatIRR(scenA.irr) : '\u2014',
+                 scenB.irr !== null ? PDE.formatIRR(scenB.irr) : '\u2014',
+                 scenC.irr !== null ? PDE.formatIRR(scenC.irr) : '\u2014'],
             ];
             const scenData = [
                 [L.xlsScenariosTitle],
@@ -166,11 +165,11 @@ PDE.exportExcel = function exportExcel() {
                 [L.scenarioBTitle],
                 [L.scenLabelNet,    ...senValue(m => Math.round(m.scenB.net))],
                 [L.scenLabelPayback,...senValue(m => isFinite(m.scenB.pb) ? Math.round(m.scenB.pb * 10) / 10 : L.scenInfinity)],
-                ['IRR',             ...senValue(m => m.scenB.irr !== null ? (m.scenB.irr * 100).toFixed(1) + '%' : '\u2014')],
+                ['IRR',             ...senValue(m => PDE.formatIRR(m.scenB.irr))],
                 [L.scenarioCTitle],
                 [L.scenLabelNet,    ...senValue(m => Math.round(m.scenC.net))],
                 [L.scenLabelPayback,...senValue(m => isFinite(m.scenC.pb) ? Math.round(m.scenC.pb * 10) / 10 : L.scenInfinity)],
-                ['IRR',             ...senValue(m => m.scenC.irr !== null ? (m.scenC.irr * 100).toFixed(1) + '%' : '\u2014')],
+                ['IRR',             ...senValue(m => PDE.formatIRR(m.scenC.irr))],
             ];
             const sensData = [
                 [L.xlsSensitivityTitle],
@@ -226,12 +225,11 @@ PDE.exportCsv = function exportCsv() {
             const top3 = leversRaw.slice(0, 3);
             const totalRecovery = top3.reduce((s, l) => s + l.recovery, 0);
 
-            const annualRecurring = r.cWaste + r.cRisk;
             const dr = p.discountRate;
             const ny = p.horizonYears;
-            const scenA = PDE.scenCalc(0, 0, annualRecurring, dr, ny);
-            const scenB = PDE.scenCalc(p.autoLevel / 100, p.capex, annualRecurring, dr, ny);
-            const scenC = PDE.scenCalc(r.scenCAutoLevel, p.capex * r.scenCCapexMult, annualRecurring, dr, ny);
+            const scenA = PDE.scenCalc(0, 0, r.recoverable, dr, ny);
+            const scenB = PDE.scenCalc(p.autoLevel / 100, p.capex, r.recoverable, dr, ny);
+            const scenC = PDE.scenCalc(r.scenCAutoLevel, p.capex * r.scenCCapexMult, r.recoverable, dr, ny);
 
             const q1Raw = PDE.clamp('q1'), q2Raw = PDE.clamp('q2'), q3Raw = PDE.clamp('q3'),
                 q4Raw = PDE.currencyToUsd(PDE.clamp('q4')), q5Raw = PDE.clamp('q5'), q11Raw = PDE.clamp('q11'),
@@ -287,7 +285,7 @@ PDE.exportCsv = function exportCsv() {
                 Math.round(r.cWaste), Math.round(r.cRisk), Math.round(r.cOppDirect),
                 Math.round(r.totalImpact), Math.round(p.capex), Math.round(r.netDebt),
                 Math.round(r.potentialSavings), isFinite(r.paybackMonths) ? Math.round(r.paybackMonths * 10) / 10 : L.scenInfinity,
-                r.irr !== null ? (r.irr * 100).toFixed(1) + '%' : '-',
+                r.irr !== null ? PDE.formatIRR(r.irr) : '-',
             ];
             resultLabels.forEach(function (label, i) {
                 rows.push(csvEscape(label) + ',' + csvEscape(resultValues[i]));
@@ -312,7 +310,7 @@ PDE.exportCsv = function exportCsv() {
                 [0, Math.round(p.capex), Math.round(scenC_cap)],
                 [0, Math.round(scenB.net), Math.round(scenC.net)],
                 ['---', isFinite(scenB.pb) ? Math.round(scenB.pb * 10) / 10 : '---', isFinite(scenC.pb) ? Math.round(scenC.pb * 10) / 10 : '---'],
-                [scenA.irr !== null ? (scenA.irr * 100).toFixed(1) + '%' : '-', scenB.irr !== null ? (scenB.irr * 100).toFixed(1) + '%' : '-', scenC.irr !== null ? (scenC.irr * 100).toFixed(1) + '%' : '-'],
+                [scenA.irr !== null ? PDE.formatIRR(scenA.irr) : '-', scenB.irr !== null ? PDE.formatIRR(scenB.irr) : '-', scenC.irr !== null ? PDE.formatIRR(scenC.irr) : '-'],
             ];
             L.xlsScenariosRows.forEach(function (row, i) {
                 rows.push(csvEscape(row[0]) + ',' + csvEscape(scenValues[i][0]) + ',' + csvEscape(scenValues[i][1]) + ',' + csvEscape(scenValues[i][2]));
@@ -746,7 +744,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                     { label: L.statOppLabel,    val: PDE.formatCurrency(r.cOppDirect), color: [124,58,237] },
                     { label: L.statTotalLabel,  val: PDE.formatCurrency(r.totalImpact), color: [30,41,59] },
                     { label: L.statNpvLabel,    val: PDE.formatCurrency(r.npvTotalDebt), color: [8,145,178] },
-                    { label: L.statIrrLabel,    val: r.irr !== null ? (r.irr >= 0.999 ? '>99.9%' : (r.irr * 100).toFixed(1) + '%') : '\u2014', color: [124,58,237] },
+                    { label: L.statIrrLabel,    val: r.irr !== null ? PDE.formatIRR(r.irr) : '\u2014', color: [124,58,237] },
                     { label: L.statNetLabel,    val: PDE.formatCurrency(r.netDebt),    color: [22,163,74] },
                 ];
                 const cols = 2, cw = (UW - 6) / cols, ch = 16;
@@ -776,12 +774,11 @@ PDE.exportPDF = async function exportPDF(mode) {
             }
 
             function renderSimpleScenarios() {
-            const annualRecurring = r.cWaste + r.cRisk;
                 const dr = p.discountRate;
                 const ny = p.horizonYears;
-                const scenA = PDE.scenCalc(0, 0, annualRecurring, dr, ny);
-                const scenB = PDE.scenCalc(p.autoLevel / 100, p.capex, annualRecurring, dr, ny);
-                const scenC = PDE.scenCalc(r.scenCAutoLevel, p.capex * r.scenCCapexMult, annualRecurring, dr, ny);
+                const scenA = PDE.scenCalc(0, 0, r.recoverable, dr, ny);
+                const scenB = PDE.scenCalc(p.autoLevel / 100, p.capex, r.recoverable, dr, ny);
+                const scenC = PDE.scenCalc(r.scenCAutoLevel, p.capex * r.scenCCapexMult, r.recoverable, dr, ny);
                 const scens = [
                     { title: L.scenarioATitle, desc: L.scenarioADesc, accent: [220,38,38], data: scenA, cx: 0 },
                     { title: L.scenarioBTitle, desc: L.scenarioBDesc, accent: [180,83,9],  data: scenB, cx: p.capex },
@@ -814,7 +811,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                             [L.scenLabelInvestment,  s.cx > 0 ? PDE.formatCurrency(s.cx) : L.scenNoInvestment, [180,83,9]],
                             [L.scenLabelNet,         s.data.net >= 0 ? '+' + PDE.formatCurrency(s.data.net) : '-' + PDE.formatCurrency(Math.abs(s.data.net)), s.data.net >= 0 ? [22,163,74] : [220,38,38]],
                             [L.scenLabelPayback,     !isFinite(s.data.pb) || s.data.pb <= 0 ? L.scenInfinity : s.data.pb.toFixed(1) + ' ' + L.scenMonths, [180,83,9]],
-                            ['IRR',                  s.data.irr !== null ? (s.data.irr * 100).toFixed(1) + '%' : '\u2014', [124,58,237]],
+                            ['IRR',                  s.data.irr !== null ? PDE.formatIRR(s.data.irr) : '\u2014', [124,58,237]],
                         ];
                         rows.forEach((row, ri) => {
                             const ry = cy + 22 + ri * 6;
@@ -852,7 +849,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                 };
                 const signNum = n => (n >= 0 ? '+' : '-') + PDE.formatCurrency(Math.abs(n));
                 const formatPb = pb => !isFinite(pb) || pb <= 0 ? L.scenInfinity : pb.toFixed(1) + ' ' + L.scenMonths;
-                const formatIrr = irr => irr !== null ? (irr * 100).toFixed(1) + '%' : '\u2014';
+                const formatIrr = irr => irr !== null ? PDE.formatIRR(irr) : '\u2014';
 
                 const cw = (UW - 6) / 3;
                 sens.forEach((v, i) => {

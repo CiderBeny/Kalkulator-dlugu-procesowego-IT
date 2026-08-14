@@ -86,7 +86,8 @@ describe('Sensitivity Views — guaranteed invariants', () => {
         const views = P.scenSensitivity(s);
         const base = views[1];
         const annualRecurring = P.computeModel(s).cWaste + P.computeModel(s).cRisk;
-        const scB = P.scenCalc(s.autoLevel / 100, s.capex, annualRecurring, s.discountRate, s.horizonYears);
+        const recoverable = P.computeModel(s).recoverable;
+        const scB = P.scenCalc(s.autoLevel / 100, s.capex, recoverable, s.discountRate, s.horizonYears);
         assert.ok(Math.abs(base.metrics.drag - annualRecurring) < 0.01,
             'base view drag equals unperturbed annualRecurring');
         assert.ok(Math.abs(base.metrics.scenB.net - scB.net) < 0.01, 'base view scenario B net matches scenCalc');

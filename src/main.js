@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Preset buttons ──
     const PRESETS = {
         low:    { q1:70, q2:168, q4:50000, q5:10, q6:150, q10:25, teamSize:15, autoLevel:20, capex:20000 },
-        medium: { q1:40, q2:72,  q4:10000, q5:3,  q6:150, q10:15, teamSize:10, autoLevel:40, capex:50000 },
+        medium: { q1:25, q2:48, q3:3, q4:5000, q5:2, q6:120, q7:20, q8:150000, q9:3, q10:12, teamSize:10, autoLevel:40, capex:50000 },
         high:   { q1:15, q2:24,  q4:5000,  q5:1,  q6:150, q10:8,  teamSize:8,  autoLevel:65, capex:80000 },
     };
     document.querySelectorAll('.preset-btn').forEach(function (btn) {
