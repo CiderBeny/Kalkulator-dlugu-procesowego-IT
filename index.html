@@ -221,15 +221,22 @@
                     <span class="flag" id="langFlag">🇵🇱</span>
                     <span id="langLabel">PL</span>
                 </button>
-                <button id="exportExcelBtn" data-i18n="exportExcelBtn">
-                    ⬇ EXPORT TO EXCEL
-                </button>
-                <button id="exportCsvBtn" data-i18n="exportCsvBtn">
-                    ⬇ EXPORT TO CSV
-                </button>
-                <button id="exportBtnSimple" data-i18n="exportBtnSimple">
-                    📄 EXPORT SUMMARY REPORT (PDF)
-                </button>
+                <div id="exportMenu" class="nav-export-menu">
+                    <button id="exportMenuBtn" class="nav-export-trigger" data-i18n="exportMenu" aria-haspopup="true" aria-expanded="false">
+                        ⬇ EXPORT ▾
+                    </button>
+                    <div id="exportMenuPanel" class="nav-export-panel">
+                        <button id="exportExcelBtn" data-i18n="exportExcelBtn">
+                            ⬇ EXPORT TO EXCEL
+                        </button>
+                        <button id="exportCsvBtn" data-i18n="exportCsvBtn">
+                            ⬇ EXPORT TO CSV
+                        </button>
+                        <button id="exportBtnSimple" data-i18n="exportBtnSimple">
+                            📄 EXPORT SUMMARY REPORT (PDF)
+                        </button>
+                    </div>
+                </div>
                 <button id="ctaBtn" data-i18n="ctaBtn" style="background:var(--accent);color:#fff;border:none;border-radius:999px;padding:0.4rem 1.2rem;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.75rem;letter-spacing:0.06em;cursor:pointer;transition:background 0.2s;text-transform:uppercase;">
                     🚀 Download Full Report →
                 </button>

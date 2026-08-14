@@ -19,7 +19,7 @@
 │   └── dev-server.js      # Hardened local dev server (127.0.0.1, CSP + X-Frame-Options, path blocking)
 ├── src/
 │   ├── config.js          # Constants, coefficients, defaults (~201 lines)
-│   ├── i18n.js            # Translations (EN + PL, 394 keys/lang, ~892 lines)
+│   ├── i18n.js            # Translations (EN + PL, 395 keys/lang, ~894 lines)
 │   ├── utils.js           # Utility functions (~288 lines)
 │   ├── state.js           # URL hash state — encode/decode/copy (~110 lines)
 │   ├── model.js           # Financial model — pure computation (~263 lines)
@@ -77,7 +77,7 @@ npm test
 
 ## i18n Conventions
 - Translations live in `PDE.TRANSLATIONS` object (`src/i18n.js`) — keys `en` and `pl`
-- 394 keys per language, with `{C}` (currency symbol) and `{CC}` (currency code) placeholders
+- 395 keys per language, with `{C}` (currency symbol) and `{CC}` (currency code) placeholders
 - HTML elements tagged with `data-i18n="key"` for text, `data-i18n-formula="key"` for tooltips
 - To add a language: add a new key to `PDE.TRANSLATIONS`, add entries for all existing keys
 - `PDE.applyTranslations()` iterates `[data-i18n]` elements and sets `textContent`

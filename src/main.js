@@ -124,6 +124,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctaBtn = document.getElementById('ctaBtn');
     if (ctaBtn) ctaBtn.addEventListener('click', function () { PDE.exportPDF('full'); });
 
+    const exportMenu = document.getElementById('exportMenu');
+    const exportMenuBtn = document.getElementById('exportMenuBtn');
+    if (exportMenu && exportMenuBtn) {
+        exportMenuBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const open = exportMenu.classList.toggle('open');
+            exportMenuBtn.setAttribute('aria-expanded', String(open));
+        });
+        document.addEventListener('click', function (e) {
+            if (!exportMenu.contains(e.target)) {
+                exportMenu.classList.remove('open');
+                exportMenuBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                exportMenu.classList.remove('open');
+                exportMenuBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
     const sliderIds = [
         'scenCAutoLevel','scenCCapexMult','annualHours',
         'leverInnovation','leverManagement','leverTurnover',

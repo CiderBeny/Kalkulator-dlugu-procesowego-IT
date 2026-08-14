@@ -200,6 +200,60 @@ nav p {
   transform: translateY(-1px);
 }
 
+/* ── Nav export dropdown (compact mobile nav) ── */
+.nav-export-menu {
+  position: relative;
+  display: flex;
+}
+.nav-export-trigger {
+  display: none;
+}
+#exportMenuPanel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .nav-export-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #3B82F6;
+    color: #3B82F6;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .nav-export-trigger:hover {
+    background: rgba(59, 130, 246, 0.08);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.20);
+  }
+  #exportMenuPanel {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.4rem);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+    background: var(--bg-elevated, #1a2634);
+    border: 1px solid var(--border, #1e3a52);
+    border-radius: 12px;
+    padding: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    z-index: 60;
+    min-width: 220px;
+  }
+  #exportMenu.open #exportMenuPanel {
+    display: flex;
+  }
+}
+
 
 
 /* ── Preset buttons (quick-start profiles) ── */
@@ -630,7 +684,9 @@ section h2 {
   vertical-align: middle;
 }
 
-/* Tooltip bubble — pure CSS, no JS */
+/* Tooltip bubble — pure CSS, no JS.
+   Hidden state uses display:none so the tooltip never extends the
+   scrollable area; the fade-in runs via animation when it appears. */
 .formula-tip::after {
   content: attr(data-formula);
   position: absolute;
@@ -653,7 +709,6 @@ section h2 {
   opacity: 0;
   display: none;
   pointer-events: none;
-  transition: opacity 0.18s ease;
   z-index: 9999;
 }
 
@@ -669,7 +724,6 @@ section h2 {
   opacity: 0;
   display: none;
   pointer-events: none;
-  transition: opacity 0.18s ease;
   z-index: 9999;
 }
 
@@ -679,8 +733,30 @@ section h2 {
 .formula-tip:focus::before,
 .formula-tip.tip-open::after,
 .formula-tip.tip-open::before {
-  opacity: 1;
   display: block;
+  animation: formula-tip-pop-in 0.18s ease forwards;
+}
+
+.formula-tip:hover::before,
+.formula-tip:focus::before,
+.formula-tip.tip-open::before {
+  animation-name: formula-tip-fade-in;
+}
+
+@keyframes formula-tip-pop-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes formula-tip-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ── DORA badge ── */
@@ -867,37 +943,54 @@ section h2 {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* ── Nav: two tidy rows on narrow viewports (logo above, actions below) ── */
+/* ── Nav: compact two-row layout on narrow viewports (logo above, actions below) ── */
 @media (max-width: 640px) {
+    nav {
+        padding: 0.35rem 0.75rem !important;
+    }
+    nav h1 {
+        font-size: 0.98rem;
+        line-height: 1.1;
+    }
+    nav p {
+        font-size: 0.5rem;
+        letter-spacing: 0.1em;
+        margin-top: 0.1rem;
+    }
     .container.mx-auto.flex.justify-between.items-center.max-w-7xl {
         flex-direction: column;
         align-items: stretch;
-        gap: 0.6rem;
+        gap: 0.35rem;
     }
     .flex.items-center.gap-3.flex-wrap.justify-end {
         justify-content: flex-start;
-        gap: 0.5rem;
+        gap: 0.35rem;
     }
     .flex.items-center.gap-3.flex-wrap.justify-end button,
     .flex.items-center.gap-3.flex-wrap.justify-end select {
-        font-size: 0.68rem;
-        padding: 0.4rem 0.6rem;
+        font-size: 0.6rem;
+        padding: 0.28rem 0.45rem;
+        white-space: nowrap;
+    }
+    #ctaBtn {
+        padding: 0.3rem 0.7rem;
     }
 }
 
 @media (max-width: 480px) {
     .flex.items-center.gap-3.flex-wrap.justify-end {
-        gap: 0.5rem;
+        gap: 0.3rem;
     }
     .flex.items-center.gap-3.flex-wrap.justify-end button,
     .flex.items-center.gap-3.flex-wrap.justify-end select {
-        font-size: 0.65rem;
-        padding: 0.35rem 0.6rem;
+        font-size: 0.58rem;
+        padding: 0.25rem 0.4rem;
     }
     #ctaBtn {
         width: 100%;
         margin-left: 0;
         text-align: center;
+        padding: 0.36rem 0.8rem;
     }
 }
 
