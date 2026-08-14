@@ -55,7 +55,7 @@ ctx.strokeRect(12, 12, W - 24, H - 24);
 // Small bottom text
 ctx.fillStyle = 'rgba(28,20,16,0.35)';
 ctx.font = '18px Arial, Helvetica, sans-serif';
-ctx.fillText('opencode.github.io', W / 2, H - 40);
+ctx.fillText('Process Debt Engine', W / 2, H - 40);
 
 // Save
 const out = path.join(__dirname, '..', 'og-image.png');
