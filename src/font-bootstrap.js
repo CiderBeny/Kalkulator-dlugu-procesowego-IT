@@ -1,6 +1,8 @@
 /* ── Framebusting ──────────────────────────────────────────────────────────
-   Clickjacking defence: frame-ancestors 'none' in <meta> CSP is ignored by
-   all browsers (per W3C spec). This runs before any content renders.
+   Clickjacking defence: frame-ancestors 'none' is enforced only via the
+   dev-server HTTP header (browsers ignore the directive in <meta> CSP,
+   per W3C spec). GitHub Pages cannot send headers, so this runs before
+   any content renders.
 
    Primary sink: top.location.href (works cross-origin where allowed).
    Fallback: detect a navigation attempt to this page and forcibly adopt
