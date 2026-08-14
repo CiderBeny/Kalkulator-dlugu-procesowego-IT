@@ -6,6 +6,8 @@ const mime = { '.html':'text/html','.js':'application/javascript','.css':'text/c
 
 const BLOCKED_EXACT = new Set([
     'README.md', 'AGENTS.md', 'package.json', 'package-lock.json', 'src/input.css',
+    'scripts/dev-server.js', 'src/security.test.js', 'src/model-audit.test.js',
+    'src/sensitivity-views.test.js',
 ]);
 
 // Decide whether a raw URL path may be served. Returns a safe relative path,
@@ -38,6 +40,16 @@ function serveAllowedPath(rawUrlPath) {
     return rel;
 }
 
+// Security headers — mirror of the meta CSP in index.html (frame-ancestors is
+// only enforced via HTTP header, not <meta>). Kept in sync with index.html.
+const SECURITY_HEADERS = {
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com https://api.nbp.pl; form-action 'none'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; worker-src 'self';",
+    'X-Frame-Options': 'DENY',
+    'Permissions-Policy': 'geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=(), midi=(), sync-xhr=(), interest-cohort=()',
+    'X-Content-Type-Options': 'nosniff',
+    'Cache-Control': 'no-store',
+};
+
 if (require.main === module) {
     h.createServer((r, s) => {
         const rel = serveAllowedPath(r.url === '/' ? '/' : r.url.slice(1));
@@ -46,10 +58,11 @@ if (require.main === module) {
         const full = p.join('.', rel);
         try {
             const c = fs.readFileSync(full);
-            s.writeHead(200, { 'Content-Type': mime[ext] || 'text/plain',
-                               'Access-Control-Allow-Origin': '*',
-                               'X-Content-Type-Options': 'nosniff',
-                               'Cache-Control': 'no-store' });
+            s.writeHead(200, Object.assign(
+                { 'Content-Type': mime[ext] || 'text/plain',
+                  'Access-Control-Allow-Origin': '*' },
+                SECURITY_HEADERS
+            ));
             s.end(c);
         } catch {
             s.writeHead(404);

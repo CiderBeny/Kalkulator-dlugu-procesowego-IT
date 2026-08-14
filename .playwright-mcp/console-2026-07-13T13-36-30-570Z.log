@@ -1,8 +1,0 @@
-[      70ms] [ERROR] The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element. @ http://127.0.0.1:5500/index.html:16
-[      76ms] [ERROR] Executing inline script violates the following Content Security Policy directive 'script-src 'self' 'sha384-tsCQS0ke6XMJa8OsPrBXsKsk6Y40fbUxlCfnLi3xWPtgH7TZXjLfXY6pv/Kb0FoU' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com'. Either the 'unsafe-inline' keyword, a hash ('sha256-VSbWVt1jTZyKNhStSHwZJ3eqEydVTKtVm2djS16tIKA='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked. @ http://127.0.0.1:5500/index.html:41
-[    1268ms] ReferenceError: formatCurrency is not defined
-    at Object.recAutomation (http://127.0.0.1:5500/src/i18n.js:98:41)
-    at Object.updateRecs (http://127.0.0.1:5500/src/ui-renderers.js:144:69)
-    at Object.calculate (http://127.0.0.1:5500/src/ui-renderers.js:132:9)
-    at window.onload (http://127.0.0.1:5500/src/main.js:124:9)
-[    1469ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:5500/favicon.ico:0
