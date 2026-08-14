@@ -651,6 +651,7 @@ section h2 {
   min-width: 200px;
   max-width: 260px;
   opacity: 0;
+  display: none;
   pointer-events: none;
   transition: opacity 0.18s ease;
   z-index: 9999;
@@ -666,6 +667,7 @@ section h2 {
   border: 5px solid transparent;
   border-top-color: var(--accent);
   opacity: 0;
+  display: none;
   pointer-events: none;
   transition: opacity 0.18s ease;
   z-index: 9999;
@@ -678,6 +680,7 @@ section h2 {
 .formula-tip.tip-open::after,
 .formula-tip.tip-open::before {
   opacity: 1;
+  display: block;
 }
 
 /* ── DORA badge ── */
@@ -784,6 +787,19 @@ section h2 {
   }
 }
 
+/* ── Sensitivity views grid (3 cards → single column on mobile) ── */
+#sensViewsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  #sensViewsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Hover glow on scenario cards */
 #scenarioGrid > div:hover {
   box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 16px rgba(6,182,212,0.08);
@@ -800,6 +816,11 @@ section h2 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
+}
+
+.roadmap-card {
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 @media (max-width: 768px) {
@@ -846,14 +867,37 @@ section h2 {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* ── Nav button row: wrap on narrow mobile viewports ── */
+/* ── Nav: two tidy rows on narrow viewports (logo above, actions below) ── */
+@media (max-width: 640px) {
+    .container.mx-auto.flex.justify-between.items-center.max-w-7xl {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.6rem;
+    }
+    .flex.items-center.gap-3.flex-wrap.justify-end {
+        justify-content: flex-start;
+        gap: 0.5rem;
+    }
+    .flex.items-center.gap-3.flex-wrap.justify-end button,
+    .flex.items-center.gap-3.flex-wrap.justify-end select {
+        font-size: 0.68rem;
+        padding: 0.4rem 0.6rem;
+    }
+}
+
 @media (max-width: 480px) {
     .flex.items-center.gap-3.flex-wrap.justify-end {
         gap: 0.5rem;
     }
-    .flex.items-center.gap-3.flex-wrap.justify-end button {
+    .flex.items-center.gap-3.flex-wrap.justify-end button,
+    .flex.items-center.gap-3.flex-wrap.justify-end select {
         font-size: 0.65rem;
         padding: 0.35rem 0.6rem;
+    }
+    #ctaBtn {
+        width: 100%;
+        margin-left: 0;
+        text-align: center;
     }
 }
 

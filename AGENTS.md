@@ -15,37 +15,47 @@
 ## Project Structure
 ```
 ├── fonts/                # Inter TTF files for PDF export (Polish support)
+├── scripts/
+│   └── dev-server.js      # Hardened local dev server (127.0.0.1, CSP + X-Frame-Options, path blocking)
 ├── src/
-│   ├── config.js          # Constants, coefficients, defaults (~135 lines)
-│   ├── i18n.js            # Translations (EN + PL, ~711 lines)
-│   ├── utils.js           # Utility functions (~194 lines)
-│   ├── state.js           # URL hash state — encode/decode/copy (~76 lines)
-│   ├── model.js           # Financial model — pure computation (~298 lines)
-│   ├── charts.js          # Chart.js wrappers (~120 lines)
-│   ├── ui-renderers.js    # UI rendering — calculate, recs, roadmap, scenarios (~395 lines)
-│   ├── exports.js         # Excel + PDF export, font cache (~700 lines)
-│   ├── main.js            # Entry point — DOMContentLoaded + window.onload
+│   ├── config.js          # Constants, coefficients, defaults (~201 lines)
+│   ├── i18n.js            # Translations (EN + PL, 394 keys/lang, ~892 lines)
+│   ├── utils.js           # Utility functions (~288 lines)
+│   ├── state.js           # URL hash state — encode/decode/copy (~110 lines)
+│   ├── model.js           # Financial model — pure computation (~263 lines)
+│   ├── mc-worker.js       # Monte Carlo simulation Web Worker (~255 lines)
+│   ├── charts.js          # Chart.js wrappers (~67 lines)
+│   ├── sensitivity.js     # Sensitivity analysis — tornado chart (~178 lines)
+│   ├── ui-renderers.js    # UI rendering — calculate, recs, roadmap, scenarios, calibration (~573 lines)
+│   ├── exports.js         # Excel + PDF export, font cache (~1204 lines)
+│   ├── font-bootstrap.js  # Font fallback + framebusting guard (~96 lines)
+│   ├── gen-og-image.js    # Build script — generates og-image.png via node-canvas (~53 lines)
+│   ├── main.js            # Entry point — DOMContentLoaded + window.onload (~191 lines)
 │   ├── input.css          # Tailwind CSS entry point
-│   ├── security.test.js   # Security/safety unit tests
-│   └── model-audit.test.js# Model integrity audit tests
+│   ├── security.test.js   # Security/safety unit tests (~288 lines)
+│   ├── model-audit.test.js# Model integrity audit tests (~592 lines)
+│   └── sensitivity-views.test.js  # Sensitivity views tests (~158 lines)
 ├── .vscode/              # Recommended extensions
-├── index.html            # Main HTML (UI, CSP, font bootstrap + cache)
-├── style.css             # Custom CSS + base64-embedded fonts
+├── index.html            # Main HTML (UI, CSP, font bootstrap + cache, ~1046 lines)
+├── style.css             # Custom CSS + base64-embedded fonts (~938 lines)
 ├── output.css            # Compiled Tailwind output
 ├── package.json
 └── AGENTS.md
 ```
 
 ## Module Dependency Order (script tags in index.html)
+- `font-bootstrap.js` loads first (no `defer` — runs during parsing; sets up font fallback + framebusting)
 1. `config.js` — pure constants (no PDE dependency)
 2. `i18n.js` — `PDE.TRANSLATIONS`, `PDE.currentLang`, `PDE.currentCurrency`, `PDE.nbpDate`
 3. `utils.js` — helpers (depends on config + i18n)
 4. `state.js` — URL hash (depends on config + utils)
 5. `model.js` — computation engine (depends on config + utils)
 6. `charts.js` — Chart.js rendering (depends on i18n + config + utils)
-7. `ui-renderers.js` — DOM updates (depends on all above)
-8. `exports.js` — export features (depends on all above)
-9. `main.js` — startup (depends on all above)
+7. `sensitivity.js` — tornado chart (depends on model + charts)
+8. `ui-renderers.js` — DOM updates (depends on all above)
+9. `exports.js` — export features (depends on all above)
+10. `main.js` — startup (depends on all above)
+- `mc-worker.js` is NOT a script tag — loaded as a Web Worker by `ui-renderers.js`
 
 ## How to Run
 ```sh
@@ -62,12 +72,12 @@ npx @tailwindcss/cli -i src/input.css -o output.css
 ## How to Run Tests
 ```sh
 npm test
-# Runs: node --test src/security.test.js src/model-audit.test.js
+# Runs: node --test src/security.test.js src/model-audit.test.js src/sensitivity-views.test.js
 ```
 
 ## i18n Conventions
 - Translations live in `PDE.TRANSLATIONS` object (`src/i18n.js`) — keys `en` and `pl`
-- ~140 keys per language, with `{C}` (currency symbol) and `{CC}` (currency code) placeholders
+- 394 keys per language, with `{C}` (currency symbol) and `{CC}` (currency code) placeholders
 - HTML elements tagged with `data-i18n="key"` for text, `data-i18n-formula="key"` for tooltips
 - To add a language: add a new key to `PDE.TRANSLATIONS`, add entries for all existing keys
 - `PDE.applyTranslations()` iterates `[data-i18n]` elements and sets `textContent`

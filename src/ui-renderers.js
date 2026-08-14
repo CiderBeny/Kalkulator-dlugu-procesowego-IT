@@ -289,7 +289,7 @@ PDE.updateRoadmap = function updateRoadmap(top3) {
         ).join('');
 
         html += `
-        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-top:3px solid ${meta.accent};border-radius:var(--radius-md);padding:1rem;">
+        <div class="roadmap-card" style="background:var(--bg-elevated);border:1px solid var(--border);border-top:3px solid ${meta.accent};border-radius:var(--radius-md);padding:1rem;min-width:0;">
             <p style="font-family:'Space Grotesk',sans-serif;font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:${meta.accent};margin:0 0 2px;">${PDE.esc(L[meta.titleKey])}</p>
             <p style="font-family:'Space Grotesk',sans-serif;font-size:0.8rem;font-weight:700;color:var(--text-primary);margin:0 0 0.75rem;">${PDE.esc(L[meta.subKey])}</p>
             <ul style="list-style:none;margin:0;padding:0;">${taskRows || '<li style="font-size:0.72rem;color:var(--text-muted);">No tasks for selected levers.</li>'}</ul>
