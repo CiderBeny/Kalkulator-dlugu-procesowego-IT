@@ -49,6 +49,24 @@ describe('PDE.fmtMonths — Polish month declension', () => {
     });
 });
 
+describe('PDE.fmtCount — Polish incident declension (DORA table)', () => {
+    it('declines incydent/incydenty/incydentów by count', () => {
+        P.currentLang = 'pl';
+        assert.strictEqual(P.TRANSLATIONS.pl.doraErrorsDesc(0), '0 incydentów');
+        assert.strictEqual(P.TRANSLATIONS.pl.doraErrorsDesc(1), '1 incydent');
+        assert.strictEqual(P.TRANSLATIONS.pl.doraErrorsDesc(2), '2 incydenty');
+        assert.strictEqual(P.TRANSLATIONS.pl.doraErrorsDesc(5), '5 incydentów');
+        assert.strictEqual(P.TRANSLATIONS.pl.doraErrorsDesc(12), '12 incydentów');
+        assert.strictEqual(P.TRANSLATIONS.pl.doraErrorsDesc(22), '22 incydenty');
+    });
+
+    it('English keeps two forms', () => {
+        P.currentLang = 'en';
+        assert.strictEqual(P.TRANSLATIONS.en.doraErrorsDesc(1), '1 incident');
+        assert.strictEqual(P.TRANSLATIONS.en.doraErrorsDesc(2), '2 incidents');
+    });
+});
+
 describe('PDE.fmtMonthsRange — ranges decline by upper bound', () => {
     it('Polish range forms follow the upper bound', () => {
         P.currentLang = 'pl';

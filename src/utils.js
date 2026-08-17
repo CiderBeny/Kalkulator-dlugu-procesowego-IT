@@ -37,14 +37,17 @@ PDE.monthsWord = function monthsWord(n) {
     return PDE.pluralize(n, PDE.TRANSLATIONS[PDE.currentLang].monthsPlural);
 };
 
+PDE.fmtCount = function fmtCount(n, forms) {
+    const locale = PDE.currentLang === 'pl' ? 'pl-PL' : 'en-US';
+    const num = new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(n);
+    return num + ' ' + PDE.pluralize(n, forms);
+};
+
 PDE.fmtMonths = function fmtMonths(pb) {
     const L = PDE.TRANSLATIONS[PDE.currentLang];
     if (!isFinite(pb) || pb <= 0) return L.scenInfinity;
-    const locale = PDE.currentLang === 'pl' ? 'pl-PL' : 'en-US';
-    const num = pb < 1
-        ? '< 1'
-        : new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(pb);
-    return num + ' ' + PDE.monthsWord(pb);
+    if (pb < 1) return '< 1 ' + PDE.monthsWord(pb);
+    return PDE.fmtCount(pb, L.monthsPlural);
 };
 
 PDE.fmtMonthsRange = function fmtMonthsRange(a, b) {
