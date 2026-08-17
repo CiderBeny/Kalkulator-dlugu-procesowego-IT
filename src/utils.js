@@ -43,11 +43,19 @@ PDE.fmtCount = function fmtCount(n, forms) {
     return num + ' ' + PDE.pluralize(n, forms);
 };
 
-PDE.fmtMonths = function fmtMonths(pb) {
+PDE._fmtMonthsWith = function _fmtMonthsWith(pb, forms) {
     const L = PDE.TRANSLATIONS[PDE.currentLang];
     if (!isFinite(pb) || pb <= 0) return L.scenInfinity;
-    if (pb < 1) return '< 1 ' + PDE.monthsWord(pb);
-    return PDE.fmtCount(pb, L.monthsPlural);
+    if (pb < 1) return '< 1 ' + PDE.pluralize(pb, forms);
+    return PDE.fmtCount(pb, forms);
+};
+
+PDE.fmtMonths = function fmtMonths(pb) {
+    return PDE._fmtMonthsWith(pb, PDE.TRANSLATIONS[PDE.currentLang].monthsPlural);
+};
+
+PDE.fmtMonthsLocative = function fmtMonthsLocative(pb) {
+    return PDE._fmtMonthsWith(pb, PDE.TRANSLATIONS[PDE.currentLang].monthsPluralLocative);
 };
 
 PDE.fmtMonthsRange = function fmtMonthsRange(a, b) {

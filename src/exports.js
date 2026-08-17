@@ -933,7 +933,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                 cy += 50;
 
                 // Verdict bar
-                const pbStr = PDE.fmtMonths(r.paybackMonths);
+                const pbStr = PDE.fmtMonthsLocative(r.paybackMonths);
                 const heroCapex   = (p.capex || 0) > 0 ? PDE.formatCurrencyWhole(p.capex) : '';
                 const heroSavings = (r.potentialSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.potentialSavings) : '';
                 let heroStr = '';

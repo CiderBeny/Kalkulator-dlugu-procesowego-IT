@@ -67,6 +67,31 @@ describe('PDE.fmtCount — Polish incident declension (DORA table)', () => {
     });
 });
 
+describe('PDE.fmtMonthsLocative — Polish locative case after "po"', () => {
+    it('declines locative forms correctly', () => {
+        P.currentLang = 'pl';
+        assert.strictEqual(P.fmtMonthsLocative(1), '1 miesiącu');
+        assert.strictEqual(P.fmtMonthsLocative(2), '2 miesiącach');
+        assert.strictEqual(P.fmtMonthsLocative(5), '5 miesiącach');
+        assert.strictEqual(P.fmtMonthsLocative(12), '12 miesiącach');
+        assert.strictEqual(P.fmtMonthsLocative(22), '22 miesiącach');
+        assert.strictEqual(P.fmtMonthsLocative(4.5), '4,5 miesiąca');
+        assert.strictEqual(P.fmtMonthsLocative(0.5), '< 1 miesiąca');
+    });
+
+    it('verdictHero renders "zwrot nastąpi po X miesiącach"', () => {
+        P.currentLang = 'pl';
+        const hero = P.TRANSLATIONS.pl.verdictHero('185 685 zł', '2 452 443 zł', P.fmtMonthsLocative(5));
+        assert.ok(hero.indexOf('po <strong>5 miesiącach</strong>') !== -1, hero);
+    });
+
+    it('English keeps the plain plural after "occurs after"', () => {
+        P.currentLang = 'en';
+        assert.strictEqual(P.fmtMonthsLocative(5), '5 months');
+        assert.strictEqual(P.fmtMonthsLocative(1), '1 month');
+    });
+});
+
 describe('PDE.fmtMonthsRange — ranges decline by upper bound', () => {
     it('Polish range forms follow the upper bound', () => {
         P.currentLang = 'pl';

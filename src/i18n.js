@@ -111,6 +111,7 @@ recRisk:        () => `<strong style="color:var(--orange)">Risk Lever:</strong> 
 recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</strong> Debt backlog is blocking roadmap. Resolving it unlocks <strong>${PDE.formatCompactCurrency(val)}</strong> in project margin.`,
                 recVerdict:    (pb)  => `Financial Verdict: Payback period — ${PDE.fmtMonths(pb)}.`,
                 monthsPlural:          { one: 'month', other: 'months' },
+                monthsPluralLocative:  { one: 'month', other: 'months' },
                 // lever titles & details
                 leverAutomationTitle:  'Process Automation',
                 leverAutomationDetail: (pct) => `Automating ${pct}% of manual sprint work with CI/CD pipelines and self-service portals eliminates repetitive overhead and accelerates delivery.`,
@@ -557,6 +558,7 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 recInnovation: (val) => `<strong style="color:var(--purple)">Dźwignia Innowacji:</strong> Zaległości blokują roadmapę. Ich usunięcie odblokowuje <strong>${PDE.formatCompactCurrency(val)}</strong> marży projektowej.`,
                 recVerdict:    (pb)  => `Werdykt Finansowy: Zwrot z inwestycji w ciągu — ${PDE.fmtMonths(pb)}.`,
                 monthsPlural:          { one: 'miesiąc', few: 'miesiące', many: 'miesięcy', other: 'miesiąca' },
+                monthsPluralLocative:  { one: 'miesiącu', few: 'miesiącach', many: 'miesiącach', other: 'miesiąca' },
                 leverAutomationTitle:  'Automatyzacja Procesów',
                 leverAutomationDetail: (pct) => `Automatyzacja ${pct}% manualnej pracy w sprincie za pomocą pipeline'ów CI/CD i portali samoobsługowych eliminuje powtarzalne zadania i przyspiesza dostarczanie.`,
                 leverRiskTitle:        'Redukcja Ryzyka i Incydentów',

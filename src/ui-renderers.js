@@ -208,7 +208,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
     const heroCapex   = (capexUSD || 0) > 0 ? PDE.formatCurrencyWhole(capexUSD) : '';
     const heroSavings = (annualSavingsUSD || 0) > 0 ? PDE.formatCurrencyWhole(annualSavingsUSD) : '';
     const heroFinite  = isFinite(pb) && pb > 0;
-    const heroMonths  = !heroFinite ? '' : PDE.fmtMonths(pb);
+    const heroMonths  = !heroFinite ? '' : PDE.fmtMonthsLocative(pb);
 
     let heroHtml = '';
     if (heroCapex && heroSavings && heroMonths) {
