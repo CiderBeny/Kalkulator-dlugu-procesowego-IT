@@ -956,7 +956,7 @@
                 <div class="methodology-section" id="methodology-about">
                     <h4 data-i18n="methodologyAboutTitle">About This Tool</h4>
                     <p><span data-i18n="methodologyAboutBody">Process Debt Engine is a static single-page application (SPA) that estimates the financial cost of process debt in software delivery. It combines a strategic diagnostic questionnaire (Q1-Q12) with a multi-factor financial model to calculate annual OPEX waste, risk exposure, pipeline erosion, and NPV/IRR economics. No data is sent to any server — all inputs are processed locally in your browser. Your diagnostic state is encoded in the URL hash for easy sharing, and calibration data is stored only in your browser's localStorage. Exchange rates are fetched client-side from the public NBP API. This tool provides directional estimates only and should not replace professional financial analysis. All 'tool estimate' multipliers are user-configurable via the Advanced Parameters panel.</span></p>
-                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyAboutSource">Built as a static SPA with vanilla JavaScript, Chart.js, jsPDF, html2canvas, and SheetJS. Methodology based on BLS, OECD, DORA, COSO, SHRM, and Exepron research (see sections 1-16).</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyAboutSource">Built as a static SPA with vanilla JavaScript, Chart.js, jsPDF, html2canvas, and SheetJS. Methodology based on BLS, OECD, DORA, COSO, SHRM, and Exepron research (see sections 1-17).</span></p>
                 </div>
 
                 <!-- 1 -->
@@ -979,8 +979,8 @@
                 <div class="methodology-section" id="methodology-3">
                     <h4 data-i18n="methodologyOppTitle">3. Pipeline Margin Erosion</h4>
                     <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code>Opportunity margin &times; 0.25</code></p>
-                    <p><strong>0.25 multiplier (tool estimate):</strong> <span data-i18n="methodologyOppFactor1">Reflects the portion of pipeline project margin conservatively estimated as eroded during the first year of delay due to competitive response, customer churn, or SLA penalties. No single authoritative study isolates this fraction; 0.25 is a conservative floor.</span></p>
-                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyOppSource">Exepron — "The True Cost of Delay" (2026). exepron.com.</span></p>
+                    <p><strong>0.25 multiplier (tool estimate):</strong> <span data-i18n="methodologyOppFactor1">Derived from Reinertsen's Cost of Delay framework (Principles of Product Development Flow, 2009): delayed projects lose value at ~2%/month, or ~25%/year. The 0.25 multiplier reflects year-1 erosion — a conservative application of the CoD principle.</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyOppSource">Reinertsen, D.G. — Principles of Product Development Flow (2009). Exepron — "The True Cost of Delay" (2026). exepron.com.</span></p>
                 </div>
 
                 <!-- 4 (formerly "OPEX-adjusted Estimate" — merged into OPEX Waste ×1.15) -->
@@ -1015,7 +1015,7 @@
                             <tr>
                                 <td data-i18n="methodologyLeverMgmt">Management Efficiency</td>
                                 <td>15%</td>
-                                <td data-i18n="methodologyLeverMgmtSrc">PanDev Metrics (2026): 42% of engineering coding time lost to context switching. TheTab 2025 research: 40% productivity loss, $450B/yr globally, 23 min recovery per interruption. Gerald Weinberg, Quality Software Management (1992): 3 concurrent projects = 40% overhead. These studies establish context-switching loss at 15–40%; the conservative 15% is applied to management coordination overhead.</td>
+                                <td data-i18n="methodologyLeverMgmtSrc">Gerald Weinberg, Quality Software Management (1992): 3 concurrent projects = 40% overhead. Gloria Mark, The Cost of Interrupted Work (UC Irvine, 2008): ~23 min recovery per interruption. Chris Parnin &amp; Robert DeLine (IEEE, 2010): 10–15 min resume time after interruption. PanDev Metrics (2026): median context-switching tax 15–22% across B2B teams. These studies establish context-switching loss at 15–40%; the conservative 15% is applied to management coordination overhead.</td>
                             </tr>
                             <tr>
                                 <td data-i18n="methodologyLeverTurnover">Retention &amp; Burnout</td>
@@ -1030,7 +1030,7 @@
                 <div class="methodology-section" id="methodology-6">
                     <h4 data-i18n="methodologyTurnoverTitle">6. Turnover Cost Model</h4>
                     <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code>Turnover rate &times; Team Size &times; Blended Rate (Q6) &times; 1,800 hrs</code></p>
-                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Assumptions:</span> <span data-i18n="methodologyTurnoverAssumptions">The 50-engineer reference and $150/hr rate are organisational defaults aligned with SHRM's total replacement cost framework. Adjust these to match your actual headcount and cost structures.</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Assumptions:</span> <span data-i18n="methodologyTurnoverAssumptions">Uses your actual Team Size and Blended Rate (Q6) multiplied by 1,800 annual hours (aligned with ANNUAL_HOURS_PER_ENGINEER across the model). The $150/hr and 50-engineer defaults are no longer hardcoded — the model reads your diagnostic inputs in real time.</span></p>
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyTurnoverSource">SHRM Foundation — "Retaining Talent: A Guide to Analyzing and Managing Employee Turnover" (2025 update). SHRM 2025 Benchmarking Reports, shrm.org/benchmarking.</span></p>
                 </div>
 
@@ -1051,21 +1051,21 @@
                 <!-- 9 -->
                 <div class="methodology-section" id="methodology-9">
                     <h4 data-i18n="methodologyTotalTitle">9. Estimated Annual Drag</h4>
-                    <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code data-i18n="methodologyTotalFormula">OPEX Waste (&times;1.15 context-switching premium) + Risk Exposure + Pipeline Margin Erosion</code></p>
-                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Note:</span> <span data-i18n="methodologyTotalNote">Pipeline Margin Erosion (cOppDirect) is a one-time estimate reflecting margin lost in the first year of delay. OPEX Waste includes a built-in 15% context-switching premium (&times;1.15). All other components recur annually.</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code data-i18n="methodologyTotalFormula">OPEX Waste (incl. context-switching premium) + Risk Exposure + Pipeline Margin Erosion</code></p>
+                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Note:</span> <span data-i18n="methodologyTotalNote">Pipeline Margin Erosion (cOppDirect) is a one-time estimate reflecting margin lost in the first year of delay. OPEX Waste includes a configurable context-switching premium (default 15%, range 0–30%). All other components recur annually.</span></p>
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyTotalSource">Economic model synthesised from BLS ATUS (2024), OECD Annual Hours (2024), Exepron "True Cost of Delay" (2026), COSO ERM (2017), and SHRM Retention Framework (2025).</span></p>
                 </div>
 
                 <div class="methodology-section" id="methodology-10">
                     <h4 data-i18n="methodologyNpvTitle">10. NPV &amp; IRR Economic Model</h4>
                     <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code data-i18n="methodologyNpvFormula">NPV = One-Time Costs + PVIFA &times; Annual Recurring | IRR = rate where &Sigma;(CF&#8347;/(1+r)^(t/12)) = 0</code></p>
-                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Note:</span> <span data-i18n="methodologyNpvNote">One-time costs = Pipeline Margin Erosion + CAPEX. Annual recurring = OPEX Waste (incl. 15% context-switching premium) + Risk. PVIFA discounts the recurring stream using a 10% WACC over a 5-year horizon. Discounted Payback uses monthly DCF to find the break-even month. IRR (Internal Rate of Return) is computed via binary search over monthly cash flows — the rate at which NPV = 0. IRR &gt; WACC (10%) indicates value creation. This aligns with standard capital budgeting (Brealey, Myers &amp; Allen) and COSO ERM 2017 guidance on multi-period risk assessment.</span></p>
-                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyNpvSource">Brealey, R.A., Myers, S.C. &amp; Allen, F. — Principles of Corporate Finance (14th ed., McGraw-Hill). COSO — Enterprise Risk Management — Integrating with Strategy and Performance (2017). WACC benchmark: Damodaran, A. — Cost of Capital by Sector (2025), IT infrastructure median ~9.3%.</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Note:</span> <span data-i18n="methodologyNpvNote">One-time costs = Pipeline Margin Erosion + CAPEX. Annual recurring = OPEX Waste (incl. configurable context-switching premium) + Risk. PVIFA discounts the recurring stream using a 9.3% WACC (Damodaran 2025, IT Infrastructure median) over a 5-year horizon. If tax rate &gt; 0%, NPV includes a simplified straight-line 5yr depreciation tax shield. The tax shield affects NPV only — IRR and payback are computed on pre-tax cash flows. IRR assumes a 6-month implementation ramp (3mo zero savings, 3mo 50%) for realistic returns. Discounted Payback uses monthly DCF with the same 6-month implementation ramp (3mo zero savings, 3mo 50%) to find the break-even month. IRR (Internal Rate of Return) is computed via binary search over monthly cash flows — the rate at which NPV = 0. IRR &gt; WACC indicates value creation. This aligns with standard capital budgeting (Brealey, Myers &amp; Allen) and COSO ERM 2017 guidance on multi-period risk assessment.</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyNpvSource">Brealey, R.A., Myers, S.C. &amp; Allen, F. — Principles of Corporate Finance (14th ed., McGraw-Hill). COSO — Enterprise Risk Management — Integrating with Strategy and Performance (2017). WACC benchmark: Damodaran, A. — Cost of Capital by Sector (Jan 2025), IT Infrastructure median 9.3%.</span></p>
                 </div>
 
                 <div class="methodology-section" id="methodology-11">
                     <h4 data-i18n="methodologyAdvancedTitle">11. Configurable Advanced Parameters</h4>
-                    <p><span data-i18n="methodologyAdvancedBody">Five parameters in the "Advanced Parameters" panel let you override default coefficients in real time: Pipeline Erosion Rate (0.0–1.0), WACC / Discount Rate (5–20%), NPV Time Horizon (3–10 years), Automation Lever Recovery (10–60%), and Risk Lever Recovery (20–80%). Changing any slider immediately recalculates all dependent metrics. Defaults are restored on page reload.</span></p>
+                    <p><span data-i18n="methodologyAdvancedBody">Seven parameters in the "Advanced Parameters" panel let you override default coefficients in real time: Pipeline Erosion Rate (0.0–1.0), WACC / Discount Rate (5–20%), NPV Time Horizon (3–10 years), Automation Lever Recovery (10–60%), Risk Lever Recovery (20–80%), Context-Switching Premium (0–30%), and Corporate Tax Rate (0–50%, for the CAPEX depreciation tax shield). Changing any slider immediately recalculates all dependent metrics. Defaults are restored on page reload.</span></p>
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyAdvancedSource">User-configurable — overrides the Economic Model defaults (Section 10) in real time.</span></p>
                 </div>
 
