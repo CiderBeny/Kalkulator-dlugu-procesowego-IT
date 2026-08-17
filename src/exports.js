@@ -730,11 +730,11 @@ PDE.exportPDF = async function exportPDF(mode) {
             console.debug('[PDF] cy start =', cy);
 
             const leversRaw = [
-                { key: 'automation', label: L.leverAutomationTitle, recovery: r.leverRecoveryAuto,    effort: L.effortMedium, timeline: '2\u20134 ' + L.verdictPaybackUnit, color: [220,38,38] },
-                { key: 'risk',       label: L.leverRiskTitle,        recovery: r.leverRecoveryRisk,    effort: L.effortLow,    timeline: '1\u20132 ' + L.verdictPaybackUnit, color: [234,88,12] },
-                { key: 'innovation', label: L.leverInnovationTitle,  recovery: r.leverRecoveryInnovation, effort: L.effortHigh, timeline: '3\u20136 ' + L.verdictPaybackUnit, color: [124,58,237] },
-                { key: 'mgmt',      label: L.leverMgmtTitle,        recovery: r.leverRecoveryMgmt,    effort: L.effortLow,    timeline: '1 '   + L.verdictPaybackUnit, color: [8,145,178] },
-                { key: 'turnover',  label: L.leverTurnoverTitle,    recovery: r.leverRecoveryTurnover, effort: L.effortMedium,timeline: '3\u20135 ' + L.verdictPaybackUnit, color: [22,163,74] },
+                { key: 'automation', label: L.leverAutomationTitle, recovery: r.leverRecoveryAuto,    effort: L.effortMedium, timeline: PDE.fmtMonthsRange(2, 4), color: [220,38,38] },
+                { key: 'risk',       label: L.leverRiskTitle,        recovery: r.leverRecoveryRisk,    effort: L.effortLow,    timeline: PDE.fmtMonthsRange(1, 2), color: [234,88,12] },
+                { key: 'innovation', label: L.leverInnovationTitle,  recovery: r.leverRecoveryInnovation, effort: L.effortHigh, timeline: PDE.fmtMonthsRange(3, 6), color: [124,58,237] },
+                { key: 'mgmt',      label: L.leverMgmtTitle,        recovery: r.leverRecoveryMgmt,    effort: L.effortLow,    timeline: PDE.fmtMonthsRange(1, 1), color: [8,145,178] },
+                { key: 'turnover',  label: L.leverTurnoverTitle,    recovery: r.leverRecoveryTurnover, effort: L.effortMedium,timeline: PDE.fmtMonthsRange(3, 5), color: [22,163,74] },
             ];
 
             function renderSimpleResults() {
@@ -810,7 +810,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                             [L.scenLabelDebt,       PDE.formatCurrency(r.totalImpact), [220,38,38]],
                             [L.scenLabelInvestment,  s.cx > 0 ? PDE.formatCurrency(s.cx) : L.scenNoInvestment, [180,83,9]],
                             [L.scenLabelNet,         s.data.net >= 0 ? '+' + PDE.formatCurrency(s.data.net) : '-' + PDE.formatCurrency(Math.abs(s.data.net)), s.data.net >= 0 ? [22,163,74] : [220,38,38]],
-                            [L.scenLabelPayback,     !isFinite(s.data.pb) || s.data.pb <= 0 ? L.scenInfinity : s.data.pb.toFixed(1) + ' ' + L.scenMonths, [180,83,9]],
+                            [L.scenLabelPayback,     PDE.fmtMonths(s.data.pb), [180,83,9]],
                             ['IRR',                  s.data.irr !== null ? PDE.formatIRR(s.data.irr) : '\u2014', [124,58,237]],
                         ];
                         rows.forEach((row, ri) => {
@@ -848,7 +848,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                     aggressive:   [22,163,74],
                 };
                 const signNum = n => (n >= 0 ? '+' : '-') + PDE.formatCurrency(Math.abs(n));
-                const formatPb = pb => !isFinite(pb) || pb <= 0 ? L.scenInfinity : pb.toFixed(1) + ' ' + L.scenMonths;
+                const formatPb = pb => PDE.fmtMonths(pb);
                 const formatIrr = irr => irr !== null ? PDE.formatIRR(irr) : '\u2014';
 
                 const cw = (UW - 6) / 3;
@@ -933,7 +933,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                 cy += 50;
 
                 // Verdict bar
-                const pbStr = !isFinite(r.paybackMonths) || r.paybackMonths <= 0 ? L.scenInfinity : (r.paybackMonths < 1 ? '< 1' : r.paybackMonths.toFixed(1)) + ' ' + L.verdictPaybackUnit;
+                const pbStr = PDE.fmtMonths(r.paybackMonths);
                 const heroCapex   = (p.capex || 0) > 0 ? PDE.formatCurrencyWhole(p.capex) : '';
                 const heroSavings = (r.potentialSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.potentialSavings) : '';
                 let heroStr = '';

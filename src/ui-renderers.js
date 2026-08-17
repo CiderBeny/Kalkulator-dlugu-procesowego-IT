@@ -146,7 +146,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
     if (cw > PDE.COEFFICIENTS.REC_AUTO_MIN_WASTE)  html += `<li>${L.recAutomation(Math.round(cw * leverAuto))}</li>`;
     if (cr > PDE.COEFFICIENTS.REC_RISK_MIN_EXPOSURE) html += `<li>${L.recRisk()}</li>`;
     if (co > PDE.COEFFICIENTS.REC_INNOVATION_MIN) html += `<li>${L.recInnovation(Math.round(co * PDE.COEFFICIENTS.LEVER_INNOVATION))}</li>`;
-    html += `<li class="mt-3 p-3 font-bold italic" style="background:var(--accent-dim);border-left:4px solid var(--accent);color:var(--accent);border-radius:0 6px 6px 0;">${PDE.esc(L.recVerdict(!isFinite(pb) || pb <= 0 ? L.scenInfinity : (pb < 1 ? '< 1' : pb.toFixed(1))))}</li>`;
+    html += `<li class="mt-3 p-3 font-bold italic" style="background:var(--accent-dim);border-left:4px solid var(--accent);color:var(--accent);border-radius:0 6px 6px 0;">${PDE.esc(L.recVerdict(pb))}</li>`;
     engine.innerHTML = html + `</ul>`;
 
     const ICONS = {
@@ -170,11 +170,11 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
     };
 
     const levers = [
-        { key:'automation', title: L.leverAutomationTitle, recovery: Math.round(cw * leverAuto),  effort: L.effortMedium, timeline: '2\u20134 ' + L.verdictPaybackUnit, color:'var(--red)',    icon: ICONS.automation, detail: L.leverAutomationDetail(Math.round(manualPct * PDE.COEFFICIENTS.AUTOMATABLE_SHARE)) },
-        { key:'risk',       title: L.leverRiskTitle,       recovery: Math.round(cr * leverRisk),        effort: L.effortLow,    timeline: '1\u20132 ' + L.verdictPaybackUnit, color:'var(--orange)', icon: ICONS.risk,       detail: L.leverRiskDetail() },
-        { key:'innovation', title: L.leverInnovationTitle, recovery: Math.round(co * PDE.COEFFICIENTS.LEVER_INNOVATION), effort: L.effortHigh, timeline: '3\u20136 ' + L.verdictPaybackUnit, color:'var(--purple)', icon: ICONS.innovation, detail: L.leverInnovationDetail() },
-        { key:'mgmt',       title: L.leverMgmtTitle,       recovery: Math.round(cw * PDE.COEFFICIENTS.LEVER_MANAGEMENT), effort: L.effortLow,    timeline: '1 '   + L.verdictPaybackUnit,  color:'var(--cyan)',   icon: ICONS.mgmt,       detail: L.leverMgmtDetail() },
-        { key:'turnover',   title: L.leverTurnoverTitle,   recovery: Math.round(turnoverCost * PDE.COEFFICIENTS.LEVER_TURNOVER), effort: L.effortMedium,timeline: '3\u20135 ' + L.verdictPaybackUnit, color:'var(--green)',  icon: ICONS.turnover,   detail: L.leverTurnoverDetail() },
+        { key:'automation', title: L.leverAutomationTitle, recovery: Math.round(cw * leverAuto),  effort: L.effortMedium, timeline: PDE.fmtMonthsRange(2, 4), color:'var(--red)',    icon: ICONS.automation, detail: L.leverAutomationDetail(Math.round(manualPct * PDE.COEFFICIENTS.AUTOMATABLE_SHARE)) },
+        { key:'risk',       title: L.leverRiskTitle,       recovery: Math.round(cr * leverRisk),        effort: L.effortLow,    timeline: PDE.fmtMonthsRange(1, 2), color:'var(--orange)', icon: ICONS.risk,       detail: L.leverRiskDetail() },
+        { key:'innovation', title: L.leverInnovationTitle, recovery: Math.round(co * PDE.COEFFICIENTS.LEVER_INNOVATION), effort: L.effortHigh, timeline: PDE.fmtMonthsRange(3, 6), color:'var(--purple)', icon: ICONS.innovation, detail: L.leverInnovationDetail() },
+        { key:'mgmt',       title: L.leverMgmtTitle,       recovery: Math.round(cw * PDE.COEFFICIENTS.LEVER_MANAGEMENT), effort: L.effortLow,    timeline: PDE.fmtMonthsRange(1, 1),  color:'var(--cyan)',   icon: ICONS.mgmt,       detail: L.leverMgmtDetail() },
+        { key:'turnover',   title: L.leverTurnoverTitle,   recovery: Math.round(turnoverCost * PDE.COEFFICIENTS.LEVER_TURNOVER), effort: L.effortMedium,timeline: PDE.fmtMonthsRange(3, 5), color:'var(--green)',  icon: ICONS.turnover,   detail: L.leverTurnoverDetail() },
     ];
 
     levers.sort((a, b) => b.recovery - a.recovery);
@@ -208,7 +208,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
     const heroCapex   = (capexUSD || 0) > 0 ? PDE.formatCurrencyWhole(capexUSD) : '';
     const heroSavings = (annualSavingsUSD || 0) > 0 ? PDE.formatCurrencyWhole(annualSavingsUSD) : '';
     const heroFinite  = isFinite(pb) && pb > 0;
-    const heroMonths  = !heroFinite ? '' : ((pb < 1 ? '< 1' : pb.toFixed(1)) + ' ' + L.verdictPaybackUnit);
+    const heroMonths  = !heroFinite ? '' : PDE.fmtMonths(pb);
 
     let heroHtml = '';
     if (heroCapex && heroSavings && heroMonths) {
@@ -232,7 +232,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
                 </div>
                 <div style="text-align:right;">
                     <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:0 0 4px;">${PDE.esc(L.verdictPaybackLabel)}</p>
-                    <p style="font-size:1.15rem;font-weight:900;color:var(--text-primary);margin:0;">${!isFinite(pb) || pb <= 0 ? PDE.esc(L.scenInfinity) : (pb < 1 ? '< 1' : pb.toFixed(1))} ${PDE.esc(L.verdictPaybackUnit)}</p>
+                    <p style="font-size:1.15rem;font-weight:900;color:var(--text-primary);margin:0;">${PDE.esc(PDE.fmtMonths(pb))}</p>
                 </div>
                 <div style="flex:1;min-width:200px;">
                     <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;font-style:italic;">${PDE.esc(L.verdictNote)}</p>
@@ -314,9 +314,7 @@ PDE.updateScenarios = function updateScenarios(recoverable, capex, autoLevel, to
     function netColor(val) { return val >= 0 ? 'var(--green)' : 'var(--red)'; }
     function netSign(val)  { return val >= 0 ? '+' : '-'; }
     function pbStr(pb) {
-        if (!isFinite(pb) || pb <= 0) return L.scenInfinity;
-        if (pb < 1) return '< 1 ' + L.scenMonths;
-        return pb.toFixed(1) + ' ' + L.scenMonths;
+        return PDE.fmtMonths(pb);
     }
     function pbColor(pb) {
         if (!isFinite(pb) || pb <= 0) return 'var(--red)';
@@ -398,9 +396,7 @@ PDE.updateSensitivityViews = function updateSensitivityViews(params) {
     const fmt = (n) => PDE.formatCompactCurrency(Math.abs(n));
 
     const pbStr = (pb) => {
-        if (!isFinite(pb) || pb <= 0) return L.scenInfinity;
-        if (pb < 1) return '< 1 ' + L.scenMonths;
-        return pb.toFixed(1) + ' ' + L.scenMonths;
+        return PDE.fmtMonths(pb);
     };
     const pbColor = (pb) => {
         if (!isFinite(pb) || pb <= 0) return 'var(--red)';

@@ -24,6 +24,36 @@ PDE.t = function t(key) {
     return val;
 };
 
+PDE._pluralRules = {};
+
+PDE.pluralize = function pluralize(n, forms) {
+    const lang = PDE.currentLang === 'pl' ? 'pl' : 'en';
+    if (!PDE._pluralRules[lang]) PDE._pluralRules[lang] = new Intl.PluralRules(lang);
+    const rule = PDE._pluralRules[lang].select(n);
+    return forms[rule] !== undefined ? forms[rule] : forms.other;
+};
+
+PDE.monthsWord = function monthsWord(n) {
+    return PDE.pluralize(n, PDE.TRANSLATIONS[PDE.currentLang].monthsPlural);
+};
+
+PDE.fmtMonths = function fmtMonths(pb) {
+    const L = PDE.TRANSLATIONS[PDE.currentLang];
+    if (!isFinite(pb) || pb <= 0) return L.scenInfinity;
+    const locale = PDE.currentLang === 'pl' ? 'pl-PL' : 'en-US';
+    const num = pb < 1
+        ? '< 1'
+        : new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(pb);
+    return num + ' ' + PDE.monthsWord(pb);
+};
+
+PDE.fmtMonthsRange = function fmtMonthsRange(a, b) {
+    const locale = PDE.currentLang === 'pl' ? 'pl-PL' : 'en-US';
+    const fmt = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+    const range = a === b ? fmt.format(a) : fmt.format(a) + '\u2013' + fmt.format(b);
+    return range + ' ' + PDE.monthsWord(b);
+};
+
 PDE.applyTranslations = function applyTranslations() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
