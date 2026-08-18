@@ -77,7 +77,7 @@ npm test
 
 ## i18n Conventions
 - Translations live in `PDE.TRANSLATIONS` object (`src/i18n.js`) — keys `en` and `pl`
-- 399 keys per language, with `{C}` (currency symbol) and `{CC}` (currency code) placeholders
+- 400 keys per language, with `{C}` (currency symbol) and `{CC}` (currency code) placeholders
 - HTML elements tagged with `data-i18n="key"` for text, `data-i18n-formula="key"` for tooltips
 - To add a language: add a new key to `PDE.TRANSLATIONS`, add entries for all existing keys
 - `PDE.applyTranslations()` iterates `[data-i18n]` elements and sets `textContent`
