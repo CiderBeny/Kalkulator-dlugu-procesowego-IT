@@ -27,16 +27,16 @@ W świecie IT Service Managementu często trudno jest przekonać zarząd do inwe
 * **Eksport Excel:** 5 arkuszy (Inputs, Financial Results, Top Levers, Scenario Comparison, DORA Benchmark) z pełną dokumentacją kalkulacji.
 * **Eksport PDF:** Wielostronicowy raport A4 — strona 1 z pytaniami diagnostycznymi, strony 2+ ze screenshotami bloków (html2canvas + jsPDF).
 * **Link współdzielenia:** Stan kalkulacji zakodowany w URL hash — skopiuj link i wyślij zespołowi.
-* **Dwujęzyczność:** Pełny przełącznik EN/PL (~140 kluczy translacji każdy).
+* **Dwujęzyczność:** Pełny przełącznik EN/PL (399 kluczy translacji każdy).
 * **Offline Font Cache:** Space Grotesk + Inter cachowane jako base64 w localStorage — strona renderuje się z właściwymi fontami nawet offline.
 * **Bezpieczeństwo:** Content-Security-Policy (CSP), SRI hashes na wszystkich CDN, walidacja localStorage przed użyciem w CSS, ochrona przed formula injection w Excelu.
-* **Testy:** 87 testów automatycznych (bezpieczeństwo + audyt modelu) weryfikujących realny kod źródłowy, nie tylko kopię logiki.
+* **Testy:** 120 testów automatycznych (bezpieczeństwo + audyt modelu + widoki wrażliwości) weryfikujących realny kod źródłowy, nie tylko kopię logiki.
 
 ### Wykorzystana Technologia
 * **Frontend:** HTML5, Tailwind CSS + custom CSS (dark theme, CSS custom properties).
 * **Logika:** Vanilla JavaScript (ES6+).
 * **Model finansowy:** czysty JS bez frameworka — łatwy do audytu, testowania i weryfikacji.
-* **Testy:** Node.js built-in test runner (`node:test`) — 87 testów (security + model audit).
+* **Testy:** Node.js built-in test runner (`node:test`) — 120 testów (security + model audit + widoki wrażliwości).
 * **Biblioteki:** Chart.js (wykresy), jsPDF + html2canvas (PDF), SheetJS/XLSX (Excel), Google Fonts Space Grotesk + Inter.
 * **Źródła danych:** Damodaran (WACC 2025), Weinberg (1992), Mark et al. UC Irvine (2008), Parnin & DeLine IEEE (2010), NBP FX (kursy walut).
 * **Hosting:** GitHub Pages (gotowe do deployu — brak backendu, wszystko w jednym pliku `index.html`).
@@ -64,16 +64,16 @@ In the world of IT Service Management, it's often difficult to convince the boar
 * **Excel Export:** 5 sheets (Inputs, Financial Results, Top Levers, Scenario Comparison, DORA Benchmark) with full calculation documentation.
 * **PDF Export:** Multi-page A4 report — page 1 with diagnostic questions, pages 2+ with block screenshots (html2canvas + jsPDF).
 * **Share Link:** Calculation state encoded in URL hash — copy the link and share with your team.
-* **Bilingual:** Full EN/PL toggle (~140 translation keys each).
+* **Bilingual:** Full EN/PL toggle (399 translation keys each).
 * **Offline Font Cache:** Space Grotesk + Inter cached as base64 in localStorage — renders with proper fonts even offline.
 * **Security:** Content-Security-Policy (CSP), SRI hashes on all CDNs, localStorage validation before CSS injection, Excel formula injection guard.
-* **Testing:** 104 automated tests (security + model audit + sensitivity views) verifying the actual source code, not a replicated copy of the logic.
+* **Testing:** 120 automated tests (security + model audit + sensitivity views) verifying the actual source code, not a replicated copy of the logic.
 
 ### Tech Stack
 * **Frontend:** HTML5, Tailwind CSS + custom CSS (dark theme, CSS custom properties).
 * **Logic:** Vanilla JavaScript (ES6+).
 * **Financial model:** framework-free plain JS — easy to audit, test and verify.
-* **Testing:** Node.js built-in test runner (`node:test`) — 104 tests (security + model audit + sensitivity views).
+* **Testing:** Node.js built-in test runner (`node:test`) — 120 tests (security + model audit + sensitivity views).
 * **Libraries:** Chart.js (charts), jsPDF + html2canvas (PDF), SheetJS/XLSX (Excel), Google Fonts Space Grotesk + Inter.
 * **Data sources:** Damodaran (2025 WACC), Weinberg (1992), Mark et al. UC Irvine (2008), Parnin & DeLine IEEE (2010), NBP FX (currency rates).
 * **Hosting:** GitHub Pages (ready to deploy — no backend, everything in a single `index.html`).
