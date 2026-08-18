@@ -936,8 +936,11 @@ PDE.exportPDF = async function exportPDF(mode) {
                 const pbStr = PDE.fmtMonthsLocative(r.paybackMonths);
                 const heroCapex   = (p.capex || 0) > 0 ? PDE.formatCurrencyWhole(p.capex) : '';
                 const heroSavings = (r.potentialSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.potentialSavings) : '';
+                const capexBelowMin = heroCapex && heroSavings && !PDE.isMeaningfulCapex(p.capex, r.potentialSavings);
                 let heroStr = '';
-                if (heroCapex && heroSavings && isFinite(r.paybackMonths) && r.paybackMonths > 0) {
+                if (heroCapex && heroSavings && capexBelowMin) {
+                    heroStr = L.verdictHeroBelowMin(heroCapex, heroSavings);
+                } else if (heroCapex && heroSavings && isFinite(r.paybackMonths) && r.paybackMonths > 0) {
                     heroStr = L.verdictHero(heroCapex, heroSavings, pbStr);
                 } else if (heroCapex && heroSavings) {
                     heroStr = L.verdictHeroNoReturn(heroCapex, heroSavings);
@@ -963,7 +966,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                 pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(180,83,9);
                 pdf.text(L.verdictPaybackLabel.toUpperCase(), ML + UW / 2, statsY);
                 pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28,20,16);
-                pdf.text(pbStr, ML + UW / 2, statsY + 7);
+                pdf.text(capexBelowMin ? '\u2014' : pbStr, ML + UW / 2, statsY + 7);
                 pdf.setFontSize(5.5); pdf.setFont(pdfFont, fontItalic); pdf.setTextColor(140,123,110);
                 const noteLines = wrapText(L.verdictNote, ML + 6, UW - 12);
                 pdf.text(noteLines[0] || '', ML + 6, statsY + 13);

@@ -207,11 +207,14 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
 
     const heroCapex   = (capexUSD || 0) > 0 ? PDE.formatCurrencyWhole(capexUSD) : '';
     const heroSavings = (annualSavingsUSD || 0) > 0 ? PDE.formatCurrencyWhole(annualSavingsUSD) : '';
+    const capexBelowMin = heroCapex && heroSavings && !PDE.isMeaningfulCapex(capexUSD, annualSavingsUSD);
     const heroFinite  = isFinite(pb) && pb > 0;
     const heroMonths  = !heroFinite ? '' : PDE.fmtMonthsLocative(pb);
 
     let heroHtml = '';
-    if (heroCapex && heroSavings && heroMonths) {
+    if (heroCapex && heroSavings && capexBelowMin) {
+        heroHtml = L.verdictHeroBelowMin(heroCapex, heroSavings);
+    } else if (heroCapex && heroSavings && heroMonths) {
         heroHtml = L.verdictHero(heroCapex, heroSavings, heroMonths);
     } else if (heroCapex && heroSavings && !heroMonths) {
         heroHtml = L.verdictHeroNoReturn(heroCapex, heroSavings);
@@ -232,7 +235,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
                 </div>
                 <div style="text-align:right;">
                     <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:0 0 4px;">${PDE.esc(L.verdictPaybackLabel)}</p>
-                    <p style="font-size:1.15rem;font-weight:900;color:var(--text-primary);margin:0;">${PDE.esc(PDE.fmtMonths(pb))}</p>
+                    <p style="font-size:1.15rem;font-weight:900;color:var(--text-primary);margin:0;">${PDE.esc(capexBelowMin ? '\u2014' : PDE.fmtMonths(pb))}</p>
                 </div>
                 <div style="flex:1;min-width:200px;">
                     <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;font-style:italic;">${PDE.esc(L.verdictNote)}</p>

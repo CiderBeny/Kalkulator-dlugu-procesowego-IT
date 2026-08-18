@@ -47,6 +47,11 @@ PDE.COEFFICIENTS = {
     PAYBACK_GREEN:             24,
     PAYBACK_YELLOW:            48,
 
+    // Minimum absolute CAPEX (USD) treated as a meaningful investment —
+    // below this (and below 1 month of potential savings) payback is a
+    // meaningless 4-month floor and the hero message switches to a warning
+    CAPEX_MIN_ABS:             1000,
+
     // Automation — share of manual work that is automatable
     AUTOMATABLE_SHARE:         0.6,    // 60% — cited in DevOps literature             · confidence: medium
 

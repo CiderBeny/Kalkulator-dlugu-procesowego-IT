@@ -27,6 +27,7 @@ const COEFFICIENTS = {
     REC_AUTO_MIN_WASTE:        0,
     REC_RISK_MIN_EXPOSURE:     0,
     REC_INNOVATION_MIN:        0,
+    CAPEX_MIN_ABS:             1000,
     DISCOUNT_RATE_DEFAULT:      0.093,
     TIME_HORIZON_YEARS_DEFAULT: 5,
 };
@@ -67,6 +68,14 @@ function calculateIRR(cashFlows) {
         if (high - low < precision) return (low + high) / 2;
     }
     return null;
+}
+
+// Mirrors PDE.isMeaningfulCapex — a CAPEX below the lower of the absolute
+// floor and 1 month of savings is not a meaningful investment (payback would
+// collapse to the 4-month ramp floor).
+function isMeaningfulCapex(capex, annualSavings) {
+    if (!isFinite(capex) || !isFinite(annualSavings) || annualSavings <= 0) return false;
+    return capex >= Math.min(COEFFICIENTS.CAPEX_MIN_ABS, annualSavings / 12);
 }
 
 const TRANSLATIONS_EN_LABELS = {
@@ -213,6 +222,40 @@ describe('Known Issue #4 (mitigated) — NPV model verifies fix is in place', ()
         const result = discountedPayback(1000, 1000000);
         assert.strictEqual(result, Infinity,
             'Small savings ($1k/yr) vs large investment ($1M) never pay back in 5-yr horizon');
+    });
+
+    // ── CAPEX meaningfulness gate (fixes absurd hero for tiny CAPEX) ──
+    describe('CAPEX meaningfulness gate — tiny investments must not produce a fake payback', () => {
+        it('$1 CAPEX against $660k savings is NOT a meaningful investment', () => {
+            assert.strictEqual(isMeaningfulCapex(1, 660873), false,
+                'Payback would collapse to the 4-month ramp floor — hero must warn instead');
+        });
+
+        it('default $50k CAPEX against $660k savings IS meaningful', () => {
+            assert.strictEqual(isMeaningfulCapex(50000, 660873), true);
+        });
+
+        it('CAPEX equal to the absolute floor ($1k) is meaningful', () => {
+            assert.strictEqual(isMeaningfulCapex(1000, 660873), true);
+        });
+
+        it('low-savings scenario: relative floor (1 month of savings) governs, not the $1k absolute floor', () => {
+            assert.strictEqual(isMeaningfulCapex(100, 2000), false,
+                'With $2k/yr savings the floor is ~$167 — $100 CAPEX is not meaningful');
+            assert.strictEqual(isMeaningfulCapex(167, 2000), true);
+            assert.strictEqual(isMeaningfulCapex(1000, 2000), true,
+                'A $1k CAPEX equals 6 months of $2k/yr savings — clearly meaningful');
+        });
+
+        it('zero or negative savings is never meaningful', () => {
+            assert.strictEqual(isMeaningfulCapex(50000, 0), false);
+            assert.strictEqual(isMeaningfulCapex(50000, -100), false);
+        });
+
+        it('a tiny CAPEX still yields payback = 4 months (the ramp floor), proving the gate is needed', () => {
+            assert.strictEqual(discountedPayback(660873, 1, undefined, undefined, true), 4,
+                'Any CAPEX under half a month of savings reports the same meaningless 4-month floor');
+        });
     });
 
     it('Single-year totalImpact still available for waterfall chart compatibility', () => {

@@ -23,6 +23,15 @@ PDE.discountedPayback = function discountedPayback(annualSavings, investment, ra
     return Infinity;
 };
 
+// A CAPEX only yields a meaningful payback when it is at least 1 month of
+// potential savings (below that, payback collapses to the 4-month ramp floor
+// and the headline becomes misleading). A fixed absolute floor (CAPEX_MIN_ABS)
+// keeps the check sane in high-savings scenarios without flagging defaults.
+PDE.isMeaningfulCapex = function isMeaningfulCapex(capex, annualSavings) {
+    if (!isFinite(capex) || !isFinite(annualSavings) || annualSavings <= 0) return false;
+    return capex >= Math.min(PDE.COEFFICIENTS.CAPEX_MIN_ABS, annualSavings / 12);
+};
+
 PDE.calculateIRR = function calculateIRR(cashFlows) {
     const precision = 1e-6;
     const maxIter = 1000;
