@@ -23,6 +23,7 @@ const C = {
     TURNOVER_REF_HOURS: 1800,
     RISK_SCALE_MAX: 5,
     AUTOMATABLE_SHARE: 0.6,
+    CAPEX_RECOVERY_RATIO: 0.10,
     DISCOUNT_RATE_DEFAULT: 0.093,
     TIME_HORIZON_YEARS_DEFAULT: 5,
 };
@@ -184,7 +185,10 @@ function computeModel(params, coeffs) {
     }
 
     const recoverable      = cWaste * leverAuto + cRisk * leverRisk;
-    const potentialSavings = recoverable * autoLevel;
+    const targetSavings    = recoverable * autoLevel;
+    const refCapex         = targetSavings * C.CAPEX_RECOVERY_RATIO;
+    const capture          = (refCapex > 0 && capex > 0) ? Math.min(1, capex / refCapex) : 0;
+    const potentialSavings = targetSavings * capture;
     const paybackMonths    = discountedPayback(potentialSavings, capex, dr, ny, true);
 
     const irrCashFlows = [-capex];

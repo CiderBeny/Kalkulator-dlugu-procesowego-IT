@@ -127,7 +127,7 @@ PDE.calculate = function calculate() {
     PDE.updateSliderFills();
 
     PDE.updateCharts(r.totalAnnualHrs, r.manualAnnualHrs, r.chasingAnnualHrs, r.cWaste, p.capex, r.potentialSavings, p.riskLevel, p.manualPercent, p.autoLevel / 100);
-    PDE.updateRecs(r.cWaste, r.cRisk, r.cOppDirect, r.paybackMonths, r.leverAuto, r.leverRisk, p.capex, r.potentialSavings);
+    PDE.updateRecs(r.cWaste, r.cRisk, r.cOppDirect, r.paybackMonths, r.leverAuto, r.leverRisk, p.capex, r.potentialSavings, r.targetSavings, r.captureFactor);
     PDE.updateDoraBenchmark();
     PDE.updateScenarios(r.recoverable, p.capex, p.autoLevel / 100, r.totalImpact, p.discountRate, p.horizonYears, r.scenCAutoLevel, r.scenCCapexMult);
     PDE.updateSensitivityViews(p);
@@ -136,7 +136,7 @@ PDE.calculate = function calculate() {
     PDE.updateCalibration(r);
 };
 
-PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capexUSD, annualSavingsUSD) {
+PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capexUSD, annualSavingsUSD, targetSavingsUSD, captureFactor) {
     const L = PDE.TRANSLATIONS[PDE.currentLang];
     if (leverAuto === undefined) leverAuto = PDE.readAdvanced('leverAutomation', PDE.COEFFICIENTS.LEVER_AUTOMATION_DEFAULT, 100);
     if (leverRisk === undefined) leverRisk = PDE.readAdvanced('leverRisk', PDE.COEFFICIENTS.LEVER_RISK_DEFAULT, 100);
@@ -205,28 +205,38 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
     });
     document.getElementById('leverCards').innerHTML = cards;
 
-    const heroCapex   = (capexUSD || 0) > 0 ? PDE.formatCurrencyWhole(capexUSD) : '';
-    const heroSavings = (annualSavingsUSD || 0) > 0 ? PDE.formatCurrencyWhole(annualSavingsUSD) : '';
-    const capexBelowMin = heroCapex && heroSavings && !PDE.isMeaningfulCapex(capexUSD, annualSavingsUSD);
-    const heroFinite  = isFinite(pb) && pb > 0;
-    const heroMonths  = !heroFinite ? '' : PDE.fmtMonthsLocative(pb);
+    const heroCapex    = (capexUSD || 0) > 0 ? PDE.formatCurrencyWhole(capexUSD) : '';
+    const heroSavings  = (annualSavingsUSD || 0) > 0 ? PDE.formatCurrencyWhole(annualSavingsUSD) : '';
+    const heroTarget   = (targetSavingsUSD || 0) > 0 ? PDE.formatCurrencyWhole(targetSavingsUSD) : '';
+    const capexBelowMin = heroCapex && heroTarget && !PDE.isMeaningfulCapex(capexUSD, targetSavingsUSD);
+    const heroFinite   = isFinite(pb) && pb > 0;
+    const heroMonths   = !heroFinite ? '' : PDE.fmtMonthsLocative(pb);
 
     let heroHtml = '';
-    if (heroCapex && heroSavings && capexBelowMin) {
-        heroHtml = L.verdictHeroBelowMin(heroCapex, heroSavings);
+    if (!heroCapex && heroTarget) {
+        heroHtml = L.verdictHeroNoInvest(heroTarget);
+    } else if (heroCapex && heroTarget && capexBelowMin) {
+        heroHtml = L.verdictHeroBelowMin(heroCapex, heroTarget);
     } else if (heroCapex && heroSavings && heroMonths) {
         heroHtml = L.verdictHero(heroCapex, heroSavings, heroMonths);
     } else if (heroCapex && heroSavings && !heroMonths) {
         heroHtml = L.verdictHeroNoReturn(heroCapex, heroSavings);
-    } else if (!heroCapex && heroSavings) {
-        heroHtml = L.verdictHeroNoInvest(heroSavings);
     }
     if (heroHtml) {
         heroHtml = heroHtml.replace(/<strong>/g, '<strong style="color:var(--accent);">');
     }
 
+    const capturePct  = Math.round((captureFactor || 0) * 100);
+    let captureNote = (captureFactor > 0 && captureFactor < 1 && !capexBelowMin)
+        ? L.verdictCaptureNote(capturePct)
+        : '';
+    if (captureNote) {
+        captureNote = captureNote.replace(/<strong>/g, '<strong style="color:var(--accent);">');
+    }
+
     document.getElementById('verdictBar').innerHTML = `
         <div style="display:flex;flex-direction:column;gap:0.9rem;">
+            ${captureNote ? '<p style="font-size:0.72rem;font-weight:700;color:var(--accent);margin:0;letter-spacing:0.04em;">' + captureNote + '</p>' : ''}
             ${heroHtml ? '<p style="font-family:\'Space Grotesk\',sans-serif;font-size:1.35rem;font-weight:900;line-height:1.25;color:var(--text-primary);margin:0;">' + heroHtml + '</p>' : ''}
             <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;">
                 <div>

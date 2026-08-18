@@ -32,6 +32,23 @@ PDE.isMeaningfulCapex = function isMeaningfulCapex(capex, annualSavings) {
     return capex >= Math.min(PDE.COEFFICIENTS.CAPEX_MIN_ABS, annualSavings / 12);
 };
 
+// CAPEX adequacy — the reference investment required to fully capture the
+// target savings. Savings do not scale with CAPEX by themselves; the investment
+// buys a share of the automation goal (see captureFactor below).
+PDE.referenceCapex = function referenceCapex(targetSavings) {
+    if (!isFinite(targetSavings) || targetSavings <= 0) return 0;
+    return targetSavings * PDE.COEFFICIENTS.CAPEX_RECOVERY_RATIO;
+};
+
+// Fraction of the target automation savings actually realized for a given
+// CAPEX. Linear up to full funding, then capped (more money buys no more
+// savings once the goal is fully financed).
+PDE.captureFactor = function captureFactor(capex, targetSavings) {
+    const ref = PDE.referenceCapex(targetSavings);
+    if (!isFinite(capex) || capex <= 0 || ref <= 0) return 0;
+    return Math.min(1, capex / ref);
+};
+
 PDE.calculateIRR = function calculateIRR(cashFlows) {
     const precision = 1e-6;
     const maxIter = 1000;
@@ -154,7 +171,9 @@ PDE.computeModel = function computeModel(params) {
     }
 
     const recoverable      = cWaste * leverAuto + cRisk * leverRisk;
-    const potentialSavings = recoverable * autoLevel;
+    const targetSavings    = recoverable * autoLevel;
+    const capture          = PDE.captureFactor(capex, targetSavings);
+    const potentialSavings = targetSavings * capture;
     const paybackMonths    = PDE.discountedPayback(potentialSavings, capex, dr, ny, true);
 
     const irrCashFlows = [-capex];
@@ -182,6 +201,8 @@ PDE.computeModel = function computeModel(params) {
         npvRecurring:      npvRecurring,
         npvTotalDebt:      npvTotalDebt,
         recoverable:       recoverable,
+        targetSavings:     targetSavings,
+        captureFactor:     capture,
         potentialSavings:  potentialSavings,
         paybackMonths:     paybackMonths,
         irr:               irr,
@@ -206,7 +227,8 @@ PDE.computeModel = function computeModel(params) {
 };
 
 PDE.scenCalc = function scenCalc(al, cx, recoverable, dr, ny) {
-    const annualSavings = recoverable * al;
+    const targetSavings = recoverable * al;
+    const annualSavings = targetSavings * PDE.captureFactor(cx, targetSavings);
     const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
     const npvSavings = annualSavings * pvifa;
     const net = npvSavings - cx;
@@ -219,7 +241,7 @@ PDE.scenCalc = function scenCalc(al, cx, recoverable, dr, ny) {
     } else if (al === 0) {
         irrVal = 0;
     }
-    return { savings: annualSavings, npvSavings: npvSavings, net: net, pb: pb, irr: irrVal };
+    return { savings: annualSavings, targetSavings: targetSavings, npvSavings: npvSavings, net: net, pb: pb, irr: irrVal };
 };
 
 // runMonteCarlo migrated to src/mc-worker.js (Web Worker)

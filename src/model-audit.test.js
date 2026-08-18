@@ -27,6 +27,7 @@ const COEFFICIENTS = {
     REC_RISK_MIN_EXPOSURE:     0,
     REC_INNOVATION_MIN:        0,
     CAPEX_MIN_ABS:             1000,
+    CAPEX_RECOVERY_RATIO:      0.10,
     DISCOUNT_RATE_DEFAULT:      0.093,
     TIME_HORIZON_YEARS_DEFAULT: 5,
 };
@@ -75,6 +76,19 @@ function calculateIRR(cashFlows) {
 function isMeaningfulCapex(capex, annualSavings) {
     if (!isFinite(capex) || !isFinite(annualSavings) || annualSavings <= 0) return false;
     return capex >= Math.min(COEFFICIENTS.CAPEX_MIN_ABS, annualSavings / 12);
+}
+
+// Mirrors PDE.referenceCapex — the investment needed to fully realize target savings.
+function referenceCapex(targetSavings) {
+    if (!isFinite(targetSavings) || targetSavings <= 0) return 0;
+    return targetSavings * COEFFICIENTS.CAPEX_RECOVERY_RATIO;
+}
+
+// Mirrors PDE.captureFactor — fraction of target savings realized for a given CAPEX.
+function captureFactor(capex, targetSavings) {
+    const ref = referenceCapex(targetSavings);
+    if (!isFinite(capex) || capex <= 0 || ref <= 0) return 0;
+    return Math.min(1, capex / ref);
 }
 
 const TRANSLATIONS_EN_LABELS = {
@@ -250,6 +264,42 @@ describe('Known Issue #4 (mitigated) — NPV model verifies fix is in place', ()
         it('a tiny CAPEX still yields payback = 4 months (the ramp floor), proving the gate is needed', () => {
             assert.strictEqual(discountedPayback(660873, 1, undefined, undefined, true), 4,
                 'Any CAPEX under half a month of savings reports the same meaningless 4-month floor');
+        });
+    });
+
+    // ── CAPEX adequacy — savings scale with investment (capture rate) ──
+    describe('CAPEX adequacy — savings scale with investment (capture rate)', () => {
+        const target = 376990; // ~$377k annual target savings (user scenario)
+        const ref    = 37699;  // reference CAPEX = 10% of target
+
+        it('reference CAPEX = CAPEX_RECOVERY_RATIO × target savings (10%)', () => {
+            assert.ok(Math.abs(referenceCapex(target) - ref) < 1e-6,
+                'referenceCapex(' + target + ') = ' + referenceCapex(target) + ', expected ~' + ref);
+        });
+
+        it('$1k vs $100k CAPEX produce DIFFERENT realized savings (the core fix)', () => {
+            const c1 = captureFactor(1000, target);
+            const c2 = captureFactor(100000, target);
+            assert.ok(c1 < c2, 'capture($1k) = ' + c1 + ' must be < capture($100k) = ' + c2);
+            assert.ok(Math.abs(c1 - 1000 / ref) < 1e-9,
+                'linear capture below full funding: ' + c1 + ' ≈ ' + (1000 / ref));
+            assert.strictEqual(c2, 1, 'capture($100k) = 1 (fully funded, capped)');
+            assert.ok(c1 * target < c2 * target,
+                'realized savings scale with investment: ' + (c1 * target) + ' < ' + (c2 * target));
+        });
+
+        it('capture is 0 for zero/negative CAPEX or target', () => {
+            assert.strictEqual(captureFactor(0, target), 0);
+            assert.strictEqual(captureFactor(-5000, target), 0);
+            assert.strictEqual(captureFactor(50000, 0), 0);
+            assert.strictEqual(captureFactor(50000, -100), 0);
+        });
+
+        it('the meaningfulness barrier keys off TARGET savings (not realized)', () => {
+            assert.strictEqual(isMeaningfulCapex(1, target), false,
+                '$1 vs $377k target → below-min warning (realized savings alone would hide this)');
+            assert.strictEqual(isMeaningfulCapex(1000, target), true,
+                '$1k is above the absolute floor → meaningful');
         });
     });
 
@@ -599,7 +649,8 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
             npvTotalDebt -= capex * (taxRate / 100) * 0.2 * pvifa;
         }
         const recoverable = cWaste * leverAuto + cRisk * leverRisk;
-        const potentialSavings = recoverable * autoLevel;
+        const targetSavings = recoverable * autoLevel;
+        const potentialSavings = targetSavings * captureFactor(capex, targetSavings);
         const paybackMonths = discountedPayback(potentialSavings, capex, 0.093, 5, true);
         const irrCashFlows = [-capex];
         for (let mi = 1; mi <= ny * 12; mi++) {
@@ -610,7 +661,7 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
             irrCashFlows.push((potentialSavings / 12) * rampFactor);
         }
         const irr = calculateIRR(irrCashFlows);
-        return { cWaste, cRisk, cOppDirect, totalImpact, netDebt, annualRecurring, oneTimeCosts, npvTotalDebt, recoverable, potentialSavings, paybackMonths, irr };
+        return { cWaste, cRisk, cOppDirect, totalImpact, netDebt, annualRecurring, oneTimeCosts, npvTotalDebt, recoverable, targetSavings, potentialSavings, paybackMonths, irr };
     }
 
     let realPDE = null;
@@ -678,13 +729,22 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
             'Scenario B payback (' + scenB.pb.toFixed(1) + ' mo) matches headline payback (' + real.paybackMonths.toFixed(1) + ' mo)');
     });
 
-    it('potentialSavings = recoverable × autoLevel (lever-weighted recovery)', () => {
+    it('targetSavings = recoverable × autoLevel (lever-weighted recovery)', () => {
         const r = realPDE.computeModel(sample);
         const recoverable = r.cWaste * sample.leverAuto + r.cRisk * sample.leverRisk;
         assert.ok(Math.abs(r.recoverable - recoverable) < 0.01,
             'recoverable = cWaste×leverAuto + cRisk×leverRisk (' + r.recoverable + ' vs ' + recoverable + ')');
-        assert.ok(Math.abs(r.potentialSavings - recoverable * (sample.autoLevel / 100)) < 0.01,
-            'potentialSavings = recoverable × autoLevel (' + r.potentialSavings + ' vs ' + (recoverable * (sample.autoLevel / 100)) + ')');
+        const target = recoverable * (sample.autoLevel / 100);
+        assert.ok(Math.abs(r.targetSavings - target) < 0.01,
+            'targetSavings = recoverable × autoLevel (' + r.targetSavings + ' vs ' + target + ')');
+    });
+
+    it('potentialSavings = targetSavings × captureFactor (fully-funded sample → capture = 1)', () => {
+        const r = realPDE.computeModel(sample);
+        assert.strictEqual(r.captureFactor, 1,
+            'sample CAPEX $150k fully funds the target → capture = 1');
+        assert.ok(Math.abs(r.potentialSavings - r.targetSavings) < 0.01,
+            'potentialSavings = targetSavings when capture = 1 (' + r.potentialSavings + ' vs ' + r.targetSavings + ')');
     });
 
     it('potentialSavings never exceeds full lever recovery', () => {
@@ -692,5 +752,28 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
         const leverRecoveryTotal = r.cWaste * sample.leverAuto + r.cRisk * sample.leverRisk;
         assert.ok(r.potentialSavings <= leverRecoveryTotal + 0.01,
             'potentialSavings (' + r.potentialSavings + ') ≤ full lever recovery (' + leverRecoveryTotal + ')');
+    });
+
+    it('real computeModel: identical params, different CAPEX → different realized savings', () => {
+        const small = realPDE.computeModel(Object.assign({}, sample, { capex: 1000 }));
+        const full  = realPDE.computeModel(Object.assign({}, sample, { capex: 150000 }));
+        assert.ok(small.captureFactor < full.captureFactor,
+            'capture($1k) = ' + small.captureFactor + ' < capture($150k) = ' + full.captureFactor);
+        assert.ok(small.potentialSavings < full.potentialSavings,
+            'savings scale with CAPEX: $' + small.potentialSavings.toFixed(0) + ' < $' + full.potentialSavings.toFixed(0));
+        assert.ok(Math.abs(full.potentialSavings - full.targetSavings) < 0.01,
+            'fully funded → realized = target');
+    });
+
+    it('real scenCalc: scenario B savings scale with CAPEX and stay consistent with headline', () => {
+        const real = realPDE.computeModel(sample);
+        const underFunded = realPDE.scenCalc(0.8, 1000, real.recoverable, 0.093, 5);
+        const funded      = realPDE.scenCalc(0.8, 150000, real.recoverable, 0.093, 5);
+        assert.ok(underFunded.savings < funded.savings,
+            'scenario B savings scale with CAPEX: ' + underFunded.savings + ' < ' + funded.savings);
+        assert.ok(Math.abs(funded.savings - real.potentialSavings) < 0.01,
+            'funded scenario B savings match headline realized savings (' + funded.savings + ' vs ' + real.potentialSavings + ')');
+        assert.ok(Math.abs(underFunded.targetSavings - funded.targetSavings) < 0.01,
+            'target savings are independent of CAPEX — only realized savings scale');
     });
 });

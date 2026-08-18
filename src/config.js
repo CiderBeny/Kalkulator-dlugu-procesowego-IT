@@ -52,6 +52,13 @@ PDE.COEFFICIENTS = {
     // meaningless 4-month floor and the hero message switches to a warning
     CAPEX_MIN_ABS:             1000,
 
+    // CAPEX adequacy — the reference investment needed to fully capture the
+    // target automation savings is CAPEX_RECOVERY_RATIO × target savings.
+    // Below it, realized savings scale linearly (capture factor = capex / reference).
+    // Rationale: you must fund a fraction of the annual savings you claim.
+    // confidence: medium · configurable
+    CAPEX_RECOVERY_RATIO:      0.10,
+
     // Automation — share of manual work that is automatable
     AUTOMATABLE_SHARE:         0.6,    // 60% — cited in DevOps literature             · confidence: medium
 
