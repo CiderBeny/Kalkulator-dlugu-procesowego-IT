@@ -23,7 +23,6 @@ const COEFFICIENTS = {
     PAYBACK_GREEN:             24,
     PAYBACK_YELLOW:            48,
     AUTOMATABLE_SHARE:         0.6,
-    TARGET_RISK_REDUCTION:     0.5,
     REC_AUTO_MIN_WASTE:        0,
     REC_RISK_MIN_EXPOSURE:     0,
     REC_INNOVATION_MIN:        0,
@@ -148,10 +147,6 @@ describe('Known Issue #3 — Hardcoded coefficients without direct empirical bas
 
     it('AUTOMATABLE_SHARE = 60% — "cited in DevOps literature" without specific source', () => {
         assert.strictEqual(COEFFICIENTS.AUTOMATABLE_SHARE, 0.6);
-    });
-
-    it('TARGET_RISK_REDUCTION = 50% — model assumption for heatmap visualization', () => {
-        assert.strictEqual(COEFFICIENTS.TARGET_RISK_REDUCTION, 0.5);
     });
 
     it('Annual hours = 1800, Turnover ref hours = 1800 — aligned to same standard', () => {

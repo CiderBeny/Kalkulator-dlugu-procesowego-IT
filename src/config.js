@@ -55,9 +55,6 @@ PDE.COEFFICIENTS = {
     // Automation — share of manual work that is automatable
     AUTOMATABLE_SHARE:         0.6,    // 60% — cited in DevOps literature             · confidence: medium
 
-    // Risk heatmap — target-state risk reduction (deprecated)
-    TARGET_RISK_REDUCTION:     0.5,    // kept for backward compat                     · confidence: deprecated
-
     // Recommendation gate thresholds (disabled — always show when > 0)
     REC_AUTO_MIN_WASTE:        0,      // $                                           · confidence: removed
     REC_RISK_MIN_EXPOSURE:     0,      // $                                           · confidence: removed
