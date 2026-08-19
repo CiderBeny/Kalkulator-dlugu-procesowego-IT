@@ -69,4 +69,11 @@ PDE.updateCharts = function updateCharts(total, manual, chase, waste, capex, sav
             }
         }
     });
+
+    const wf = document.getElementById('waterfallChart');
+    if (wf) wf.setAttribute('aria-label', L.chartWaterfallAria(Math.round(total), Math.round(manual), Math.round(chase), Math.round(valDelivery)));
+    const br = document.getElementById('bridgeChart');
+    if (br) br.setAttribute('aria-label', L.chartBridgeAria(waste, capex, savings - capex));
+    const hm = document.getElementById('heatmapChart');
+    if (hm) hm.setAttribute('aria-label', L.chartHeatmapAria(Math.round(effort), Math.round(risk * 10) / 10, Math.round(effort * (1 - auto)), Math.round(risk * (1 - auto * 0.6) * 10) / 10));
 };
