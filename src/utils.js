@@ -232,21 +232,47 @@ PDE.clamp = function clamp(id) {
     return Math.round(Math.min(maxInCurrency, Math.max(minInCurrency, raw)) * 100) / 100;
 };
 
+PDE._fmtBound = function fmtBound(value) {
+    const locale = PDE.currentLang === 'pl' ? 'pl-PL' : 'en-US';
+    const num = parseFloat(value);
+    if (!isFinite(num)) return '0';
+    return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num);
+};
+
+PDE._setFieldError = function setFieldError(el, message) {
+    let msg = el.nextElementSibling;
+    if (msg && msg.classList.contains('field-error')) {
+        msg.textContent = message;
+        return;
+    }
+    msg = document.createElement('p');
+    msg.className = 'field-error';
+    msg.textContent = message;
+    el.insertAdjacentElement('afterend', msg);
+};
+
+PDE._clearFieldError = function clearFieldError(el) {
+    const msg = el.nextElementSibling;
+    if (msg && msg.classList.contains('field-error')) msg.remove();
+};
+
 PDE.validateField = function (id) {
     const el = document.getElementById(id);
     if (!el) return;
     if (el.classList.contains('slider')) {
-        el.classList.remove('is-invalid');
+        el.classList.remove('input-error');
         return;
     }
     const c = PDE.HASH_CONSTRAINTS[id];
     if (!c) {
-        el.classList.remove('is-invalid');
+        el.classList.remove('input-error');
+        PDE._clearFieldError(el);
         return;
     }
     const raw = parseFloat(el.value);
     if (!isFinite(raw)) {
-        el.classList.add('is-invalid');
+        el.classList.add('input-error');
+        PDE._setFieldError(el, PDE.t('fieldError')(PDE._fmtBound(el.min), PDE._fmtBound(el.max)));
         return;
     }
     const monetaryIds = ['q4', 'q6', 'q8', 'capex'];
@@ -254,9 +280,11 @@ PDE.validateField = function (id) {
         ? raw / PDE.EXCHANGE_RATES[PDE.currentCurrency]
         : raw;
     if (val < c.min || val > c.max) {
-        el.classList.add('is-invalid');
+        el.classList.add('input-error');
+        PDE._setFieldError(el, PDE.t('fieldError')(PDE._fmtBound(el.min), PDE._fmtBound(el.max)));
     } else {
-        el.classList.remove('is-invalid');
+        el.classList.remove('input-error');
+        PDE._clearFieldError(el);
     }
 };
 

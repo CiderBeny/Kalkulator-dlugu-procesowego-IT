@@ -443,9 +443,15 @@ section h2 {
   box-shadow: 0 0 0 3px var(--accent-dim) !important;
 }
 
-.input-field.is-invalid {
-  border-color: #DC2626 !important;
-  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.3) !important;
+.input-field.input-error {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15) !important;
+}
+.field-error,
+.q-card .field-error {
+  color: var(--red) !important;
+  font-size: 0.65rem;
+  margin-top: 4px;
 }
 
 /* Remove number input spinners */
