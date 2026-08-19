@@ -250,7 +250,7 @@ describe('CDN SRI integrity hashes — pinned to verified values', () => {
     const SRI_PINS = {
         'https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js':
             'sha384-G436+Z2nlA8+PNoeRvWdxKbvOf8E/y+lYxqht2iBwNHTQDV5CJr3+AGVj8fGZi5t',
-        'https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js':
+        'https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js':
             'sha384-qovJwSBbRDPP5cEjCp8S0UP66wrvnjaa60XMOGzTNanrThcrGfXfnZkvgY8N1KT3',
         'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js':
             'sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H',
