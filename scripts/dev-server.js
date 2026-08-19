@@ -74,5 +74,9 @@ if (require.main === module) {
 
 // Export for unit tests (security.test.js).
 if (require.main !== module) {
-    module.exports = { serveAllowedPath: serveAllowedPath, BLOCKED_EXACT: BLOCKED_EXACT };
+    module.exports = {
+        serveAllowedPath: serveAllowedPath,
+        BLOCKED_EXACT: BLOCKED_EXACT,
+        SECURITY_HEADERS: SECURITY_HEADERS
+    };
 }

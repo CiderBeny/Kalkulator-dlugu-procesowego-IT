@@ -329,3 +329,133 @@ describe('dev-server serveAllowedPath — never expose repository internals', ()
         assert.strictEqual(serveAllowedPath('src/input.css'), null);
     });
 });
+
+describe('antiClickjack — hide-until-verified framebusting', () => {
+    const { antiClickjack } = require('../src/font-bootstrap.js');
+
+    function makeDoc(hasStyle) {
+        const state = { removed: false };
+        const el = {
+            parentNode: hasStyle ? {
+                removeChild: (child) => {
+                    if (child !== el) throw new Error('removed wrong node');
+                    state.removed = true;
+                    el.parentNode = null;
+                }
+            } : null
+        };
+        return {
+            el: el,
+            state: state,
+            getElementById: (id) => (id === 'anti-clickjack' ? el : null)
+        };
+    }
+
+    function makeWin({ hrefThrows, replaceThrows }) {
+        return {
+            location: {
+                _href: 'http://top/',
+                set href(v) { if (hrefThrows) throw new Error('top nav blocked'); this._href = v; },
+                get href() { return 'http://self/'; },
+                replace: function (v) { if (replaceThrows) throw new Error('top replace blocked'); this._href = v; }
+            }
+        };
+    }
+
+    it('reveals content when running as the top-level document', () => {
+        const doc = makeDoc(true);
+        const win = makeWin({});
+        assert.strictEqual(antiClickjack(win, win, doc), true);
+        assert.strictEqual(doc.state.removed, true, '#anti-clickjack style must be removed');
+    });
+
+    it('escapes via top.location.href when framed and navigation is allowed', () => {
+        const doc = makeDoc(true);
+        const top = makeWin({});
+        const self = makeWin({});
+        assert.strictEqual(antiClickjack(top, self, doc), true);
+        assert.strictEqual(top.location._href, 'http://self/');
+        assert.strictEqual(doc.state.removed, false, 'style removal is for top-level only');
+    });
+
+    it('falls back to top.location.replace when href assignment is blocked', () => {
+        const doc = makeDoc(true);
+        const top = makeWin({ hrefThrows: true });
+        const self = makeWin({});
+        assert.strictEqual(antiClickjack(top, self, doc), true);
+        assert.strictEqual(top.location._href, 'http://self/');
+    });
+
+    it('keeps content hidden when sandboxed iframe blocks both navigation sinks', () => {
+        const doc = makeDoc(true);
+        const top = makeWin({ hrefThrows: true, replaceThrows: true });
+        const self = makeWin({});
+        assert.strictEqual(antiClickjack(top, self, doc), false);
+        assert.strictEqual(doc.state.removed, false, '#anti-clickjack style must survive as last line of defence');
+    });
+
+    it('is a safe no-op when the guard style element is absent', () => {
+        const doc = makeDoc(false);
+        const win = makeWin({});
+        assert.strictEqual(antiClickjack(win, win, doc), true);
+        assert.strictEqual(doc.state.removed, false);
+    });
+});
+
+describe('anti-clickjack guard markup — index.html', () => {
+    const fs = require('node:fs');
+    const path = require('node:path');
+    const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+
+    it('#anti-clickjack style is present and precedes font-bootstrap.js', () => {
+        const styleIdx = html.indexOf('<style id="anti-clickjack">');
+        const scriptIdx = html.indexOf('<script src="src/font-bootstrap.js"></script>');
+        assert.ok(styleIdx !== -1, '#anti-clickjack style missing from index.html');
+        assert.ok(scriptIdx !== -1, 'font-bootstrap.js script tag missing');
+        assert.ok(styleIdx < scriptIdx, '#anti-clickjack must render before font-bootstrap.js runs');
+    });
+
+    it('hides the whole body with display:none !important', () => {
+        assert.match(
+            html,
+            /<style id="anti-clickjack">\s*body\s*\{\s*display\s*:\s*none\s*!important\s*\}\s*<\/style>/,
+            'guard style must be body{display:none!important}'
+        );
+    });
+});
+
+describe('CSP parity — meta tag vs dev-server header', () => {
+    const fs = require('node:fs');
+    const path = require('node:path');
+    const { SECURITY_HEADERS } = require('../scripts/dev-server.js');
+    const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+
+    function normalize(csp) {
+        return csp.split(';').map(s => s.trim()).filter(Boolean).sort();
+    }
+
+    it('dev-server sends a Content-Security-Policy header', () => {
+        assert.ok(SECURITY_HEADERS['Content-Security-Policy']);
+    });
+
+    it('meta CSP matches the dev-server header CSP except for frame-ancestors', () => {
+        // Browsers ignore frame-ancestors in a <meta> CSP and log a console
+        // error when present, so the published build deliberately omits it;
+        // the header CSP enforces it. All other directives must stay in sync.
+        const m = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)"/);
+        assert.ok(m, 'meta CSP not found in index.html');
+
+        const metaSet = normalize(m[1]);
+        const headerSet = normalize(SECURITY_HEADERS['Content-Security-Policy']);
+        const metaOnly = metaSet.filter(d => !headerSet.includes(d));
+        const headerOnly = headerSet.filter(d => !metaSet.includes(d));
+
+        assert.deepStrictEqual(metaOnly, [], 'meta CSP contains directives absent from the header CSP');
+        assert.deepStrictEqual(headerOnly, ["frame-ancestors 'none'"],
+            'the only allowed header-only directive is frame-ancestors');
+    });
+
+    it('the header CSP forbids framing via frame-ancestors', () => {
+        assert.match(SECURITY_HEADERS['Content-Security-Policy'], /frame-ancestors 'none'/, 'header CSP must declare frame-ancestors');
+    });
+});

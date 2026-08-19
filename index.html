@@ -56,6 +56,11 @@
     <script defer src="src/ui-renderers.js"></script>
     <script defer src="src/exports.js"></script>
     <script defer src="src/main.js"></script>
+    <!-- Anti-clickjack: content stays hidden until JS confirms top-level frame.
+         Browsers ignore frame-ancestors in <meta> CSP, so this hide-until-verified
+         guard is the enforced defence on header-less hosts (GitHub Pages).
+         Removed by antiClickjack() in font-bootstrap.js when top === self. -->
+    <style id="anti-clickjack">body{display:none!important}</style>
     <script src="src/font-bootstrap.js"></script>
     <!-- Tier 2: Google CDN — loaded after fonts.css so it wins the cascade -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

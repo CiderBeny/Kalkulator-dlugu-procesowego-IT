@@ -1,21 +1,43 @@
-/* ── Framebusting ──────────────────────────────────────────────────────────
-   Clickjacking defence: frame-ancestors 'none' is enforced only via the
-   dev-server HTTP header (browsers ignore the directive in <meta> CSP,
-   per W3C spec). GitHub Pages cannot send headers, so this runs before
-   any content renders.
+/* global module */
 
-   Primary sink: top.location.href (works cross-origin where allowed).
-   Fallback: detect a navigation attempt to this page and forcibly adopt
-   self — defensive when the sandbox blocks top navigation.
+/* ── Framebusting ──────────────────────────────────────────────────────────
+   Clickjacking defence (hide-until-verified). frame-ancestors 'none' is
+   enforced only via the dev-server HTTP header (browsers ignore the
+   directive in <meta> CSP, per W3C spec) and GitHub Pages cannot send
+   headers. The page is therefore rendered hidden (#anti-clickjack style in
+   index.html) and revealed only after this script confirms top-level.
+
+   Attack path: a sandboxed iframe without allow-top-navigation blocks both
+   top.location sinks; the page then stays hidden instead of being a visible
+   clickjacking target. Sandboxed iframes without allow-scripts never run
+   this script, so the static hide style in index.html is the last line of
+   defence in that case.
+
+   Exported for unit tests (security.test.js) under a CommonJS guard — the
+   browser ignores the export branch.
 ────────────────────────────────────────────────────────────────────────── */
-(function() {
-    if (top !== self) {
+function antiClickjack(topObj, selfObj, doc) {
+    const unlock = function (d) {
+        const s = d.getElementById('anti-clickjack');
+        if (s && s.parentNode) s.parentNode.removeChild(s);
+    };
+    if (topObj === selfObj) { unlock(doc); return true; }
+    try {
+        topObj.location.href = selfObj.location.href;
+        return true;
+    } catch {
         try {
-            top.location.href = self.location.href;
+            topObj.location.replace(selfObj.location.href);
+            return true;
         } catch {
-            top.location.replace(self.location.href);
+            return false; // framed + sandboxed: keep content hidden
         }
     }
+}
+
+(function() {
+    if (typeof document === 'undefined') return; // node/test environment
+    antiClickjack(top, self, document);
 })();
 
 /* ── Font cache bootstrap (runs before any stylesheet) ───────────────────
@@ -108,3 +130,9 @@ function validateFontFace(f) {
 })();
 
 })();
+
+// Export for unit tests (security.test.js). No module object in the browser,
+// so this branch never runs there.
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { antiClickjack: antiClickjack };
+}
