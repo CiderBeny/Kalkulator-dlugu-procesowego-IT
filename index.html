@@ -977,7 +977,7 @@
                 <div class="methodology-section" id="methodology-1">
                     <h4 data-i18n="methodologyWasteTitle">1. Annual OPEX Waste</h4>
                     <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code>(Manual hrs/yr + Chase hrs/yr) &times; Blended Rate &times; Team Size</code></p>
-                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Assumptions:</span> <span data-i18n="methodologyWasteAssumptions">1,800 productive hours per engineer per year — derived from U.S. Bureau of Labor Statistics American Time Use Survey (2024), which reports full-time employees average 8.1 hours on workdays, and OECD data (2024) calculating ~1,811 actual hours worked per US worker annually after accounting for paid leave, holidays, and sick time.</span></p>
+                    <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Assumptions:</span> <span data-i18n="methodologyWasteAssumptions">1,800 productive hours per engineer per year — derived from U.S. Bureau of Labor Statistics American Time Use Survey (2024), which reports full-time employees average 8.1 hours on workdays, and OECD data (2024) calculating ~1,811 actual hours worked per US worker annually after accounting for paid leave, holidays, and sick time. The 1,800-hour baseline is user-adjustable via the Annual Productive Hours slider (Section 11).</span></p>
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyWasteSource">BLS American Time Use Survey 2024 (bls.gov); OECD Average Annual Hours Actually Worked 2024 (oecd.org).</span></p>
                 </div>
 
@@ -1079,7 +1079,7 @@
 
                 <div class="methodology-section" id="methodology-11">
                     <h4 data-i18n="methodologyAdvancedTitle">11. Configurable Advanced Parameters</h4>
-                    <p><span data-i18n="methodologyAdvancedBody">Seven parameters in the "Advanced Parameters" panel let you override default coefficients in real time: Pipeline Erosion Rate (0.0–1.0), WACC / Discount Rate (5–20%), NPV Time Horizon (3–10 years), Automation Lever Recovery (10–60%), Risk Lever Recovery (20–80%), Context-Switching Premium (0–30%), and Corporate Tax Rate (0–50%, for the CAPEX depreciation tax shield). Changing any slider immediately recalculates all dependent metrics. Defaults are restored on page reload.</span></p>
+                    <p><span data-i18n="methodologyAdvancedBody">Thirteen parameters in the "Advanced Parameters" panel let you override default coefficients in real time: Pipeline Erosion Rate (0.0–1.0), WACC / Discount Rate (5–20%), NPV Time Horizon (3–10 years), Automation Lever Recovery (10–60%), Risk Lever Recovery (20–80%), Context-Switching Premium (0–30%), Corporate Tax Rate (0–50%, for the CAPEX depreciation tax shield), Annual Productive Hours (1,500–2,500, default 1,800), Innovation Runway Lever Recovery (10–80%), Management Efficiency Lever Recovery (5–40%), Retention &amp; Burnout Lever Recovery (10–60%), and Scenario C overrides: automation level (50–100%) and CAPEX multiplier (10–30%). Changing any slider immediately recalculates all dependent metrics. Defaults are restored on page reload.</span></p>
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyAdvancedSource">User-configurable — overrides the Economic Model defaults (Section 10) in real time.</span></p>
                 </div>
 
@@ -1109,7 +1109,7 @@
 
                 <div class="methodology-section" id="methodology-16">
                     <h4 data-i18n="methodologyCalibTitle">16. Model Calibration</h4>
-                    <p><span data-i18n="methodologyCalibBody">The Model Calibration panel lets you compare model predictions against your actual quarterly data. Each metric row shows: (1) Predicted value — the model's annual estimate divided by 4. (2) Your actual value — entered per quarter. (3) Variance — actual minus predicted. (4) Delta % — (actual - predicted) / predicted x 100. (5) Accuracy badge — green (<=15% error — Accurate), yellow (<=30% — Off), red (>30% — Poor). An overall Accuracy Score averages all metric delta %. Actual values are saved to localStorage and persist across sessions. Use "Reset" to clear all entered data.</span></p>
+                    <p><span data-i18n="methodologyCalibBody">The Model Calibration panel lets you compare model predictions against your actual quarterly data. Each metric row shows: (1) Predicted value — the model's annual estimate divided by 4. (2) Your actual value — entered per quarter. (3) Variance — actual minus predicted. (4) Delta % — (actual - predicted) / predicted x 100. (5) Accuracy badge — green (<=15% error — Accurate), yellow (<=30% — Off), red (>30% — Poor). An overall Accuracy Score averages all metric delta %. Actual values are saved to localStorage and persist across sessions. Use "Reset Actuals" in the panel header to clear all entered data.</span></p>
                     <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyCalibSource">Built-in calibration tool — user-provided actuals stored in localStorage.</span></p>
                 </div>
 
