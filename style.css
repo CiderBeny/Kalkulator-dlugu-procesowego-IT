@@ -194,6 +194,22 @@ nav p {
 }
 
 /* ── CTA button in nav ── */
+#ctaBtn {
+  background: var(--accent) !important;
+  color: #FFFFFF !important;
+  font-family: 'Space Grotesk', 'DM Sans', 'Nunito Sans', 'Trebuchet MS', ui-rounded, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1.75rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
 #ctaBtn:hover {
   background: var(--accent-bright) !important;
   box-shadow: 0 0 18px var(--accent-glow);
