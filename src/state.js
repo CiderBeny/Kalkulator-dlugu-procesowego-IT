@@ -10,6 +10,12 @@ PDE.encodeState = function encodeState() {
     history.replaceState(null, '', '#' + hash);
 };
 
+PDE._encodeStateTimeout = null;
+PDE.encodeStateDebounced = function encodeStateDebounced() {
+    clearTimeout(PDE._encodeStateTimeout);
+    PDE._encodeStateTimeout = setTimeout(PDE.encodeState, 300);
+};
+
 PDE.decodeState = function decodeState() {
     if (!location.hash || location.hash.length < 3) return;
     const pairs = location.hash.slice(1).split('&');

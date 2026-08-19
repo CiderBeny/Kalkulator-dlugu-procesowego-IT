@@ -397,7 +397,7 @@ PDE.updateScenarios = function updateScenarios(recoverable, capex, autoLevel, to
         scenCard({ title: L.scenarioBTitle, desc: L.scenarioBDesc, accentColor: 'var(--accent)', capexAmt: capex, calcResult: scenB, showBadge: isRecommendedB, badgeText: L.scenRecommended }) +
         scenCard({ title: L.scenarioCTitle, desc: L.scenarioCDesc, accentColor: 'var(--green)', capexAmt: capex * 1.5, calcResult: scenC, showBadge: isRecommendedC, badgeText: L.scenRecommended });
 
-    PDE.encodeState();
+    PDE.encodeStateDebounced();
 };
 
 PDE.updateSensitivityViews = function updateSensitivityViews(params) {
