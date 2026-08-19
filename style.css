@@ -662,8 +662,15 @@ section h2 {
 .label-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
+
+/* ── Stat card icon colours (inherit stroke via currentColor) ── */
+#pdf-block-3 .border-l-red-600    .label-row svg { color: var(--red); }
+#pdf-block-3 .border-l-orange-500 .label-row svg { color: var(--orange); }
+#pdf-block-3 .border-l-purple-600 .label-row svg { color: var(--purple); }
+#pdf-block-3 .border-l-amber-700  .label-row svg { color: var(--accent); }
+#pdf-block-3 .border-l-green-600  .label-row svg { color: var(--green); }
 
 /* ── Formula tooltips ── */
 /*
