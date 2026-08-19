@@ -705,11 +705,14 @@ section h2 {
 */
 .formula-tip {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: help;
   font-size: 0.65rem;
   color: var(--text-muted);
-  margin-left: 5px;
+  padding: 12px;
+  margin: -12px -12px -12px -7px; /* -7px = 5px original margin − 12px padding */
   vertical-align: middle;
 }
 
@@ -719,7 +722,7 @@ section h2 {
 .formula-tip::after {
   content: attr(data-formula);
   position: absolute;
-  bottom: calc(100% + 10px); /* float above the ⓘ icon */
+  bottom: calc(100% - 2px); /* float above the ⓘ icon (compensates 12px box padding) */
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-elevated);
@@ -745,7 +748,7 @@ section h2 {
 .formula-tip::before {
   content: '';
   position: absolute;
-  bottom: calc(100% + 4px);
+  bottom: calc(100% - 8px); /* compensates 12px box padding */
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;

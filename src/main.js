@@ -7,22 +7,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const gFont = document.getElementById('googleFontsSheet');
     if (gFont) gFont.media = 'all';
 
+    const setTipOpen = function (el, open) {
+        el.classList.toggle('tip-open', open);
+        el.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
     document.querySelectorAll('.formula-tip').forEach(el => {
+        el.setAttribute('aria-expanded', 'false');
         el.addEventListener('click', e => {
             e.stopPropagation();
             const isOpen = el.classList.contains('tip-open');
-            document.querySelectorAll('.formula-tip').forEach(t => t.classList.remove('tip-open'));
-            if (!isOpen) el.classList.add('tip-open');
+            document.querySelectorAll('.formula-tip').forEach(t => setTipOpen(t, false));
+            if (!isOpen) setTipOpen(el, true);
         });
         el.addEventListener('keydown', e => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 const isOpen = el.classList.contains('tip-open');
-                document.querySelectorAll('.formula-tip').forEach(t => t.classList.remove('tip-open'));
-                if (!isOpen) el.classList.add('tip-open');
+                document.querySelectorAll('.formula-tip').forEach(t => setTipOpen(t, false));
+                if (!isOpen) setTipOpen(el, true);
             }
             if (e.key === 'Escape') {
-                el.classList.remove('tip-open');
+                setTipOpen(el, false);
+                el.blur();
             }
         });
     });
@@ -268,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('click', e => {
         if (!e.target.classList.contains('formula-tip')) {
-            document.querySelectorAll('.formula-tip').forEach(t => t.classList.remove('tip-open'));
+            document.querySelectorAll('.formula-tip').forEach(t => setTipOpen(t, false));
         }
     });
 });
