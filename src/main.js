@@ -129,6 +129,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ── Advanced Metrics toggle ──
+    const toggleMetrics = document.getElementById('toggleAdvancedMetrics');
+    const metricsGrid = document.getElementById('pdf-block-3');
+    if (toggleMetrics && metricsGrid) {
+        toggleMetrics.addEventListener('click', function () {
+            const collapsed = metricsGrid.classList.toggle('metrics-collapsed');
+            const span = toggleMetrics.querySelector('[data-i18n]');
+            if (span) {
+                const key = collapsed ? 'showAdvancedMetrics' : 'hideAdvancedMetrics';
+                span.textContent = PDE.TRANSLATIONS[PDE.currentLang][key] || key;
+                span.setAttribute('data-i18n', key);
+            }
+        });
+    }
+
     // ── Quick/Full model mode toggle ──
     PDE.currentMode = PDE.readMode();
     PDE.setMode(PDE.currentMode, true);
@@ -201,8 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pdfBtnSimple) pdfBtnSimple.addEventListener('click', function () { PDE.exportPDF('simple'); });
     const pdfBtnFull = document.getElementById('exportBtnFull');
     if (pdfBtnFull) pdfBtnFull.addEventListener('click', function () { PDE.exportPDF('full'); });
-    const ctaBtn = document.getElementById('ctaBtn');
-    if (ctaBtn) ctaBtn.addEventListener('click', function () { PDE.exportPDF('full'); });
 
     const exportMenu = document.getElementById('exportMenu');
     const exportMenuBtn = document.getElementById('exportMenuBtn');

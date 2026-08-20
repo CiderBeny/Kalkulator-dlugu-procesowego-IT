@@ -193,29 +193,6 @@ nav p {
   letter-spacing: 0.12em;
 }
 
-/* ── CTA button in nav ── */
-#ctaBtn {
-  background: var(--accent) !important;
-  color: #FFFFFF !important;
-  font-family: 'Space Grotesk', 'DM Sans', 'Nunito Sans', 'Trebuchet MS', ui-rounded, system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  border: none;
-  border-radius: 999px;
-  padding: 0.6rem 1.75rem;
-  font-size: 0.75rem;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-  box-shadow: 0 0 16px var(--accent-glow);
-}
-
-#ctaBtn:hover {
-  background: var(--accent-bright) !important;
-  box-shadow: 0 0 18px var(--accent-glow);
-  transform: translateY(-1px);
-}
-
 /* ── Nav export dropdown (compact mobile nav) ── */
 .nav-export-menu {
   position: relative;
@@ -841,9 +818,14 @@ body.mode-quick .mode-full-only {
 }
 @media (min-width: 768px) {
   html.mode-quick #pdf-block-3,
-  body.mode-quick #pdf-block-3 {
+  body.mode-quick #pdf-block-3,
+  #pdf-block-3.metrics-collapsed {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+#pdf-block-3.metrics-collapsed .advanced-metric {
+  display: none;
 }
 
 /* ── DORA badge ── */
@@ -1059,9 +1041,6 @@ body.mode-quick .mode-full-only {
         padding: 0.28rem 0.45rem;
         white-space: nowrap;
     }
-    #ctaBtn {
-        padding: 0.3rem 0.7rem;
-    }
 }
 
 /* ── Sticky progress nav: phase tabs + reset ── */
@@ -1135,12 +1114,6 @@ body.mode-quick .mode-full-only {
         font-size: 0.58rem;
         padding: 0.25rem 0.4rem;
     }
-    #ctaBtn {
-        width: 100%;
-        margin-left: 0;
-        text-align: center;
-        padding: 0.36rem 0.8rem;
-    }
 }
 
 /* ── Methodology & Sources expandable card ── */
@@ -1212,6 +1185,48 @@ details.methodology-card[open] summary {
     border-radius: 3px;
     font-size: 0.68rem;
     color: var(--text-primary);
+}
+details.methodology-sub {
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+}
+details.methodology-sub summary {
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    margin: -0.4rem -0.7rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+}
+details.methodology-sub summary:hover {
+    background: var(--bg-input);
+}
+details.methodology-sub summary::-webkit-details-marker {
+    display: none;
+}
+details.methodology-sub summary::marker {
+    display: none;
+}
+details.methodology-sub summary::before {
+    content: '\25B6';
+    font-size: 0.55rem;
+    color: var(--accent);
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+}
+details.methodology-sub[open] > summary::before {
+    transform: rotate(90deg);
+}
+details.methodology-sub summary h4 {
+    display: inline;
+    margin: 0;
+}
+details.methodology-sub .methodology-sub-body {
+    padding-top: 0.25rem;
 }
 .methodology-label {
     font-weight: 700;

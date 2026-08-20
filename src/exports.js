@@ -403,9 +403,9 @@ PDE.resolveCSSVarsOnElement = function resolveCSSVarsOnElement(el) {
 PDE.exportPDF = async function exportPDF(mode) {
     const isMobile = PDE.isMobileBrowser();
 
-    const btnId = mode === 'full' ? 'ctaBtn' : 'exportBtnSimple';
+    const btnId = mode === 'full' ? 'exportBtnFull' : 'exportBtnSimple';
     const generatingKey = mode === 'full' ? 'exportGeneratingFull' : 'exportGeneratingSimple';
-    const finishedKey = mode === 'full' ? 'ctaBtn' : 'exportBtnSimple';
+    const finishedKey = mode === 'full' ? 'exportBtnFull' : 'exportBtnSimple';
     const filename = mode === 'full' ? 'Strategic_Detailed_Report.pdf' : 'Strategic_Summary_Report.pdf';
 
     const { jsPDF } = window.jspdf;
@@ -1208,10 +1208,18 @@ PDE.exportPDF = async function exportPDF(mode) {
                 newPage();
                 const methodologySection = document.getElementById('methodologySection');
                 const wasOpen = methodologySection ? methodologySection.open : false;
+                const wasSubOpen = [];
                 if (methodologySection) methodologySection.open = true;
+                document.querySelectorAll('details.methodology-sub').forEach(function (d) {
+                    wasSubOpen.push(d.open);
+                    d.open = true;
+                });
                 await new Promise(r => requestAnimationFrame(r));
                 const methodologyIds = ['methodology-header','methodology-about','methodology-1','methodology-2','methodology-3','methodology-4','methodology-5','methodology-6','methodology-7','methodology-8','methodology-9','methodology-10','methodology-11','methodology-12','methodology-13','methodology-14','methodology-15','methodology-16','methodology-footer'];
                 for (const id of methodologyIds) await captureBlock(id);
+                document.querySelectorAll('details.methodology-sub').forEach(function (d, i) {
+                    d.open = wasSubOpen[i];
+                });
                 if (methodologySection) methodologySection.open = wasOpen;
             }
 
