@@ -524,6 +524,180 @@ PDE.exportPDF = async function exportPDF(mode) {
             return lines;
         }
 
+        function getLeversRaw(r) {
+            return [
+                { key: 'automation', label: L.leverAutomationTitle, recovery: r.leverRecoveryAuto,    effort: L.effortMedium, timeline: PDE.fmtMonthsRange(2, 4), color: [220,38,38] },
+                { key: 'risk',       label: L.leverRiskTitle,        recovery: r.leverRecoveryRisk,    effort: L.effortLow,    timeline: PDE.fmtMonthsRange(1, 2), color: [234,88,12] },
+                { key: 'innovation', label: L.leverInnovationTitle,  recovery: r.leverRecoveryInnovation, effort: L.effortHigh, timeline: PDE.fmtMonthsRange(3, 6), color: [124,58,237] },
+                { key: 'mgmt',      label: L.leverMgmtTitle,        recovery: r.leverRecoveryMgmt,    effort: L.effortLow,    timeline: PDE.fmtMonthsRange(1, 1), color: [8,145,178] },
+                { key: 'turnover',  label: L.leverTurnoverTitle,    recovery: r.leverRecoveryTurnover, effort: L.effortMedium,timeline: PDE.fmtMonthsRange(3, 5), color: [22,163,74] },
+            ];
+        }
+
+        function renderExecutiveSummary(p, r, leversRaw) {
+            // Header band
+            drawRect(0, 0, PW, 12, [92, 64, 18]);
+            pdf.setFontSize(9); pdf.setFont(pdfFont, 'bold');
+            pdf.setTextColor(253, 245, 230);
+            pdf.text('STRATEGIC BUSINESS CASE ENGINE', ML, 8);
+            pdf.setTextColor(214, 201, 184); pdf.setFont(pdfFont, 'normal');
+            pdf.text(L.navSubtitle.toUpperCase(), PW - MR, 8, { align: 'right' });
+
+            cy = 20;
+
+            // Section title
+            drawRect(ML - 2, cy - 4, UW + 4, 10, [180, 83, 9]);
+            pdf.setFontSize(11); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(255, 255, 255);
+            pdf.text(L.execSummaryTitle.toUpperCase(), ML + 2, cy + 3);
+            cy += 14;
+
+            // Verdict bar
+            const pbStr = PDE.fmtMonthsLocative(r.paybackMonths);
+            const heroCapex   = (p.capex || 0) > 0 ? PDE.formatCurrencyWhole(p.capex) : '';
+            const heroSavings = (r.potentialSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.potentialSavings) : '';
+            const heroTarget  = (r.targetSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.targetSavings) : '';
+            const capexBelowMin = heroCapex && heroTarget && !PDE.isMeaningfulCapex(p.capex, r.targetSavings);
+            let heroStr = '';
+            if (!heroCapex && heroTarget) {
+                heroStr = L.verdictHeroNoInvest(heroTarget);
+            } else if (heroCapex && heroTarget && capexBelowMin) {
+                heroStr = L.verdictHeroBelowMin(heroCapex, heroTarget);
+            } else if (heroCapex && heroSavings && isFinite(r.paybackMonths) && r.paybackMonths > 0) {
+                heroStr = L.verdictHero(heroCapex, heroSavings, pbStr);
+            } else if (heroCapex && heroSavings) {
+                heroStr = L.verdictHeroNoReturn(heroCapex, heroSavings);
+            }
+            heroStr = heroStr.replace(/<[^>]+>/g, '');
+            let heroRows = 0;
+            if (heroStr) {
+                pdf.setFontSize(7); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28, 20, 16);
+                const heroLines = wrapText(heroStr, ML + 6, UW - 12);
+                heroLines.slice(0, 2).forEach(function (ln, i) { pdf.text(ln, ML + 6, cy + 5 + i * 3.6); });
+                heroRows = Math.min(heroLines.length, 2);
+            }
+            const barH   = 15 + heroRows * 4;
+            const statsY = cy + 5 + heroRows * 3.6;
+            needSpace(barH + 2);
+            drawRect(ML, cy, UW, barH, [255, 255, 255], [214, 201, 184]);
+            pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(180, 83, 9);
+            pdf.text(L.verdictRecoveryLabel.toUpperCase(), ML + 6, statsY);
+            pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28, 20, 16);
+            pdf.text(PDE.formatCurrency(r.potentialSavings), ML + 6, statsY + 7);
+            pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(180, 83, 9);
+            pdf.text(L.verdictPaybackLabel.toUpperCase(), ML + UW / 2, statsY);
+            pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28, 20, 16);
+            pdf.text(capexBelowMin ? '\u2014' : pbStr, ML + UW / 2, statsY + 7);
+            pdf.setFontSize(5.5); pdf.setFont(pdfFont, fontItalic); pdf.setTextColor(140, 123, 110);
+            const noteLines = wrapText(L.verdictNote, ML + 6, UW - 12);
+            pdf.text(noteLines[0] || '', ML + 6, statsY + 13);
+            cy += barH + 4;
+
+            // Financial results (3 core cards)
+            drawRect(ML - 2, cy - 4, UW + 4, 10, [180, 83, 9]);
+            pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(255, 255, 255);
+            pdf.text('FINANCIAL RESULTS', ML + 2, cy + 3);
+            cy += 14;
+
+            const cards = [
+                { label: L.statWasteLabel,  val: PDE.formatCurrency(r.cWaste),      color: [220, 38, 38] },
+                { label: L.statRiskLabel,   val: PDE.formatCurrency(r.cRisk),       color: [234, 88, 12] },
+                { label: L.statTotalLabel,  val: PDE.formatCurrency(r.totalImpact), color: [30, 41, 59] },
+            ];
+            const cw = (UW - 6) / 3, ch = 22;
+            cards.forEach((c, i) => {
+                const x = ML + i * (cw + 3);
+                drawRect(x, cy, cw, ch, [255, 255, 255], [214, 201, 184]);
+                drawRect(x, cy, 1.5, ch, c.color);
+                pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(124, 79, 34);
+                pdf.text(String(c.label).toUpperCase(), x + 4, cy + 6);
+                pdf.setFontSize(9); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28, 20, 16);
+                pdf.text(String(c.val), x + 4, cy + 16);
+            });
+            cy += ch + 4;
+
+            // Full mode: compact NPV / IRR / Net line
+            if (PDE.currentMode !== 'quick') {
+                pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(140, 123, 110);
+                pdf.text(L.statNpvLabel + ': ' + PDE.formatCurrency(r.npvTotalDebt), ML, cy);
+                pdf.text(L.statIrrLabel + ': ' + (r.irr !== null ? PDE.formatIRR(r.irr) : '\u2014'), ML + UW / 2, cy);
+                pdf.text(L.statNetLabel + ': ' + PDE.formatCurrency(r.netDebt), PW - MR, cy, { align: 'right' });
+                cy += 8;
+            }
+
+            // Top levers
+            drawRect(ML - 2, cy - 4, UW + 4, 10, [180, 83, 9]);
+            pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(255, 255, 255);
+            pdf.text(L.execSummaryLevers.toUpperCase(), ML + 2, cy + 3);
+            cy += 14;
+
+            const sorted = leversRaw.slice().sort((a, b) => b.recovery - a.recovery).slice(0, 3);
+            const lcw = (UW - 6) / 3, lch = 40;
+            sorted.forEach((l, i) => {
+                const x = ML + i * (lcw + 3);
+                drawRect(x, cy, lcw, lch, [255, 255, 255], [214, 201, 184]);
+                drawRect(x, cy, lcw, 2, l.color);
+                pdf.setFontSize(5.5); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(...l.color);
+                pdf.text((L.rankLabels[i] || '#' + (i + 1)).toUpperCase(), x + 4, cy + 6);
+                pdf.setFontSize(7); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28, 20, 16);
+                pdf.text(String(l.label), x + 4, cy + 12);
+                pdf.setFontSize(9); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(...l.color);
+                pdf.text(PDE.formatCurrency(l.recovery), x + 4, cy + 22);
+                pdf.setFontSize(5); pdf.setFont(pdfFont, 'normal'); pdf.setTextColor(140, 123, 110);
+                pdf.text(L.estRecovery, x + 4, cy + 28);
+                pdf.text(L.effortLabel + ': ' + l.effort, x + 4, cy + 34);
+            });
+            cy += lch + 4;
+
+            // DORA benchmarks
+            drawRect(ML - 2, cy - 4, UW + 4, 10, [180, 83, 9]);
+            pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(255, 255, 255);
+            pdf.text(L.doraTitle.toUpperCase(), ML + 2, cy + 3);
+            cy += 14;
+
+            const doraMetrics = [
+                { metric: L.doraMetricLeadTime, value: L.doraLeadTimeDesc(PDE.clamp('q2')), bandDesc: L.doraLeadTimeBand, result: PDE.getDoraBand('leadTime', PDE.clamp('q2')) },
+                { metric: L.doraMetricManual,   value: L.doraManualDesc(PDE.clamp('q1')),   bandDesc: L.doraManualBand,   result: PDE.getDoraBand('manual', PDE.clamp('q1')) },
+                { metric: L.doraMetricErrors,   value: L.doraErrorsDesc(PDE.clamp('q5')),   bandDesc: L.doraErrorsBand,   result: PDE.getDoraBand('errors', PDE.clamp('q5')) },
+            ];
+            const dcolW = UW / 4;
+            drawRect(ML, cy, UW, 7, [74, 63, 53]);
+            pdf.setFontSize(5.5); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(255, 255, 255);
+            pdf.text('Metric', ML + 2, cy + 5);
+            pdf.text('Your Value', ML + dcolW + 2, cy + 5);
+            pdf.text(L.doraBandHeader, ML + dcolW * 2 + 2, cy + 5);
+            pdf.text('Status', ML + dcolW * 3 + 2, cy + 5);
+            cy += 10;
+            doraMetrics.forEach((m, i) => {
+                drawRect(ML, cy, UW, 8, i % 2 === 0 ? [255, 255, 255] : [245, 240, 232]);
+                pdf.setFontSize(6); pdf.setFont(pdfFont, 'normal'); pdf.setTextColor(28, 20, 16);
+                pdf.text(String(m.metric), ML + 2, cy + 5.5);
+                pdf.text(String(m.value), ML + dcolW + 2, cy + 5.5);
+                pdf.setFontSize(5.5); pdf.setTextColor(140, 123, 110);
+                pdf.text(String(m.bandDesc), ML + dcolW * 2 + 2, cy + 5.5);
+                pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold');
+                const col = m.result.color === 'var(--green)' ? [22, 163, 74] : m.result.color === 'var(--yellow)' ? [202, 138, 4] : m.result.color === 'var(--orange)' ? [234, 88, 12] : m.result.color === 'var(--red)' ? [220, 38, 38] : [180, 83, 9];
+                pdf.setTextColor(...col);
+                pdf.text(String(m.result.band), ML + dcolW * 3 + 2, cy + 5.5);
+                cy += 10;
+            });
+            cy += 6;
+
+            // Footer note
+            pdf.setFontSize(6); pdf.setFont(pdfFont, fontItalic); pdf.setTextColor(140, 123, 110);
+            const footerLines = wrapText(L.methodologyDesktopNote, ML, UW);
+            footerLines.forEach(function (l, li) { pdf.text(l, ML, cy + li * 3.5); });
+            cy += footerLines.length * 3.5 + 6;
+        }
+
+        if (mode === 'simple') {
+            const p = PDE.getParams();
+            const r = PDE.computeModel(p);
+            const leversRaw = getLeversRaw(r);
+            renderExecutiveSummary(p, r, leversRaw);
+            pdf.save(filename);
+            return;
+        }
+
         // PAGE 1: Phase 1 header + all questions
         drawRect(0, 0, PW, 12, [92, 64, 18]);
         pdf.setFontSize(9); pdf.setFont(pdfFont, 'bold');
@@ -729,13 +903,7 @@ PDE.exportPDF = async function exportPDF(mode) {
             console.debug('[PDF] Model results:', JSON.parse(JSON.stringify(r)));
             console.debug('[PDF] cy start =', cy);
 
-            const leversRaw = [
-                { key: 'automation', label: L.leverAutomationTitle, recovery: r.leverRecoveryAuto,    effort: L.effortMedium, timeline: PDE.fmtMonthsRange(2, 4), color: [220,38,38] },
-                { key: 'risk',       label: L.leverRiskTitle,        recovery: r.leverRecoveryRisk,    effort: L.effortLow,    timeline: PDE.fmtMonthsRange(1, 2), color: [234,88,12] },
-                { key: 'innovation', label: L.leverInnovationTitle,  recovery: r.leverRecoveryInnovation, effort: L.effortHigh, timeline: PDE.fmtMonthsRange(3, 6), color: [124,58,237] },
-                { key: 'mgmt',      label: L.leverMgmtTitle,        recovery: r.leverRecoveryMgmt,    effort: L.effortLow,    timeline: PDE.fmtMonthsRange(1, 1), color: [8,145,178] },
-                { key: 'turnover',  label: L.leverTurnoverTitle,    recovery: r.leverRecoveryTurnover, effort: L.effortMedium,timeline: PDE.fmtMonthsRange(3, 5), color: [22,163,74] },
-            ];
+            const leversRaw = getLeversRaw(r);
 
             function renderSimpleResults() {
                 const cards = [
@@ -1093,9 +1261,7 @@ PDE.exportPDF = async function exportPDF(mode) {
             pdf.save(filename);
         } else {
             // Desktop path — html2canvas screenshots
-            const mainIds = mode === 'simple'
-                ? ['pdf-block-3','scenario-compare','sens-views']
-                : ['pdf-block-3','scenario-compare','sens-views','pdf-block-sa','pdf-block-4','pdf-block-5','pdf-block-6'];
+            const mainIds = ['pdf-block-3','scenario-compare','sens-views','pdf-block-sa','pdf-block-4','pdf-block-5','pdf-block-6'];
 
             async function captureBlock(id) {
                 const el = document.getElementById(id);
