@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const el = document.getElementById(id);
                 if (el) el.value = RESET_DEFAULTS[id];
             });
-            history.replaceState(null, '', window.location.pathname + window.location.search);
+            history.replaceState(null, '', window.location.pathname + window.location.search + '#mode=' + (PDE.currentMode || 'quick'));
             PDE.ALLOWED_HASH_KEYS.forEach(function (id) { PDE.validateField(id); });
             PDE.calculate();
         });
@@ -128,6 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ── Quick/Full model mode toggle ──
+    PDE.currentMode = PDE.readMode();
+    PDE.setMode(PDE.currentMode, true);
+    document.querySelectorAll('.mode-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            PDE.setMode(this.getAttribute('data-mode'));
+        });
+    });
 
     // ── Preset buttons ──
     const PRESETS = {

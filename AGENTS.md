@@ -29,6 +29,7 @@
 │   ├── ui-renderers.js    # UI rendering — calculate, recs, roadmap, scenarios, calibration (~573 lines)
 │   ├── exports.js         # Excel + PDF export, font cache (~1204 lines)
 │   ├── font-bootstrap.js  # Font fallback + framebusting guard (~96 lines)
+│   ├── mode-bootstrap.js  # Pre-paint Quick/Full mode class — FOUC-free (~30 lines)
 │   ├── gen-og-image.js    # Build script — generates og-image.png via node-canvas (~53 lines)
 │   ├── main.js            # Entry point — DOMContentLoaded + window.onload (~191 lines)
 │   ├── input.css          # Tailwind CSS entry point
@@ -45,6 +46,7 @@
 
 ## Module Dependency Order (script tags in index.html)
 - `font-bootstrap.js` loads first (no `defer` — runs during parsing; sets up font fallback + framebusting)
+- `mode-bootstrap.js` loads next (no `defer` — sets `html.mode-quick|mode-full` + `window.__pdeMode` before first paint)
 1. `config.js` — pure constants (no PDE dependency)
 2. `i18n.js` — `PDE.TRANSLATIONS`, `PDE.currentLang`, `PDE.currentCurrency`, `PDE.nbpDate`
 3. `utils.js` — helpers (depends on config + i18n)

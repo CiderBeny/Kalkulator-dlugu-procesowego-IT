@@ -62,6 +62,8 @@
          Removed by antiClickjack() in font-bootstrap.js when top === self. -->
     <style id="anti-clickjack">body{display:none!important}</style>
     <script src="src/font-bootstrap.js"></script>
+    <!-- Sets html.mode-quick|mode-full before first paint (see mode-bootstrap.js) -->
+    <script src="src/mode-bootstrap.js"></script>
     <!-- Tier 2: Google CDN — loaded after fonts.css so it wins the cascade -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -262,6 +264,21 @@
 
     <main class="container mx-auto px-4 py-8 max-w-7xl">
 
+        <!-- MODE TOGGLE: QUICK ESTIMATE vs FULL MODEL -->
+        <section id="modeToggle" class="card mb-8" aria-label="Model mode">
+            <div class="mode-toggle" role="radiogroup" aria-label="Model mode">
+                <button type="button" class="mode-btn" data-mode="quick" role="radio" aria-checked="true">
+                    <span class="mode-icon" aria-hidden="true">⚡</span>
+                    <span class="mode-label" data-i18n="modeQuick">Quick estimate</span>
+                </button>
+                <button type="button" class="mode-btn" data-mode="full" role="radio" aria-checked="false">
+                    <svg class="mode-icon" style="width:16px;height:16px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    <span class="mode-label" data-i18n="modeFull">Full model</span>
+                </button>
+            </div>
+            <p class="mode-hint" data-i18n="modeHint">Start with 7 core questions for a quick estimate — switch to Full model for advanced analysis.</p>
+        </section>
+
         <!-- BLOCK 1: DIAGNOSTIC Q1–Q10 -->
         <section id="pdf-block-1a" class="card mb-8">
             <div class="flex items-center gap-3 mb-6">
@@ -333,10 +350,10 @@
             </div>
 
             <div class="mt-5 pt-4 border-t border-border">
-                <button id="toggleAdvancedQuestions" class="text-xs font-bold uppercase tracking-widest" style="color:var(--accent);background:none;border:1px solid var(--border);border-radius:6px;padding:0.5rem 1rem;cursor:pointer;width:100%;text-align:center;">
+                <button id="toggleAdvancedQuestions" class="mode-full-only text-xs font-bold uppercase tracking-widest" style="color:var(--accent);background:none;border:1px solid var(--border);border-radius:6px;padding:0.5rem 1rem;cursor:pointer;width:100%;text-align:center;">
                     <span data-i18n="showAdvanced">Show Advanced Questions (5)</span>
                 </button>
-                <div id="advancedQuestions" style="display:none;" class="mt-4">
+                <div id="advancedQuestions" style="display:none;" class="mode-full-only mt-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                         <div class="q-card">
@@ -424,7 +441,7 @@
                         style="border-bottom:2px solid var(--accent);color:var(--accent);background:transparent;cursor:pointer;">
                     <span data-i18n="tabStandard">Standard</span>
                 </button>
-                <button class="tab-btn px-4 py-2 text-xs font-bold uppercase tracking-widest" data-tab="advanced"
+                <button class="tab-btn mode-full-only px-4 py-2 text-xs font-bold uppercase tracking-widest" data-tab="advanced"
                         style="border-bottom:2px solid transparent;color:var(--text-muted);background:transparent;cursor:pointer;">
                     <span data-i18n="tabAdvanced">Advanced</span>
                 </button>
@@ -451,7 +468,7 @@
             </div>
 
             <!-- Advanced tab (hidden by default) -->
-            <div class="tab-content" id="tab-advanced" style="display:none;">
+            <div class="tab-content mode-full-only" id="tab-advanced" style="display:none;">
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
                         <label class="label" for="erosionRate" data-i18n="erosionRateLabel">Pipeline Erosion Rate</label>
@@ -792,7 +809,7 @@
                     </div>
                     <p class="text-3xl font-black mt-1 stat-value" id="statRisk">$0</p>
                 </div>
-                <div class="card border-l-4 border-l-purple-600">
+                <div class="card border-l-4 border-l-purple-600 mode-full-only">
                     <div class="label-row">
                         <svg style="width:16px;height:16px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         <p class="label" data-i18n="statOppLabel">Pipeline Margin Erosion</p>
@@ -808,21 +825,21 @@
                     </div>
                     <p class="text-3xl font-black mt-1 stat-value" id="totalImpact">$0</p>
                 </div>
-                <div class="card border-l-4 border-l-cyan-600">
+                <div class="card border-l-4 border-l-cyan-600 mode-full-only">
                     <div class="label-row">
                         <p class="label" data-i18n="statNpvLabel">NPV Total Debt (5 yr)</p>
-                        <span class="formula-tip" tabindex="0" role="button" data-formula="(OPEX Waste (×1.15 context-switching premium) + Risk) × PVIFA(10%,5yr) + Pipeline Erosion + CAPEX" aria-label="Formula: (OPEX Waste (×1.15 context-switching premium) + Risk) × PVIFA(10%,5yr) + Pipeline Erosion + CAPEX">ⓘ</span>
+                        <span class="formula-tip" tabindex="0" role="button" data-formula="How much this debt costs today, given that future money is worth less than money now.&#10;Formula: (OPEX Waste (×1.15 context-switching premium) + Risk) × PVIFA(10%,5yr) + Pipeline Erosion + CAPEX" aria-label="How much this debt costs today, given that future money is worth less than money now. Formula: (OPEX Waste (×1.15 context-switching premium) + Risk) × PVIFA(10%,5yr) + Pipeline Erosion + CAPEX" data-i18n-formula="formulaNpv">ⓘ</span>
                     </div>
                     <p class="text-3xl font-black mt-1 stat-value" id="npvTotalDebt" data-i18n-formula="statNpvHelper">$0</p>
                 </div>
-                <div class="card border-l-4 border-l-purple-600">
+                <div class="card border-l-4 border-l-purple-600 mode-full-only">
                     <div class="label-row">
                         <p class="label" data-i18n="statIrrLabel">IRR</p>
-                        <span class="formula-tip" tabindex="0" role="button" data-formula="Internal Rate of Return — discount rate where NPV = 0 over 5-yr horizon" aria-label="IRR — discount rate where NPV = 0 over 5-yr horizon">ⓘ</span>
+                        <span class="formula-tip" tabindex="0" role="button" data-formula="Annual rate of return on an automation investment — if it exceeds your cost of capital (WACC), the investment pays off.&#10;Formula: IRR — the discount rate where NPV = 0 over the 5-yr horizon" aria-label="Annual rate of return on an automation investment — if it exceeds your cost of capital (WACC), the investment pays off. Formula: IRR — the discount rate where NPV = 0 over the 5-yr horizon" data-i18n-formula="formulaIrr">ⓘ</span>
                     </div>
                     <p class="text-3xl font-black mt-1 stat-value" id="statIrr">—</p>
                 </div>
-                <div class="card border-l-4 border-l-green-600">
+                <div class="card border-l-4 border-l-green-600 mode-full-only">
                     <div class="label-row">
                         <svg style="width:16px;height:16px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                         <p class="label" data-i18n="statNetLabel">Net Drag After Investment</p>
@@ -846,7 +863,7 @@
             </div>
 
             <!-- SENSITIVITY VIEWS — WORST / BASE / BEST CASE -->
-            <div id="sens-views" class="card mb-6" style="border-color:var(--border);">
+            <div id="sens-views" class="card mb-6 mode-full-only" style="border-color:var(--border);">
                 <div class="flex items-center gap-3 mb-5">
                     <span style="background:var(--accent);color:#0a0f1e;border-radius:8px;padding:0.4rem 0.7rem;font-family:'Space Grotesk',sans-serif;font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">🛟</span>
                     <div style="flex:1;">
@@ -860,7 +877,7 @@
             </div>
 
             <!-- CALIBRATION PANEL -->
-            <div id="calibrationSection" class="card mb-6">
+            <div id="calibrationSection" class="card mb-6 mode-full-only">
                 <div id="calibrationHeader" style="display:flex;align-items:center;gap:12px;padding:0.5rem 0;cursor:pointer;user-select:none;">
                     <span style="background:var(--accent);color:#0a0f1e;border-radius:8px;padding:0.4rem 0.7rem;font-family:'Space Grotesk',sans-serif;font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">⚖</span>
                     <div style="flex:1;">
@@ -921,7 +938,7 @@
             </div>
 
             <!-- BLOCK SA: SENSITIVITY ANALYSIS (TORNADO CHART) -->
-            <div id="pdf-block-sa" class="card">
+            <div id="pdf-block-sa" class="card mode-full-only">
                 <div class="flex items-center gap-3 mb-5">
                     <span style="background:var(--accent);color:#0a0f1e;border-radius:8px;padding:0.4rem 0.7rem;font-family:'Space Grotesk',sans-serif;font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">⚡</span>
                     <div>

@@ -739,14 +739,14 @@ PDE.exportPDF = async function exportPDF(mode) {
 
             function renderSimpleResults() {
                 const cards = [
-                    { label: L.statWasteLabel,  val: PDE.formatCurrency(r.cWaste),     color: [220,38,38] },
-                    { label: L.statRiskLabel,   val: PDE.formatCurrency(r.cRisk),      color: [234,88,12] },
-                    { label: L.statOppLabel,    val: PDE.formatCurrency(r.cOppDirect), color: [124,58,237] },
-                    { label: L.statTotalLabel,  val: PDE.formatCurrency(r.totalImpact), color: [30,41,59] },
-                    { label: L.statNpvLabel,    val: PDE.formatCurrency(r.npvTotalDebt), color: [8,145,178] },
-                    { label: L.statIrrLabel,    val: r.irr !== null ? PDE.formatIRR(r.irr) : '\u2014', color: [124,58,237] },
-                    { label: L.statNetLabel,    val: PDE.formatCurrency(r.netDebt),    color: [22,163,74] },
-                ];
+                    { label: L.statWasteLabel,  val: PDE.formatCurrency(r.cWaste),     color: [220,38,38], quick: true },
+                    { label: L.statRiskLabel,   val: PDE.formatCurrency(r.cRisk),      color: [234,88,12], quick: true },
+                    { label: L.statOppLabel,    val: PDE.formatCurrency(r.cOppDirect), color: [124,58,237], quick: false },
+                    { label: L.statTotalLabel,  val: PDE.formatCurrency(r.totalImpact), color: [30,41,59], quick: true },
+                    { label: L.statNpvLabel,    val: PDE.formatCurrency(r.npvTotalDebt), color: [8,145,178], quick: false },
+                    { label: L.statIrrLabel,    val: r.irr !== null ? PDE.formatIRR(r.irr) : '\u2014', color: [124,58,237], quick: false },
+                    { label: L.statNetLabel,    val: PDE.formatCurrency(r.netDebt),    color: [22,163,74], quick: false },
+                ].filter(c => PDE.currentMode !== 'quick' || c.quick);
                 const cols = 2, cw = (UW - 6) / cols, ch = 16;
                 needSpace(8);
                 drawRect(ML - 2, cy - 4, UW + 4, 10, [180,83,9]);
@@ -1067,7 +1067,9 @@ PDE.exportPDF = async function exportPDF(mode) {
             try { renderSimpleScenarios(); } catch (e) { console.error('[PDF Sec: Scenarios]', e); }
 
             console.debug('[PDF] Section: Sensitivity Views | cy =', cy);
-            try { renderSimpleSensitivity(); } catch (e) { console.error('[PDF Sec: Sensitivity Views]', e); }
+            if (PDE.currentMode !== 'quick') {
+                try { renderSimpleSensitivity(); } catch (e) { console.error('[PDF Sec: Sensitivity Views]', e); }
+            }
 
             console.debug('[PDF] Section: Levers | cy =', cy);
             try { renderSimpleLevers(); } catch (e) { console.error('[PDF Sec: Levers]', e); }

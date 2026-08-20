@@ -735,7 +735,7 @@ section h2 {
   line-height: 1.55;
   padding: 0.45rem 0.65rem;
   border-radius: 6px;
-  white-space: normal;  /* allow wrapping */
+  white-space: pre-line;  /* allow wrapping + honor \n for plain-language + formula tooltips */
   min-width: 200px;
   max-width: 260px;
   opacity: 0;
@@ -789,6 +789,61 @@ section h2 {
 @keyframes formula-tip-fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+/* ── Mode toggle: Quick estimate vs Full model ── */
+.mode-toggle {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.35rem;
+}
+.mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.mode-btn .mode-icon { font-size: 0.9rem; line-height: 1; }
+.mode-btn:hover { color: var(--accent); }
+.mode-btn.active {
+  background: var(--accent);
+  color: #0a0f1e;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.mode-hint {
+  margin-top: 0.6rem;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Quick mode hides all advanced-only sections (inline styles lose to
+   !important, so hidden fields keep their values across mode switches). */
+html.mode-quick .mode-full-only,
+body.mode-quick .mode-full-only {
+  display: none !important;
+}
+@media (min-width: 768px) {
+  html.mode-quick #pdf-block-3,
+  body.mode-quick #pdf-block-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* ── DORA badge ── */
