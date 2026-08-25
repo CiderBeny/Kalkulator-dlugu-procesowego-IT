@@ -7,11 +7,11 @@
     <meta http-equiv="Permissions-Policy" content="geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=(), midi=(), sync-xhr=(), interest-cohort=()">
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js;
+        script-src 'self' https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js https://gc.zgo.at;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
         font-src 'self' data: https://fonts.gstatic.com;
-        img-src 'self' data:;
-        connect-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com https://api.nbp.pl;
+        img-src 'self' data: https://gc.zgo.at;
+        connect-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com https://api.nbp.pl https://process-debt-engine.goatcounter.com;
         form-action 'none';
         base-uri 'self';
         object-src 'none';
@@ -46,6 +46,9 @@
     <script defer src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"
             integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT"
             crossorigin="anonymous"></script>
+    <!-- GoatCounter: cookieless anonymous pageviews, EU-hosted, DNT-respecting -->
+    <script async src="https://gc.zgo.at/count.js"
+            data-goatcounter="https://process-debt-engine.goatcounter.com/count"></script>
     <script defer src="src/config.js"></script>
     <script defer src="src/i18n.js"></script>
     <script defer src="src/utils.js"></script>
@@ -996,7 +999,7 @@
                 <details class="methodology-section methodology-sub" id="methodology-about">
                   <summary><h4 data-i18n="methodologyAboutTitle">About This Tool</h4></summary>
                   <div class="methodology-sub-body">
-                  <p><span data-i18n="methodologyAboutBody">Process Debt Engine is a static single-page application (SPA) that estimates the financial cost of process debt in software delivery. It combines a strategic diagnostic questionnaire (Q1-Q12) with a multi-factor financial model to calculate annual OPEX waste, risk exposure, pipeline erosion, and NPV/IRR economics. No data is sent to any server — all inputs are processed locally in your browser. Your diagnostic state is encoded in the URL hash for easy sharing, and calibration data is stored only in your browser's localStorage. Exchange rates are fetched client-side from the public NBP API. This tool provides directional estimates only and should not replace professional financial analysis. All 'tool estimate' multipliers are user-configurable via the Advanced Parameters panel.</span></p>
+                  <p><span data-i18n="methodologyAboutBody">Process Debt Engine is a static single-page application (SPA) that estimates the financial cost of process debt in software delivery. It combines a strategic diagnostic questionnaire (Q1-Q12) with a multi-factor financial model to calculate annual OPEX waste, risk exposure, pipeline erosion, and NPV/IRR economics. Inputs are processed locally in your browser; only anonymous, cookieless visit counts are collected via GoatCounter (EU-hosted). Diagnostic values never leave your device. Your diagnostic state is encoded in the URL hash for easy sharing, and calibration data is stored only in your browser's localStorage. Exchange rates are fetched client-side from the public NBP API. This tool provides directional estimates only and should not replace professional financial analysis. All 'tool estimate' multipliers are user-configurable via the Advanced Parameters panel.</span></p>
                   <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyAboutSource">Built as a static SPA with vanilla JavaScript, Chart.js, jsPDF, html2canvas, and SheetJS. Methodology based on BLS, OECD, DORA, COSO, SHRM, and Exepron research (see sections 1-16).</span></p>
                   </div>
                 </details>
