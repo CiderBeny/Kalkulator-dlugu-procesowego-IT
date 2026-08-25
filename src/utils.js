@@ -24,6 +24,18 @@ PDE.t = function t(key) {
     return val;
 };
 
+// Null-safe DOM writers — a missing element id degrades one widget instead of
+// killing the whole calculate() chain mid-render (stale/partial UI).
+PDE.setText = function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+};
+
+PDE.setHTML = function setHTML(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+};
+
 PDE._pluralRules = {};
 
 PDE.pluralize = function pluralize(n, forms) {
@@ -84,8 +96,10 @@ PDE.applyTranslations = function applyTranslations() {
 
 PDE.toggleLang = function toggleLang() {
     PDE.currentLang = PDE.currentLang === 'en' ? 'pl' : 'en';
-    document.getElementById('langFlag').textContent = PDE.currentLang === 'en' ? '🇵🇱' : '🇬🇧';
-    document.getElementById('langLabel').textContent = PDE.currentLang === 'en' ? 'PL' : 'EN';
+    const flagEl = document.getElementById('langFlag');
+    const labelEl = document.getElementById('langLabel');
+    if (flagEl) flagEl.textContent = PDE.currentLang === 'en' ? '🇵🇱' : '🇬🇧';
+    if (labelEl) labelEl.textContent = PDE.currentLang === 'en' ? 'PL' : 'EN';
     PDE.applyTranslations();
     PDE.updateSliderFills();
     PDE.calculate();
@@ -161,7 +175,8 @@ PDE.toggleCurrency = function toggleCurrency(currency) {
         }
     });
     PDE.currentCurrency = currency;
-    document.getElementById('currencySelect').value = currency;
+    const currencyEl = document.getElementById('currencySelect');
+    if (currencyEl) currencyEl.value = currency;
     PDE.syncInputMaxes();
     PDE.ALLOWED_HASH_KEYS.forEach(function (id) { PDE.validateField(id); });
     PDE.applyTranslations();

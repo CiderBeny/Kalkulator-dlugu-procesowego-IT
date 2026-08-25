@@ -308,10 +308,12 @@ window.onload = () => {
         Chart.defaults.borderColor     = cs.getPropertyValue('--border').trim() || PDE.DARK.grid;
         Chart.defaults.backgroundColor = cs.getPropertyValue('--border').trim() || PDE.DARK.navy;
     }
-    document.getElementById('currencySelect').value = PDE.currentCurrency;
+    const currencyEl = document.getElementById('currencySelect');
+    if (currencyEl) currencyEl.value = PDE.currentCurrency;
     PDE.applyTranslations();
     PDE.nbpFetching = true;
-    document.getElementById('nbpFooter').textContent = PDE.TRANSLATIONS[PDE.currentLang].nbpFetching;
+    const footerEl = document.getElementById('nbpFooter');
+    if (footerEl) footerEl.textContent = PDE.TRANSLATIONS[PDE.currentLang].nbpFetching;
     PDE.decodeState();
     PDE.syncInputMaxes();
     PDE.ALLOWED_HASH_KEYS.forEach(function (id) { PDE.validateField(id); });

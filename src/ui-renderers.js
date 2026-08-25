@@ -7,31 +7,31 @@ window.PDE = window.PDE || {};
 PDE.calculate = function calculate() {
     const p = PDE.getParams();
 
-    document.getElementById('autoLevelVal').textContent = Math.round(p.autoLevel);
-    document.getElementById('erosionRateVal').textContent  = p.erosionRate.toFixed(2);
-    document.getElementById('discountRateVal').textContent = (Math.round(p.discountRate * 1000) / 10);
-    document.getElementById('timeHorizonVal').textContent  = p.horizonYears;
-    document.getElementById('leverAutomationVal').textContent = Math.round(p.leverAuto * 100);
-    document.getElementById('leverRiskVal').textContent    = Math.round(p.leverRisk * 100);
-    document.getElementById('scenCAutoLevelVal').textContent = Math.round(p.scenCAutoLevel * 100);
-    document.getElementById('scenCCapexMultVal').textContent = p.scenCCapexMult.toFixed(1);
-    document.getElementById('annualHoursVal').textContent = p.annualHours;
-    document.getElementById('leverInnovationVal').textContent = Math.round(p.leverInnovation * 100);
-    document.getElementById('leverManagementVal').textContent = Math.round(p.leverManagement * 100);
-    document.getElementById('leverTurnoverVal').textContent = Math.round(p.leverTurnover * 100);
-    document.getElementById('contextPremiumVal').textContent = Math.round(p.contextPremium * 100);
-    document.getElementById('taxRateVal').textContent = Math.round(p.taxRate);
-    document.getElementById('correlationStrengthVal').textContent = p.correlationMultiplier.toFixed(2);
-    document.getElementById('corrQ3Q1Val').textContent = p.corrQ3Q1;
-    document.getElementById('corrQ1Q5Val').textContent = p.corrQ1Q5.toFixed(1);
-    document.getElementById('corrQ1Q7Val').textContent = p.corrQ1Q7;
-    document.getElementById('corrQ3Q7Val').textContent = p.corrQ3Q7;
-    document.getElementById('riskSecurityWeightVal').textContent = p.riskSecurityWeight.toFixed(2);
-    document.getElementById('riskRegulatoryWeightVal').textContent = p.riskRegulatoryWeight.toFixed(2);
-    document.getElementById('mcIterationsVal').textContent = p.mcIterations;
-    document.getElementById('mcConfidenceVal').textContent = Math.round(p.mcConfidence * 100);
-    document.getElementById('mcUncertaintyPctVal').textContent = Math.round(p.mcUncertaintyPct * 100);
-    document.getElementById('mcMttrUncertaintyPctVal').textContent = Math.round(p.mcMttrUnc * 100);
+    PDE.setText('autoLevelVal', Math.round(p.autoLevel));
+    PDE.setText('erosionRateVal', p.erosionRate.toFixed(2));
+    PDE.setText('discountRateVal', (Math.round(p.discountRate * 1000) / 10));
+    PDE.setText('timeHorizonVal', p.horizonYears);
+    PDE.setText('leverAutomationVal', Math.round(p.leverAuto * 100));
+    PDE.setText('leverRiskVal', Math.round(p.leverRisk * 100));
+    PDE.setText('scenCAutoLevelVal', Math.round(p.scenCAutoLevel * 100));
+    PDE.setText('scenCCapexMultVal', p.scenCCapexMult.toFixed(1));
+    PDE.setText('annualHoursVal', p.annualHours);
+    PDE.setText('leverInnovationVal', Math.round(p.leverInnovation * 100));
+    PDE.setText('leverManagementVal', Math.round(p.leverManagement * 100));
+    PDE.setText('leverTurnoverVal', Math.round(p.leverTurnover * 100));
+    PDE.setText('contextPremiumVal', Math.round(p.contextPremium * 100));
+    PDE.setText('taxRateVal', Math.round(p.taxRate));
+    PDE.setText('correlationStrengthVal', p.correlationMultiplier.toFixed(2));
+    PDE.setText('corrQ3Q1Val', p.corrQ3Q1);
+    PDE.setText('corrQ1Q5Val', p.corrQ1Q5.toFixed(1));
+    PDE.setText('corrQ1Q7Val', p.corrQ1Q7);
+    PDE.setText('corrQ3Q7Val', p.corrQ3Q7);
+    PDE.setText('riskSecurityWeightVal', p.riskSecurityWeight.toFixed(2));
+    PDE.setText('riskRegulatoryWeightVal', p.riskRegulatoryWeight.toFixed(2));
+    PDE.setText('mcIterationsVal', p.mcIterations);
+    PDE.setText('mcConfidenceVal', Math.round(p.mcConfidence * 100));
+    PDE.setText('mcUncertaintyPctVal', Math.round(p.mcUncertaintyPct * 100));
+    PDE.setText('mcMttrUncertaintyPctVal', Math.round(p.mcMttrUnc * 100));
 
     const r = PDE.computeModel(p);
     PDE._lastResult = r;
@@ -80,15 +80,15 @@ PDE.calculate = function calculate() {
                     const mk = keyMap[id];
                     const mc = mcResults[mk];
                     if (mc) {
-                        document.getElementById(id).textContent =
-                            PDE.formatCurrency(mc.median) + ' [' + PDE.formatCurrency(mc.p5) + ' \u2013 ' + PDE.formatCurrency(mc.p95) + ']';
+                        PDE.setText(id,
+                            PDE.formatCurrency(mc.median) + ' [' + PDE.formatCurrency(mc.p5) + ' \u2013 ' + PDE.formatCurrency(mc.p95) + ']');
                     }
                 });
                 const irrMc = mcResults.irr;
                 if (irrMc && irrMc.median !== undefined) {
-                    document.getElementById('statIrr').textContent =
+                    PDE.setText('statIrr',
                         PDE.formatIRR(irrMc.median)
-                        + ' [' + (irrMc.p5 * 100).toFixed(1) + '% \u2013 ' + (irrMc.p95 * 100).toFixed(1) + '%]';
+                        + ' [' + (irrMc.p5 * 100).toFixed(1) + '% \u2013 ' + (irrMc.p95 * 100).toFixed(1) + '%]');
                 }
                 const pbMc = mcResults.paybackMonths;
                 if (pbMc && pbMc.median !== undefined) {
@@ -112,17 +112,17 @@ PDE.calculate = function calculate() {
         const wr2 = document.getElementById('mcWarning');
         if (wr2) wr2.style.display = 'none';
 
-        document.getElementById('statWaste').textContent   = PDE.formatCompactCurrency(r.cWaste);
-        document.getElementById('statRisk').textContent    = PDE.formatCompactCurrency(r.cRisk);
-        document.getElementById('statOpp').textContent     = PDE.formatCompactCurrency(r.cOppDirect);
-        document.getElementById('totalImpact').textContent = PDE.formatCompactCurrency(r.totalImpact);
-        document.getElementById('npvTotalDebt').textContent = PDE.formatCompactCurrency(r.npvTotalDebt);
-        document.getElementById('statIrr').textContent     = PDE.formatIRR(r.irr);
-        document.getElementById('statNet').textContent     = PDE.formatCompactCurrency(r.netDebt);
+        PDE.setText('statWaste', PDE.formatCompactCurrency(r.cWaste));
+        PDE.setText('statRisk', PDE.formatCompactCurrency(r.cRisk));
+        PDE.setText('statOpp', PDE.formatCompactCurrency(r.cOppDirect));
+        PDE.setText('totalImpact', PDE.formatCompactCurrency(r.totalImpact));
+        PDE.setText('npvTotalDebt', PDE.formatCompactCurrency(r.npvTotalDebt));
+        PDE.setText('statIrr', PDE.formatIRR(r.irr));
+        PDE.setText('statNet', PDE.formatCompactCurrency(r.netDebt));
     }
 
-    document.getElementById('q9Val').textContent       = document.getElementById('q9').value;
-    document.getElementById('q3Val').textContent       = document.getElementById('q3').value;
+    PDE.setText('q9Val', (document.getElementById('q9') || {}).value || '');
+    PDE.setText('q3Val', (document.getElementById('q3') || {}).value || '');
 
     PDE.updateSliderFills();
 
@@ -203,7 +203,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
             </div>
         </div>`;
     });
-    document.getElementById('leverCards').innerHTML = cards;
+    PDE.setHTML('leverCards', cards);
 
     const heroCapex    = (capexUSD || 0) > 0 ? PDE.formatCurrencyWhole(capexUSD) : '';
     const heroSavings  = (annualSavingsUSD || 0) > 0 ? PDE.formatCurrencyWhole(annualSavingsUSD) : '';
@@ -234,7 +234,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
         captureNote = captureNote.replace(/<strong>/g, '<strong style="color:var(--accent);">');
     }
 
-    document.getElementById('verdictBar').innerHTML = `
+    PDE.setHTML('verdictBar', `
         <div style="display:flex;flex-direction:column;gap:0.9rem;">
             ${captureNote ? '<p style="font-size:0.72rem;font-weight:700;color:var(--accent);margin:0;letter-spacing:0.04em;">' + captureNote + '</p>' : ''}
             ${heroHtml ? '<p style="font-family:\'Space Grotesk\',sans-serif;font-size:1.35rem;font-weight:900;line-height:1.25;color:var(--text-primary);margin:0;">' + heroHtml + '</p>' : ''}
@@ -251,7 +251,7 @@ PDE.updateRecs = function updateRecs(cw, cr, co, pb, leverAuto, leverRisk, capex
                     <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;font-style:italic;">${PDE.esc(L.verdictNote)}</p>
                 </div>
             </div>
-        </div>`;
+        </div>`);
 };
 
 PDE.getRoadmapTasks = function getRoadmapTasks() {
@@ -309,7 +309,7 @@ PDE.updateRoadmap = function updateRoadmap(top3) {
         </div>`;
     });
 
-    document.getElementById('roadmapGrid').innerHTML = html;
+    PDE.setHTML('roadmapGrid', html);
 };
 
 PDE.updateScenarios = function updateScenarios(recoverable, capex, autoLevel, totalImpact, dr, ny, scenCAutoLevel, scenCCapexMult) {
@@ -392,10 +392,10 @@ PDE.updateScenarios = function updateScenarios(recoverable, capex, autoLevel, to
     const isRecommendedB = isFinite(scenB.pb) && scenB.pb < PDE.COEFFICIENTS.PAYBACK_GREEN && autoLevel > 0;
     const isRecommendedC = !isRecommendedB && isFinite(scenC.pb) && scenC.pb < PDE.COEFFICIENTS.PAYBACK_GREEN;
 
-    document.getElementById('scenarioGrid').innerHTML =
+    PDE.setHTML('scenarioGrid',
         scenCard({ title: L.scenarioATitle, desc: L.scenarioADesc, accentColor: 'var(--red)', capexAmt: 0, calcResult: scenA, showBadge: false, badgeText: '' }) +
         scenCard({ title: L.scenarioBTitle, desc: L.scenarioBDesc, accentColor: 'var(--accent)', capexAmt: capex, calcResult: scenB, showBadge: isRecommendedB, badgeText: L.scenRecommended }) +
-        scenCard({ title: L.scenarioCTitle, desc: L.scenarioCDesc, accentColor: 'var(--green)', capexAmt: capex * 1.5, calcResult: scenC, showBadge: isRecommendedC, badgeText: L.scenRecommended });
+        scenCard({ title: L.scenarioCTitle, desc: L.scenarioCDesc, accentColor: 'var(--green)', capexAmt: capex * 1.5, calcResult: scenC, showBadge: isRecommendedC, badgeText: L.scenRecommended }));
 
     PDE.encodeStateDebounced();
 };
