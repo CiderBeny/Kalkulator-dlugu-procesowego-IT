@@ -35,7 +35,8 @@
 │   ├── input.css          # Tailwind CSS entry point
 │   ├── security.test.js   # Security/safety unit tests (~288 lines)
 │   ├── model-audit.test.js# Model integrity audit tests (~592 lines)
-│   └── sensitivity-views.test.js  # Sensitivity views tests (~158 lines)
+│   ├── sensitivity-views.test.js  # Sensitivity views tests (~158 lines)
+│   └── i18n-plural.test.js        # PL/EN plural & month declension tests
 ├── .vscode/              # Recommended extensions
 ├── index.html            # Main HTML (UI, CSP, font bootstrap + cache, ~1046 lines)
 ├── style.css             # Custom CSS + base64-embedded fonts (~938 lines)
@@ -74,7 +75,7 @@ npx @tailwindcss/cli -i src/input.css -o output.css
 ## How to Run Tests
 ```sh
 npm test
-# Runs: node --test src/security.test.js src/model-audit.test.js src/sensitivity-views.test.js
+# Runs: node --test src/security.test.js src/model-audit.test.js src/sensitivity-views.test.js src/i18n-plural.test.js
 ```
 
 ## i18n Conventions
