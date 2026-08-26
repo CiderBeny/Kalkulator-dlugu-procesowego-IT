@@ -669,17 +669,21 @@ PDE.exportPDF = async function exportPDF(mode) {
             pdf.text('Status', ML + dcolW * 3 + 2, cy + 5);
             cy += 10;
             doraMetrics.forEach((m, i) => {
-                drawRect(ML, cy, UW, 8, i % 2 === 0 ? [255, 255, 255] : [245, 240, 232]);
+                pdf.setFontSize(5.5);
+                const bandLines = wrapText(String(m.bandDesc), ML + dcolW * 2 + 2, dcolW - 4);
+                const rowH = Math.max(8, 4 + bandLines.length * 2.8);
+                needSpace(rowH + 2);
+                drawRect(ML, cy, UW, rowH, i % 2 === 0 ? [255, 255, 255] : [245, 240, 232]);
                 pdf.setFontSize(6); pdf.setFont(pdfFont, 'normal'); pdf.setTextColor(28, 20, 16);
                 pdf.text(String(m.metric), ML + 2, cy + 5.5);
                 pdf.text(String(m.value), ML + dcolW + 2, cy + 5.5);
                 pdf.setFontSize(5.5); pdf.setTextColor(140, 123, 110);
-                pdf.text(String(m.bandDesc), ML + dcolW * 2 + 2, cy + 5.5);
+                bandLines.forEach((bl, bi) => pdf.text(bl, ML + dcolW * 2 + 2, cy + 5.5 + bi * 2.8));
                 pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold');
                 const col = m.result.color === 'var(--green)' ? [22, 163, 74] : m.result.color === 'var(--yellow)' ? [202, 138, 4] : m.result.color === 'var(--orange)' ? [234, 88, 12] : m.result.color === 'var(--red)' ? [220, 38, 38] : [180, 83, 9];
                 pdf.setTextColor(...col);
                 pdf.text(String(m.result.band), ML + dcolW * 3 + 2, cy + 5.5);
-                cy += 10;
+                cy += rowH + 2;
             });
             cy += 6;
 
@@ -1165,16 +1169,19 @@ PDE.exportPDF = async function exportPDF(mode) {
                 cy += 10;
 
                 doraMetrics.forEach((m, i) => {
-                    needSpace(8);
-                    drawRect(ML, cy, UW, 8, i % 2 === 0 ? [255,255,255] : [245,240,232]);
+                    pdf.setFontSize(5.5);
+                    const bandLines = wrapText(String(m.bandDesc), ML + colW * 2 + 2, colW - 4);
+                    const rowH = Math.max(8, 4 + bandLines.length * 2.8);
+                    needSpace(rowH + 2);
+                    drawRect(ML, cy, UW, rowH, i % 2 === 0 ? [255,255,255] : [245,240,232]);
                     pdf.setFontSize(6); pdf.setFont(pdfFont, 'normal'); pdf.setTextColor(28,20,16);
                     pdf.text(String(m.metric), ML + 2, cy + 5.5);
                     pdf.text(String(m.value), ML + colW + 2, cy + 5.5);
                     pdf.setFontSize(5.5); pdf.setTextColor(140,123,110);
-                    pdf.text(String(m.bandDesc), ML + colW * 2 + 2, cy + 5.5);
+                    bandLines.forEach((bl, bi) => pdf.text(bl, ML + colW * 2 + 2, cy + 5.5 + bi * 2.8));
                     pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor.apply(pdf, m.result.color === 'var(--green)' ? [22,163,74] : m.result.color === 'var(--yellow)' ? [202,138,4] : m.result.color === 'var(--orange)' ? [234,88,12] : m.result.color === 'var(--red)' ? [220,38,38] : [180,83,9]);
                     pdf.text(String(m.result.band), ML + colW * 3 + 2, cy + 5.5);
-                    cy += 10;
+                    cy += rowH + 2;
                 });
                 cy += 4;
             }
