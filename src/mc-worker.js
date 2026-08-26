@@ -246,7 +246,7 @@ self.onmessage = function (e) {
     try {
         const baseParams = e.data.baseParams;
         const opts = e.data.opts || {};
-        const seed = e.data.seed || 42;
+        const seed = e.data.seed || Date.now();
 
         const iters = opts.iterations || 1000;
         const cl = opts.confidenceLevel || 0.9;

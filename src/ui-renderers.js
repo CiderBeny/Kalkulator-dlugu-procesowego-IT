@@ -42,11 +42,21 @@ PDE.calculate = function calculate() {
         // Terminate any previous worker
         if (PDE._mcWorker) PDE._mcWorker.terminate();
 
-        // Show progress bar + warning
+        // Session-stable random seed — drawn lazily once per session so results
+        // stay stable while dragging sliders; the re-roll control draws a fresh
+        // independent sample.
+        if (!PDE._mcSeed) {
+            PDE._mcSeed = 1 + Math.floor(Math.random() * 2147483646);
+        }
+
+        // Show progress bar + warning + seed row
         const prEl = document.getElementById('mcProgress');
         if (prEl) prEl.style.display = 'block';
         const wrEl = document.getElementById('mcWarning');
         if (wrEl) wrEl.style.display = 'block';
+        const srEl = document.getElementById('mcSeedRow');
+        if (srEl) srEl.style.display = 'flex';
+        PDE.setText('mcSeedVal', String(PDE._mcSeed));
 
         // Start worker
         PDE._mcWorker = new Worker('src/mc-worker.js');
@@ -58,7 +68,7 @@ PDE.calculate = function calculate() {
                 uncertaintyPct: p.mcUncertaintyPct,
                 mttrUncertaintyPct: p.mcMttrUnc,
             },
-            seed: 42,
+            seed: PDE._mcSeed,
         });
 
         PDE._mcWorker.onmessage = function (e) {
@@ -111,6 +121,8 @@ PDE.calculate = function calculate() {
         if (pr4) pr4.style.display = 'none';
         const wr2 = document.getElementById('mcWarning');
         if (wr2) wr2.style.display = 'none';
+        const sr2 = document.getElementById('mcSeedRow');
+        if (sr2) sr2.style.display = 'none';
 
         PDE.setText('statWaste', PDE.formatCompactCurrency(r.cWaste));
         PDE.setText('statRisk', PDE.formatCompactCurrency(r.cRisk));

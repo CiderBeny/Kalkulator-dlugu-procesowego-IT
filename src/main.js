@@ -263,6 +263,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     PDE.loadToggleStates();
 
+    // ── MC seed re-roll: fresh independent sample on demand ──
+    const rerollBtn = document.getElementById('mcRerollBtn');
+    if (rerollBtn) {
+        rerollBtn.addEventListener('click', function () {
+            PDE._mcSeed = 1 + Math.floor(Math.random() * 2147483646);
+            PDE.calculate();
+        });
+    }
+
     // ── Calibration panel: delegate events on dynamically created fields ──
     const calGrid = document.getElementById('calibrationGrid');
     if (calGrid) {

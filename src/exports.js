@@ -85,6 +85,7 @@ PDE.exportExcel = function exportExcel() {
                 [],
                 [L.sectionMc],
                 ['MC Iterations',    String(p.mcIterations), ''],
+                ['MC Seed',          String(PDE._mcSeed || ''), ''],
                 ['Confidence Level', Math.round(p.mcConfidence * 100) + '%', ''],
                 ['Input Uncertainty', Math.round(p.mcUncertaintyPct * 100) + '%', ''],
                 ['MTTR Uncertainty', Math.round(p.mcMttrUnc * 100) + '%', ''],

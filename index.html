@@ -704,6 +704,11 @@
                 <div id="mcSliders" style="display:none;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
                     <p style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin:0 0 0.75rem;" data-i18n="sectionMc">Monte Carlo Parameters</p>
                     <div id="mcWarning" class="mc-warning" style="display:none;" data-i18n="mcWarning"></div>
+                    <div id="mcSeedRow" style="display:none;align-items:center;gap:0.5rem;margin-top:0.5rem;">
+                        <span style="font-size:0.7rem;color:var(--text-secondary);" data-i18n="mcSeedLabel">MC seed</span>
+                        <span id="mcSeedVal" style="font-size:0.7rem;font-weight:700;color:var(--text-primary);"></span>
+                        <button type="button" id="mcRerollBtn" style="font-size:0.62rem;font-weight:700;letter-spacing:0.05em;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text-secondary);cursor:pointer;">↻ <span data-i18n="mcRerollLabel">New sample</span></button>
+                    </div>
                     <div id="mcProgress" style="display:none;" class="mc-progress">
                         <div class="mc-progress-track">
                             <div class="mc-progress-fill" id="mcProgressFill"></div>
@@ -1153,7 +1158,7 @@
                 <details class="methodology-section methodology-sub" id="methodology-13">
                   <summary><h4 data-i18n="methodologyMcTitle">13. Monte Carlo Confidence Intervals</h4></summary>
                   <div class="methodology-sub-body">
-                  <p><span data-i18n="methodologyMcBody">When enabled, runs 1,000 iterations of the full model with perturbed inputs. Each input (except riskLevel which is discrete 1-5) is sampled from a triangular distribution centred on the user's value with +/-15% spread. MTTR uses a log-normal distribution (Box-Muller transform) with +/-25% spread, reflecting the heavy-tailed nature of incident recovery times. Outputs are reported as median with 90% confidence interval [p5, p95]. A seeded PRNG (LCG, seed=42) ensures reproducibility across sessions. Disabled by default.</span></p>
+                  <p><span data-i18n="methodologyMcBody">When enabled, runs 1,000 iterations of the full model with perturbed inputs. Each input (except riskLevel which is discrete 1-5) is sampled from a triangular distribution centred on the user's value with +/-15% spread. MTTR uses a log-normal distribution (Box-Muller transform) with +/-25% spread, reflecting the heavy-tailed nature of incident recovery times. Outputs are reported as median with 90% confidence interval [p5, p95]. The LCG PRNG draws a fresh pseudo-random seed once per browser session (shown next to the simulation progress); the re-roll control draws an independent fresh sample. Disabled by default.</span></p>
                   <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyMcSource">Standard Monte Carlo method (Metropolis &amp; Ulam 1949). Box-Muller transform for log-normal MTTR. 90% CI is a common regulatory reporting standard (Basel II/III, Solvency II).</span></p>
                   </div>
                 </details>
