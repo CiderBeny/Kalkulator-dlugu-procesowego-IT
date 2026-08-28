@@ -738,7 +738,7 @@
                         </div>
                         <div>
                             <label class="label" for="mcUncertaintyPct" data-i18n="mcUncertaintyPctLabel">Input Uncertainty</label>
-                            <span class="helper-text mt-1 block" data-i18n="mcUncertaintyPctHelper">Triangular distribution spread for most inputs (5–30%). Default 15%.</span>
+                            <span class="helper-text mt-1 block" data-i18n="mcUncertaintyPctHelper">Uniform distribution spread for most inputs (5–30%). Default 15%.</span>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="mcUncertaintyPctFill"></div>
@@ -748,7 +748,7 @@
                         </div>
                         <div>
                             <label class="label" for="mcMttrUncertaintyPct" data-i18n="mcMttrUncertaintyPctLabel">MTTR Uncertainty</label>
-                            <span class="helper-text mt-1 block" data-i18n="mcMttrUncertaintyPctHelper">Log-normal spread for MTTR (10–50%). Default 25%.</span>
+                            <span class="helper-text mt-1 block" data-i18n="mcMttrUncertaintyPctHelper">Normal (Box-Muller) spread for MTTR (10–50%). Default 25%.</span>
                             <div class="slider-wrapper">
                                 <div class="slider-track-bg"></div>
                                 <div class="slider-track-fill" id="mcMttrUncertaintyPctFill"></div>
@@ -1013,8 +1013,8 @@
                 <details class="methodology-section methodology-sub" id="methodology-1">
                   <summary><h4 data-i18n="methodologyWasteTitle">1. Annual OPEX Waste</h4></summary>
                   <div class="methodology-sub-body">
-                  <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code>(Manual hrs/yr + Chase hrs/yr) &times; Blended Rate &times; Team Size</code></p>
-                  <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Assumptions:</span> <span data-i18n="methodologyWasteAssumptions">1,800 productive hours per engineer per year — derived from U.S. Bureau of Labor Statistics American Time Use Survey (2024), which reports full-time employees average 8.1 hours on workdays, and OECD data (2024) calculating ~1,811 actual hours worked per US worker annually after accounting for paid leave, holidays, and sick time. The 1,800-hour baseline is user-adjustable via the Annual Productive Hours slider (Section 10).</span></p>
+                  <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code>(Manual hrs/yr + Chase hrs/yr) &times; Blended Rate &times; Team Size &times; (1 + Context-Switching Premium)</code></p>
+                  <p><span class="methodology-label" data-i18n="methodologyAssumptionsLabel">Assumptions:</span> <span data-i18n="methodologyWasteAssumptions">1,800 productive hours per engineer per year — derived from U.S. Bureau of Labor Statistics American Time Use Survey (2024), which reports full-time employees average 8.1 hours on workdays, and OECD data (2024) calculating ~1,811 actual hours worked per US worker annually after accounting for paid leave, holidays, and sick time. The 1,800-hour baseline is user-adjustable via the Annual Productive Hours slider (Section 10). A configurable context-switching premium (default 15%, range 0–30%, Section 10) is included in the OPEX Waste, multiplying the base waste by (1 + context premium).</span></p>
                   <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyWasteSource">BLS American Time Use Survey 2024 (bls.gov); OECD Average Annual Hours Actually Worked 2024 (oecd.org).</span></p>
                   </div>
                 </details>
@@ -1158,8 +1158,8 @@
                 <details class="methodology-section methodology-sub" id="methodology-13">
                   <summary><h4 data-i18n="methodologyMcTitle">13. Monte Carlo Confidence Intervals</h4></summary>
                   <div class="methodology-sub-body">
-                  <p><span data-i18n="methodologyMcBody">When enabled, runs 1,000 iterations of the full model with perturbed inputs. Each input (except riskLevel which is discrete 1-5) is sampled from a triangular distribution centred on the user's value with +/-15% spread. MTTR uses a log-normal distribution (Box-Muller transform) with +/-25% spread, reflecting the heavy-tailed nature of incident recovery times. Outputs are reported as median with 90% confidence interval [p5, p95]. The LCG PRNG draws a fresh pseudo-random seed once per browser session (shown next to the simulation progress); the re-roll control draws an independent fresh sample. Disabled by default.</span></p>
-                  <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyMcSource">Standard Monte Carlo method (Metropolis &amp; Ulam 1949). Box-Muller transform for log-normal MTTR. 90% CI is a common regulatory reporting standard (Basel II/III, Solvency II).</span></p>
+                  <p><span data-i18n="methodologyMcBody">When enabled, runs 1,000 iterations of the full model with perturbed inputs. The measured cost and diagnostic inputs (manual effort %, downtime cost, failure count, MTTR, blended rate, management overhead hours, opportunity margin, and CAPEX) are sampled from a uniform distribution centred on the user's value with +/-15% spread (riskLevel, which is discrete 1-5, is not perturbed). MTTR is further perturbed using a normal variate (Box-Muller transform) with +/-25% spread, clamped to a realistic incident-recovery range. Fixed model coefficients (automation level, erosion rate, recovery levers, and team size) stay constant across iterations. Outputs are reported as median with 90% confidence interval [p5, p95]. The LCG PRNG draws a fresh pseudo-random seed once per browser session (shown next to the simulation progress); the re-roll control draws an independent fresh sample. Disabled by default.</span></p>
+                  <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyMcSource">Standard Monte Carlo method (Metropolis &amp; Ulam 1949). Box-Muller transform for normal-perturbed MTTR. 90% CI is a common regulatory reporting standard (Basel II/III, Solvency II).</span></p>
                   </div>
                 </details>
 
