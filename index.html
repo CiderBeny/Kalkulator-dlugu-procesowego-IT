@@ -796,7 +796,7 @@
             <!-- BLOCK: Tool Estimates Disclaimer -->
             <div class="card mode-full-only bg-amber-50 border border-amber-300 p-4">
                 <p class="text-xs font-bold uppercase tracking-wide text-amber-800" data-i18n="toolDisclaimerTitle">Model Estimates & Default Values</p>
-                <p class="text-xs mt-1 text-amber-700" data-i18n="toolDisclaimerBody">This model uses 14 user-configurable multipliers. Default values are directional estimates based on published research — see Methodology for specific sources. Change them in Advanced Parameters to match your context.</p>
+                <p class="text-xs mt-1 text-amber-700" data-i18n="toolDisclaimerBody">This model uses user-configurable multipliers. Default values are directional estimates based on published research — see Methodology for specific sources. Change them in Advanced Parameters to match your context.</p>
             </div>
 
             <!-- BLOCK 3: STAT CARDS -->
@@ -808,7 +808,7 @@
                     <div class="label-row">
                         <svg style="width:16px;height:16px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7l10 10"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7v10H7"/></svg>
                         <p class="label" data-i18n="statWasteLabel">Annual OPEX Waste</p>
-                        <span class="formula-tip" tabindex="0" role="button" data-formula="(Manual hrs/yr + Manager chase hrs/yr) × Blended Rate × Team Size" aria-label="Formula: (Manual hrs/yr + Manager chase hrs/yr) × Blended Rate × Team Size" data-i18n-formula="formulaWaste">ⓘ</span>
+                        <span class="formula-tip" tabindex="0" role="button" data-formula="(Manual hrs/yr + Manager chase hrs/yr) × Blended Rate × Team Size × (1 + Context Premium)" aria-label="Formula: (Manual hrs/yr + Manager chase hrs/yr) × Blended Rate × Team Size × (1 + Context Premium)" data-i18n-formula="formulaWaste">ⓘ</span>
                     </div>
                     <p class="text-3xl font-black mt-1 stat-value" id="statWaste">$0</p>
                 </div>
@@ -1033,8 +1033,8 @@
                 <details class="methodology-section methodology-sub" id="methodology-3">
                   <summary><h4 data-i18n="methodologyOppTitle">3. Pipeline Margin Erosion</h4></summary>
                   <div class="methodology-sub-body">
-                  <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code>Opportunity margin &times; 0.25</code></p>
-                  <p><strong>0.25 multiplier (tool estimate):</strong> <span data-i18n="methodologyOppFactor1">Derived from Reinertsen's Cost of Delay framework (Principles of Product Development Flow, 2009): delayed projects lose value at ~2%/month, or ~25%/year. The 0.25 multiplier reflects year-1 erosion — a conservative application of the CoD principle.</span></p>
+                  <p><span class="methodology-label" data-i18n="methodologyFormulaLabel">Formula:</span> <code>Opportunity margin &times; Pipeline Erosion Rate (default 0.25)</code></p>
+                  <p><strong>0.25 multiplier (tool estimate):</strong> <span data-i18n="methodologyOppFactor1">Derived from Reinertsen's Cost of Delay framework (Principles of Product Development Flow, 2009): delayed projects lose value at ~2%/month, or ~25%/year. The 0.25 multiplier reflects year-1 erosion — a conservative application of the CoD principle. It is the default value of the user-adjustable Pipeline Erosion Rate slider (range 0.0–1.0, Section 10); the formula uses the current value applied to the opportunity margin.</span></p>
                   <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyOppSource">Reinertsen, D.G. — Principles of Product Development Flow (2009). Exepron — "The True Cost of Delay" (2026). exepron.com.</span></p>
                   </div>
                 </details>
@@ -1134,7 +1134,7 @@
                 <details class="methodology-section methodology-sub" id="methodology-10">
                   <summary><h4 data-i18n="methodologyAdvancedTitle">10. Configurable Advanced Parameters</h4></summary>
                   <div class="methodology-sub-body">
-                  <p><span data-i18n="methodologyAdvancedBody">Thirteen parameters in the "Advanced Parameters" panel let you override default coefficients in real time: Pipeline Erosion Rate (0.0–1.0), WACC / Discount Rate (5–20%), NPV Time Horizon (3–10 years), Automation Lever Recovery (10–60%), Risk Lever Recovery (20–80%), Context-Switching Premium (0–30%), Corporate Tax Rate (0–50%, for the CAPEX depreciation tax shield), Annual Productive Hours (1,500–2,500, default 1,800), Innovation Runway Lever Recovery (10–80%), Management Efficiency Lever Recovery (5–40%), Retention &amp; Burnout Lever Recovery (10–60%), and Scenario C overrides: automation level (50–100%) and CAPEX multiplier (10–30%). Changing any slider immediately recalculates all dependent metrics. Defaults are restored on page reload.</span></p>
+                  <p><span data-i18n="methodologyAdvancedBody">The "Advanced Parameters" panel lets you override the model's default coefficients in real time — including Pipeline Erosion Rate (0.0–1.0), WACC / Discount Rate (5–20%), NPV Time Horizon (3–10 years), Automation Lever Recovery (10–60%), Risk Lever Recovery (20–80%), Context-Switching Premium (0–30%), Corporate Tax Rate (0–50%, for the CAPEX depreciation tax shield), Annual Productive Hours (1,500–2,500, default 1,800), Innovation Runway Lever Recovery (10–80%), Management Efficiency Lever Recovery (5–40%), Retention &amp; Burnout Lever Recovery (10–60%), and Scenario C overrides: automation level (50–100%) and CAPEX multiplier (10–30%). It also exposes Monte Carlo settings, correlation strength, and risk-category weights. Changing any control immediately recalculates all dependent metrics. Defaults are restored on page reload.</span></p>
                   <p><span class="methodology-label" data-i18n="methodologySourceLabel">Source:</span> <span data-i18n="methodologyAdvancedSource">User-configurable — overrides the Economic Model defaults (Section 9) in real time.</span></p>
                   </div>
                 </details>

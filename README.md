@@ -13,7 +13,7 @@ W świecie IT Service Managementu często trudno jest przekonać zarząd do inwe
 
 ### Kluczowe Funkcje
 * **Kalkulacja Kosztu Chaosu:** OPEX waste, Risk Exposure, Opportunity Loss, Net Debt, Payback Period — wyliczenia oparte na 12 pytaniach diagnostycznych (Q1–Q12: Manual Effort, Lead Time, Documentation Standard, Downtime Cost, Human Errors, itd.).
-* **Model Finansowy Multi-Czynnikowy:** NPV/IRR oparte na 14 konfigurowalnych mnożnikach — premia kontekstu, szybkość erozji, stopa dyskonta, horyzont inwestycji, lewary, współczynniki scenariuszy i parametry Monte Carlo.
+* **Model Finansowy Multi-Czynnikowy:** NPV/IRR oparte na konfigurowalnych mnożnikach — premia kontekstu, szybkość erozji, stopa dyskonta, horyzont inwestycji, lewary, współczynniki scenariuszy i parametry Monte Carlo.
 * **WACC 9.3% (Damodaran 2025):** domyślna stopa dyskonta dla branży Software (edytowalna — suwak 5–20%).
 * **IRR i Payback z 6-miesięcznym ramp-upem:** przepływy ze scenariusza inwestycyjnego narastają stopniowo przez pierwsze 6 miesięcy (3 miesiące 0 oszczędności, 3 miesiące 50%) — realistyczny, spójny rollout dla NPV, IRR i payback.
 * **Tax Shield:** wartość odpisów amortyzacyjnych CAPEX włączona do NPV (zależna od stawki CIT).
