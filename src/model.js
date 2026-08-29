@@ -23,6 +23,34 @@ PDE.discountedPayback = function discountedPayback(annualSavings, investment, ra
     return Infinity;
 };
 
+// Cumulative discounted net cash-flow series for the payback chart.
+// Mirrors discountedPayback exactly (same 6-month ramp + monthly DCF), so the
+// cumulative net crosses zero at precisely the reported payback month —
+// graphically consistent with the financial verdict on the results page.
+// Returns { points: [net at end of year 1..N], breakEvenMonth, horizonYears }.
+PDE.paybackSeries = function paybackSeries(capex, annualSavings, rate, horizonYears) {
+    if (horizonYears === undefined) horizonYears = PDE.COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT;
+    if (rate === undefined) rate = PDE.COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
+    const points = [];
+    const maxMonths = horizonYears * 12;
+    let breakEvenMonth = Infinity;
+
+    if (!isFinite(annualSavings) || annualSavings <= 0 || !isFinite(capex) || capex <= 0) {
+        const flatNet = capex <= 0 ? 0 : -capex;
+        for (let y = 1; y <= maxMonths; y += 12) points.push(flatNet);
+        return { points: points, breakEvenMonth: breakEvenMonth, horizonYears: horizonYears };
+    }
+
+    const monthly = annualSavings / 12;
+    let cumulative = -capex;
+    for (let m = 1; m <= maxMonths; m++) {
+        cumulative += (monthly * PDE.rampFactor(m)) / Math.pow(1 + rate, m / 12);
+        if (breakEvenMonth === Infinity && cumulative >= 0) breakEvenMonth = m;
+        if (m % 12 === 0) points.push(cumulative);
+    }
+    return { points: points, breakEvenMonth: breakEvenMonth, horizonYears: horizonYears };
+};
+
 // A CAPEX only yields a meaningful payback when it is at least 1 month of
 // potential savings (below that, payback collapses to the 4-month ramp floor
 // and the headline becomes misleading). A fixed absolute floor (CAPEX_MIN_ABS)

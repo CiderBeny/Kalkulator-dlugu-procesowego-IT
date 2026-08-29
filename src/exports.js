@@ -1269,7 +1269,7 @@ PDE.exportPDF = async function exportPDF(mode) {
             pdf.save(filename);
         } else {
             // Desktop path — html2canvas screenshots
-            const mainIds = ['pdf-block-3','scenario-compare','sens-views','pdf-block-sa','pdf-block-4','pdf-block-5','pdf-block-6'];
+            const mainIds = ['pdf-block-3','scenario-compare','sens-views','pdf-block-sa','pdf-block-4','pdf-block-roi','pdf-block-5','pdf-block-6'];
 
             async function captureBlock(id) {
                 const el = document.getElementById(id);

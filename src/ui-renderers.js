@@ -139,6 +139,7 @@ PDE.calculate = function calculate() {
     PDE.updateSliderFills();
 
     PDE.updateCharts(r.totalAnnualHrs, r.manualAnnualHrs, r.chasingAnnualHrs, r.cWaste, p.capex, r.potentialSavings, p.riskLevel, p.manualPercent, p.autoLevel / 100);
+    PDE.renderPaybackChart(PDE.paybackSeries(p.capex, r.potentialSavings, p.discountRate, p.horizonYears));
     PDE.updateRecs(r.cWaste, r.cRisk, r.cOppDirect, r.paybackMonths, r.leverAuto, r.leverRisk, p.capex, r.potentialSavings, r.targetSavings, r.captureFactor);
     PDE.updateDoraBenchmark();
     PDE.updateScenarios(r.recoverable, p.capex, p.autoLevel / 100, r.totalImpact, p.discountRate, p.horizonYears, r.scenCAutoLevel, r.scenCCapexMult);

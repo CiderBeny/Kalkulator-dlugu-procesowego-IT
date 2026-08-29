@@ -776,4 +776,59 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
         assert.ok(Math.abs(underFunded.targetSavings - funded.targetSavings) < 0.01,
             'target savings are independent of CAPEX — only realized savings scale');
     });
+
+    describe('paybackSeries — cumulative ROI series consistency', () => {
+        it('break-even month matches discountedPayback exactly (same ramp + DCF)', () => {
+            const capex = 300000;
+            const savings = 100000;
+            const rate = 0.093;
+            const years = 5;
+            const series = realPDE.paybackSeries(capex, savings, rate, years);
+            const pb = realPDE.discountedPayback(savings, capex, rate, years, true);
+            assert.strictEqual(series.points.length, years,
+                'one year-end bar per horizon year');
+            assert.ok(isFinite(pb), 'sample should have a finite payback');
+            assert.strictEqual(series.breakEvenMonth, pb,
+                'cumulative net crosses zero at the same month as discountedPayback (' + pb + ')');
+            assert.ok(series.points[0] < 0,
+                'year-1 net position stays negative during the 6-month implementation ramp');
+            assert.ok(series.points[years - 1] >= 0,
+                'final year-end net ≥ 0 when payback is reached within the horizon');
+        });
+
+        it('no payback within horizon → breakEvenMonth Infinity and all year-end bars negative', () => {
+            const series = realPDE.paybackSeries(1000000, 1000, 0.093, 5);
+            assert.strictEqual(series.breakEvenMonth, Infinity);
+            series.points.forEach((v) => {
+                assert.ok(v < 0, 'year-end net stays below zero when payback never occurs');
+            });
+        });
+
+        it('zero savings or zero CAPEX yields no payback and flat net = -capex', () => {
+            const noSavings = realPDE.paybackSeries(50000, 0, 0.093, 5);
+            assert.strictEqual(noSavings.breakEvenMonth, Infinity);
+            assert.strictEqual(noSavings.points[4], -50000, 'net stays at -CAPEX with no savings');
+            const noCapex = realPDE.paybackSeries(0, 100000, 0.093, 5);
+            assert.strictEqual(noCapex.breakEvenMonth, Infinity);
+            assert.strictEqual(noCapex.points[4], 0, 'net stays at 0 with no investment');
+        });
+
+        it('year-end net position is monotonic non-decreasing', () => {
+            const series = realPDE.paybackSeries(300000, 100000, 0.093, 10);
+            assert.strictEqual(series.points.length, 10);
+            for (let i = 1; i < series.points.length; i++) {
+                assert.ok(series.points[i] >= series.points[i - 1] - 1e-6,
+                    'bar ' + (i + 1) + ' not below bar ' + i);
+            }
+        });
+
+        it('break-even month marked in the year it occurs', () => {
+            const series = realPDE.paybackSeries(300000, 100000, 0.093, 5);
+            const beYear = Math.ceil(series.breakEvenMonth / 12);
+            assert.ok(beYear >= 1 && beYear <= series.points.length,
+                'break-even year falls within the chart bands');
+            assert.ok(series.points[beYear - 1] >= 0,
+                'cumulative net is non-negative by the break-even year');
+        });
+    });
 });

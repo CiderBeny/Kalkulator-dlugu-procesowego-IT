@@ -925,6 +925,16 @@
                 </div>
             </div>
 
+            <!-- BLOCK 4B: CUMULATIVE ROI / PAYBACK CHART -->
+            <div id="pdf-block-roi" class="card">
+                <h2 class="text-xs font-black uppercase mb-2 pb-2 border-b flex justify-between items-center">
+                    <span data-i18n="chart4Title">4. Cumulative ROI &amp; Payback</span>
+                    <span style="color:var(--text-muted);font-weight:400" data-i18n="chart4Sub">cumulative discounted net</span>
+                </h2>
+                <p id="paybackSub" style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:0 0 6px;"></p>
+                <div class="h-72"><canvas id="paybackChart" role="img"></canvas></div>
+            </div>
+
             <!-- BLOCK 5: CHARTS ROW 2 + EXEC SUMMARY -->
             <div id="pdf-block-5" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="card">
