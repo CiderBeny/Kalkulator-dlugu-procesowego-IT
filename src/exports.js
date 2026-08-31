@@ -554,6 +554,7 @@ PDE.exportPDF = async function exportPDF(mode) {
 
             // Verdict bar
             const pbStr = PDE.fmtMonthsLocative(r.paybackMonths);
+            const pbStrNom = PDE.fmtMonths(r.paybackMonths);
             const heroCapex   = (p.capex || 0) > 0 ? PDE.formatCurrencyWhole(p.capex) : '';
             const heroSavings = (r.potentialSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.potentialSavings) : '';
             const heroTarget  = (r.targetSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.targetSavings) : '';
@@ -587,7 +588,7 @@ PDE.exportPDF = async function exportPDF(mode) {
             pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(180, 83, 9);
             pdf.text(L.verdictPaybackLabel.toUpperCase(), ML + UW / 2, statsY);
             pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28, 20, 16);
-            pdf.text(capexBelowMin ? '\u2014' : pbStr, ML + UW / 2, statsY + 7);
+            pdf.text(capexBelowMin ? '\u2014' : pbStrNom, ML + UW / 2, statsY + 7);
             pdf.setFontSize(5.5); pdf.setFont(pdfFont, fontItalic); pdf.setTextColor(140, 123, 110);
             const noteLines = wrapText(L.verdictNote, ML + 6, UW - 12);
             pdf.text(noteLines[0] || '', ML + 6, statsY + 13);
@@ -596,7 +597,7 @@ PDE.exportPDF = async function exportPDF(mode) {
             // Financial results (3 core cards)
             drawRect(ML - 2, cy - 4, UW + 4, 10, [180, 83, 9]);
             pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(255, 255, 255);
-            pdf.text('FINANCIAL RESULTS', ML + 2, cy + 3);
+                pdf.text(L.financialResultsTitle.toUpperCase(), ML + 2, cy + 3);
             cy += 14;
 
             const cards = [
@@ -924,7 +925,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                 needSpace(8);
                 drawRect(ML - 2, cy - 4, UW + 4, 10, [180,83,9]);
                 pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(255,255,255);
-                pdf.text('FINANCIAL RESULTS', ML + 2, cy + 3);
+            pdf.text(L.financialResultsTitle.toUpperCase(), ML + 2, cy + 3);
                 cy += 14;
 
                 cards.forEach((c, i) => {
@@ -1107,6 +1108,7 @@ PDE.exportPDF = async function exportPDF(mode) {
 
                 // Verdict bar
                 const pbStr = PDE.fmtMonthsLocative(r.paybackMonths);
+                const pbStrNom = PDE.fmtMonths(r.paybackMonths);
                 const heroCapex   = (p.capex || 0) > 0 ? PDE.formatCurrencyWhole(p.capex) : '';
                 const heroSavings = (r.potentialSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.potentialSavings) : '';
                 const heroTarget  = (r.targetSavings || 0) > 0 ? PDE.formatCurrencyWhole(r.targetSavings) : '';
@@ -1140,7 +1142,7 @@ PDE.exportPDF = async function exportPDF(mode) {
                 pdf.setFontSize(6); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(180,83,9);
                 pdf.text(L.verdictPaybackLabel.toUpperCase(), ML + UW / 2, statsY);
                 pdf.setFontSize(10); pdf.setFont(pdfFont, 'bold'); pdf.setTextColor(28,20,16);
-                pdf.text(capexBelowMin ? '\u2014' : pbStr, ML + UW / 2, statsY + 7);
+                pdf.text(capexBelowMin ? '\u2014' : pbStrNom, ML + UW / 2, statsY + 7);
                 pdf.setFontSize(5.5); pdf.setFont(pdfFont, fontItalic); pdf.setTextColor(140,123,110);
                 const noteLines = wrapText(L.verdictNote, ML + 6, UW - 12);
                 pdf.text(noteLines[0] || '', ML + 6, statsY + 13);
