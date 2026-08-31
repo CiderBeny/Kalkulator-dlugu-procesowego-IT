@@ -152,7 +152,7 @@ PDE.renderPaybackChart = function renderPaybackChart(result) {
                                 const yearStart = idx * 12 + 1;
                                 const yearEnd = (idx + 1) * 12;
                                 if (breakEven >= yearStart && breakEven <= yearEnd) {
-                                    txt += '\n' + (L.chartPaybackOnTrack || 'Break-even reached after') + ' ' + PDE.fmtMonths(breakEven);
+                                    txt += '\n' + (L.chartPaybackOnTrack || 'Break-even reached after') + ' ' + PDE.fmtMonthsLocative(breakEven);
                                 }
                             }
                             return txt;
@@ -176,7 +176,7 @@ PDE.renderPaybackChart = function renderPaybackChart(result) {
     });
 
     const sub = document.getElementById('paybackSub');
-    if (sub) sub.textContent = hasBreakEven ? L.chartPaybackBreakEven(PDE.fmtMonths(breakEven)) : L.chartPaybackNone;
+    if (sub) sub.textContent = hasBreakEven ? L.chartPaybackBreakEven(PDE.fmtMonthsLocative(breakEven)) : L.chartPaybackNone;
     if (typeof L.chartPaybackAria === 'function') {
         canvas.setAttribute('aria-label', L.chartPaybackAria(pts, hasBreakEven ? breakEven : null));
     }

@@ -607,7 +607,7 @@ recInnovation: (val) => `<strong style="color:var(--purple)">Innovation Lever:</
                 chartPaybackOnTrack:    'Próg rentowności osiągnięty po',
                 chartPaybackBreakEven:  (pb) => `Próg rentowności po ${pb}`,
                 chartPaybackNone:       'Brak zwrotu w horyzoncie oceny',
-                chartPaybackAria: (points, be) => `Wykres skumulowanego ROI: pozycje netto na koniec roku ${points.map((v, i) => 'R' + (i + 1) + ' ' + PDE.formatCompactCurrency(v)).join(', ')}.` + (be ? ` Próg rentowności po ${PDE.fmtMonths(be)}.` : ' Brak progu rentowności w horyzoncie oceny.'),
+                chartPaybackAria: (points, be) => `Wykres skumulowanego ROI: pozycje netto na koniec roku ${points.map((v, i) => 'R' + (i + 1) + ' ' + PDE.formatCompactCurrency(v)).join(', ')}.` + (be ? ` Próg rentowności po ${PDE.fmtMonthsLocative(be)}.` : ' Brak progu rentowności w horyzoncie oceny.'),
                 recAutomation: (val) => `<strong style="color:var(--red)">Dźwignia Automatyzacji:</strong> Wysoki narzut manualny. Portal samoobsługowy może odzyskać <strong>${PDE.formatCompactCurrency(val)}</strong> kosztów pracy.`,
                 recRisk:        () => `<strong style="color:var(--orange)">Dźwignia Ryzyka:</strong> Krytyczna ekspozycja na ryzyko. Auto-Discovery (CMDB) skraca MTTR i chroni przychody.`,
                 recInnovation: (val) => `<strong style="color:var(--purple)">Dźwignia Innowacji:</strong> Zaległości blokują roadmapę. Ich usunięcie odblokowuje <strong>${PDE.formatCompactCurrency(val)}</strong> marży projektowej.`,
