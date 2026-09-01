@@ -78,19 +78,35 @@ PDE.captureFactor = function captureFactor(capex, targetSavings) {
 };
 
 PDE.calculateIRR = function calculateIRR(cashFlows) {
+    if (cashFlows.every(function (v) { return v === 0; })) return null;
     const precision = 1e-6;
     const maxIter = 1000;
-    let low = -0.99;
-    let high = 1;
+    const low = -0.99;
+    const high = 1000;
+    let npv = 0;
+    for (let t = 0; t < cashFlows.length; t++) {
+        npv += cashFlows[t] / Math.pow(1 + low, t / 12);
+    }
+    const npvLow = npv;
+    npv = 0;
+    for (let t = 0; t < cashFlows.length; t++) {
+        npv += cashFlows[t] / Math.pow(1 + high, t / 12);
+    }
+    const npvHigh = npv;
+    if (!((npvLow <= 0 && npvHigh >= 0) || (npvLow >= 0 && npvHigh <= 0))) {
+        return null;
+    }
+    let lo = low;
+    let hi = high;
     for (let i = 0; i < maxIter; i++) {
-        const rate = (low + high) / 2;
-        let npv = 0;
+        const rate = (lo + hi) / 2;
+        let cur = 0;
         for (let t = 0; t < cashFlows.length; t++) {
-            npv += cashFlows[t] / Math.pow(1 + rate, t / 12);
+            cur += cashFlows[t] / Math.pow(1 + rate, t / 12);
         }
-        if (Math.abs(npv) < precision) return rate;
-        if (npv > 0) low = rate; else high = rate;
-        if (high - low < precision) return (low + high) / 2;
+        if (Math.abs(cur) < precision) return rate;
+        if (cur > 0) lo = rate; else hi = rate;
+        if (hi - lo < precision) return (lo + hi) / 2;
     }
     return null;
 };
