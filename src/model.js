@@ -107,11 +107,11 @@ PDE.computeModel = function computeModel(params) {
     const capex          = params.capex          || 0;
     let autoLevel      = (params.autoLevel     || 0) / 100;
     const teamSize       = params.teamSize        || 0;
-    const erosionRate    = params.erosionRate    || PDE.COEFFICIENTS.PIPELINE_EROSION_RATE_DEFAULT;
-    const discountRate   = params.discountRate   || PDE.COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
+    const erosionRate    = params.erosionRate    !== undefined ? params.erosionRate : PDE.COEFFICIENTS.PIPELINE_EROSION_RATE_DEFAULT;
+    const discountRate   = params.discountRate   !== undefined ? params.discountRate : PDE.COEFFICIENTS.DISCOUNT_RATE_DEFAULT;
     const horizonYears   = params.horizonYears   || PDE.COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT;
-    const leverAuto      = params.leverAuto      || PDE.COEFFICIENTS.LEVER_AUTOMATION_DEFAULT;
-    const leverRisk      = params.leverRisk      || PDE.COEFFICIENTS.LEVER_RISK_DEFAULT;
+    const leverAuto      = params.leverAuto      !== undefined ? params.leverAuto : PDE.COEFFICIENTS.LEVER_AUTOMATION_DEFAULT;
+    const leverRisk      = params.leverRisk      !== undefined ? params.leverRisk : PDE.COEFFICIENTS.LEVER_RISK_DEFAULT;
     const turnover        = params.turnover        || 0;
     const correlationsEnabled = params.correlationsEnabled || false;
     const docStandard     = params.docStandard     || 3;

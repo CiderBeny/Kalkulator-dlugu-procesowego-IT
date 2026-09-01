@@ -708,6 +708,31 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
             'real IRR (' + (real.irr * 100).toFixed(2) + '%) matches ramp replication (' + (exp.irr * 100).toFixed(2) + '%)');
     });
 
+    it('real computeModel honors erosionRate=0 (erosion can be turned off)', () => {
+        const rZero = realPDE.computeModel(Object.assign({}, sample, { erosionRate: 0 }));
+        assert.strictEqual(rZero.cOppDirect, 0,
+            'erosionRate=0 must zero cOppDirect — no default 0.25 fallback');
+        const rQuarter = realPDE.computeModel(Object.assign({}, sample, { erosionRate: 0.25 }));
+        assert.ok(Math.abs(rQuarter.cOppDirect - 100000 * 0.25) < 0.01,
+            'erosionRate=0.25 must give cOppDirect = opportunityVal × 0.25');
+        assert.ok(rZero.cOppDirect !== rQuarter.cOppDirect,
+            'erosionRate=0 and 0.25 must produce different cOppDirect');
+    });
+
+    it('real computeModel honors discountRate=0 (no discounting) and lever=0', () => {
+        const base = { ...sample, taxRate: 0, contextPremium: 0 };
+        const r0 = realPDE.computeModel(Object.assign({}, base, { discountRate: 0, horizonYears: 5 }));
+        const rPv = realPDE.computeModel(Object.assign({}, base, { discountRate: 0.093, horizonYears: 5 }));
+        const expectedUndiscounted = r0.oneTimeCosts + r0.annualRecurring * 5;
+        assert.ok(Math.abs(r0.npvTotalDebt - expectedUndiscounted) < 0.01,
+            'discountRate=0 must collapse to undiscounted sum (oneTime + recurring×5)');
+        assert.ok(r0.npvTotalDebt > rPv.npvTotalDebt,
+            'discountRate=0 must leave NPV undiscounted (higher) than with the 9.3% default');
+        const rLever0 = realPDE.computeModel(Object.assign({}, base, { leverAuto: 0, leverRisk: 0 }));
+        assert.ok(Math.abs(rLever0.recoverable) < 0.01,
+            'leverAuto=0 and leverRisk=0 must give recoverable = 0, not the defaults');
+    });
+
     it('real computeModel applies context premium and tax shield', () => {
         const base = realPDE.computeModel(Object.assign({}, sample, { contextPremium: 0, taxRate: 0 }));
         const prem = realPDE.computeModel(Object.assign({}, sample, { contextPremium: 0.15, taxRate: 0 }));
