@@ -127,11 +127,11 @@ PDE.computeModel = function computeModel(params) {
     const taxRate = params.taxRate !== undefined ? params.taxRate : PDE.COEFFICIENTS.TAX_RATE_DEFAULT;
 
     if (correlationsEnabled) {
-        const cMult = params.correlationMultiplier || PDE.CORRELATION_DEFAULTS.correlationMultiplier;
-        const corrQ3Q1 = params.corrQ3Q1 || PDE.CORRELATION_DEFAULTS.corrQ3Q1;
-        const corrQ1Q5 = params.corrQ1Q5 || PDE.CORRELATION_DEFAULTS.corrQ1Q5;
-        const corrQ1Q7 = params.corrQ1Q7 || PDE.CORRELATION_DEFAULTS.corrQ1Q7;
-        const corrQ3Q7 = params.corrQ3Q7 || PDE.CORRELATION_DEFAULTS.corrQ3Q7;
+        const cMult = params.correlationMultiplier !== undefined ? params.correlationMultiplier : PDE.CORRELATION_DEFAULTS.correlationMultiplier;
+        const corrQ3Q1 = params.corrQ3Q1 !== undefined ? params.corrQ3Q1 : PDE.CORRELATION_DEFAULTS.corrQ3Q1;
+        const corrQ1Q5 = params.corrQ1Q5 !== undefined ? params.corrQ1Q5 : PDE.CORRELATION_DEFAULTS.corrQ1Q5;
+        const corrQ1Q7 = params.corrQ1Q7 !== undefined ? params.corrQ1Q7 : PDE.CORRELATION_DEFAULTS.corrQ1Q7;
+        const corrQ3Q7 = params.corrQ3Q7 !== undefined ? params.corrQ3Q7 : PDE.CORRELATION_DEFAULTS.corrQ3Q7;
 
         const q1Base = manualPercent / 100;
         const q5Base = failures;

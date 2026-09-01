@@ -733,6 +733,29 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
             'leverAuto=0 and leverRisk=0 must give recoverable = 0, not the defaults');
     });
 
+    it('real computeModel honors zero correlation weights (P2)', () => {
+        const off = realPDE.computeModel(Object.assign({}, sample, { correlationsEnabled: false }));
+        const zeroed = realPDE.computeModel(Object.assign({}, sample, {
+            correlationsEnabled: true,
+            correlationMultiplier: 0,
+            corrQ3Q1: 0, corrQ1Q5: 0, corrQ1Q7: 0, corrQ3Q7: 0,
+        }));
+        assert.ok(Math.abs(zeroed.cWaste - off.cWaste) < 0.01,
+            'all-zero correlation weights must leave cWaste identical to correlations-off (' + zeroed.cWaste + ' vs ' + off.cWaste + ')');
+        assert.ok(Math.abs(zeroed.totalImpact - off.totalImpact) < 0.01,
+            'all-zero correlation weights must leave totalImpact identical to correlations-off');
+
+        // A strong non-zero correlation weight must actually perturb the model —
+        // proving the sliders drive it (regression: `|| default` ignored zeros).
+        const strong = realPDE.computeModel(Object.assign({}, sample, {
+            correlationsEnabled: true,
+            correlationMultiplier: 1,
+            corrQ3Q1: 0, corrQ1Q5: 0, corrQ1Q7: 20, corrQ3Q7: 0,
+        }));
+        assert.notStrictEqual(strong.chasingAnnualHrs, off.chasingAnnualHrs,
+            'corrQ1Q7=20 with multiplier 1 must change manager hours away from correlations-off');
+    });
+
     it('real computeModel applies context premium and tax shield', () => {
         const base = realPDE.computeModel(Object.assign({}, sample, { contextPremium: 0, taxRate: 0 }));
         const prem = realPDE.computeModel(Object.assign({}, sample, { contextPremium: 0.15, taxRate: 0 }));

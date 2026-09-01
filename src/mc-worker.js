@@ -116,10 +116,10 @@ function computeModel(params, coeffs) {
 
     if (correlationsEnabled) {
         const cMult = params.correlationMultiplier !== undefined ? params.correlationMultiplier : CD.correlationMultiplier;
-        const corrQ3Q1 = params.corrQ3Q1 || CD.corrQ3Q1;
-        const corrQ1Q5 = params.corrQ1Q5 || CD.corrQ1Q5;
-        const corrQ1Q7 = params.corrQ1Q7 || CD.corrQ1Q7;
-        const corrQ3Q7 = params.corrQ3Q7 || CD.corrQ3Q7;
+        const corrQ3Q1 = params.corrQ3Q1 !== undefined ? params.corrQ3Q1 : CD.corrQ3Q1;
+        const corrQ1Q5 = params.corrQ1Q5 !== undefined ? params.corrQ1Q5 : CD.corrQ1Q5;
+        const corrQ1Q7 = params.corrQ1Q7 !== undefined ? params.corrQ1Q7 : CD.corrQ1Q7;
+        const corrQ3Q7 = params.corrQ3Q7 !== undefined ? params.corrQ3Q7 : CD.corrQ3Q7;
 
         const q1Base = manualPercent / 100;
         const q5Base = failures;
