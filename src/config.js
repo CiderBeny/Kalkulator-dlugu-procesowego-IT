@@ -205,10 +205,23 @@ PDE.CHART_OPTS = {
 };
 
 // ── URL hash security constraints ──
+// The allowlist covers the FULL model so a shared link reproduces every
+// parameter, including the advanced Full-Mode inputs. Boolean toggles and the
+// Monte Carlo seed are handled separately (reserved keys `togg`/`mcseed`).
 PDE.ALLOWED_HASH_KEYS = new Set(
     ['q1','q2','q3','q4','q5','q11','q6','q7','q8','q9','q10','autoLevel','capex','teamSize',
      'erosionRate','discountRate','timeHorizon','leverAutomation','leverRisk',
-     'contextPremium','taxRate']
+     'contextPremium','taxRate',
+     // Scenario C + Annual Hours
+     'scenCAutoLevel','scenCCapexMult','annualHours',
+     // Additional recovery levers
+     'leverInnovation','leverManagement','leverTurnover',
+     // Monte Carlo
+     'mcIterations','mcConfidence','mcUncertaintyPct','mcMttrUncertaintyPct',
+     // Correlations
+     'correlationStrength','corrQ3Q1','corrQ1Q5','corrQ1Q7','corrQ3Q7',
+     // Advanced risk model
+     'riskSecurityWeight','riskRegulatoryWeight']
 );
 
 PDE.HASH_CONSTRAINTS = {
@@ -233,4 +246,31 @@ PDE.HASH_CONSTRAINTS = {
     leverRisk:       { min: 20,  max: 80   },  // 20%–80%
     contextPremium:  { min: 0,   max: 30   },  // 0%–30% (×100)
     taxRate:         { min: 0,   max: 50   },  // 0%–50%
+
+    // Scenario C + Annual Hours
+    scenCAutoLevel:  { min: 50,  max: 100  },  // 50%–100%
+    scenCCapexMult:  { min: 10,  max: 30   },  // 1.0–3.0 (×10)
+    annualHours:     { min: 1500, max: 2500 }, // hrs/yr
+
+    // Additional recovery levers
+    leverInnovation: { min: 10,  max: 80   },  // 10%–80%
+    leverManagement: { min: 5,   max: 40   },  // 5%–40%
+    leverTurnover:   { min: 10,  max: 60   },  // 10%–60%
+
+    // Monte Carlo
+    mcIterations:       { min: 100, max: 10000 }, // count
+    mcConfidence:       { min: 50,  max: 99   },  // 50%–99%
+    mcUncertaintyPct:   { min: 5,   max: 30   },  // 5%–30%
+    mcMttrUncertaintyPct: { min: 10, max: 50  },  // 10%–50%
+
+    // Correlations
+    correlationStrength: { min: 0, max: 100 },  // 0.0–1.0 (×100)
+    corrQ3Q1:            { min: 0, max: 50  },  // h
+    corrQ1Q5:            { min: 0, max: 10  },  // (×1, step 0.5)
+    corrQ1Q7:            { min: 0, max: 50  },  // h
+    corrQ3Q7:            { min: 0, max: 30  },  // h
+
+    // Advanced risk model
+    riskSecurityWeight:   { min: 0, max: 100 },  // ×100
+    riskRegulatoryWeight: { min: 0, max: 100 },  // ×100
 };

@@ -48,9 +48,26 @@ PDE.encodeState = function encodeState() {
     const ids = [...PDE.ALLOWED_HASH_KEYS];
     const vals = ids.map(id => document.getElementById(id).value);
     const hash = ids.map((id,i) => id+'='+encodeURIComponent(vals[i])).join('&');
+    // Boolean toggle states are packed into a single `togg` bitmask so the
+    // recipient lands in exactly the same advanced-mode configuration.
+    let mask = 0;
+    PDE.TOGGLE_IDS.forEach(function (id, i) {
+        const el = document.getElementById(id);
+        if (el && el.checked) mask |= (1 << i);
+    });
+    // The Monte Carlo seed is pinned so the recipient reproduces the exact
+    // sample (only meaningful when probabilistic mode is on).
+    let seedPart = '';
+    if (typeof PDE._mcSeed === 'number' && isFinite(PDE._mcSeed)) {
+        seedPart = '&mcseed=' + String(Math.floor(PDE._mcSeed));
+    }
     // Monetary fields are stored verbatim in the current display currency;
     // the active currency code is pinned so remote decoders can convert back.
-    history.replaceState(null, '', '#' + hash + '&cur=' + encodeURIComponent(PDE.currentCurrency) + '&mode=' + (PDE.currentMode || 'quick'));
+    history.replaceState(null, '', '#' + hash
+        + '&cur=' + encodeURIComponent(PDE.currentCurrency)
+        + '&mode=' + (PDE.currentMode || 'quick')
+        + '&togg=' + mask
+        + seedPart);
 };
 
 PDE._encodeStateTimeout = null;
@@ -86,6 +103,29 @@ PDE.decodeState = function decodeState() {
             let decoded;
             try { decoded = decodeURIComponent(raw); } catch { return; }
             if (decoded === 'full' || decoded === 'quick') PDE.setMode(decoded, true);
+            return;
+        }
+        if (key === 'togg') {
+            let decoded;
+            try { decoded = decodeURIComponent(raw); } catch { return; }
+            const mask = parseInt(decoded, 10);
+            if (!isFinite(mask) || mask < 0) return;
+            PDE.TOGGLE_IDS.forEach(function (id, i) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.checked = (mask & (1 << i)) !== 0;
+                    PDE.applyToggleVisibility(id);
+                }
+            });
+            return;
+        }
+        if (key === 'mcseed') {
+            let decoded;
+            try { decoded = decodeURIComponent(raw); } catch { return; }
+            const seed = parseInt(decoded, 10);
+            if (isFinite(seed) && seed > 0) {
+                PDE._mcSeed = seed;
+            }
             return;
         }
 
