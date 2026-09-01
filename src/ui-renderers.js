@@ -408,7 +408,7 @@ PDE.updateScenarios = function updateScenarios(recoverable, capex, autoLevel, to
     PDE.setHTML('scenarioGrid',
         scenCard({ title: L.scenarioATitle, desc: L.scenarioADesc, accentColor: 'var(--red)', capexAmt: 0, calcResult: scenA, showBadge: false, badgeText: '' }) +
         scenCard({ title: L.scenarioBTitle, desc: L.scenarioBDesc, accentColor: 'var(--accent)', capexAmt: capex, calcResult: scenB, showBadge: isRecommendedB, badgeText: L.scenRecommended }) +
-        scenCard({ title: L.scenarioCTitle, desc: L.scenarioCDesc, accentColor: 'var(--green)', capexAmt: capex * 1.5, calcResult: scenC, showBadge: isRecommendedC, badgeText: L.scenRecommended }));
+        scenCard({ title: L.scenarioCTitle, desc: L.scenarioCDesc, accentColor: 'var(--green)', capexAmt: capex * scenCCapexMult, calcResult: scenC, showBadge: isRecommendedC, badgeText: L.scenRecommended }));
 
     PDE.encodeStateDebounced();
 };

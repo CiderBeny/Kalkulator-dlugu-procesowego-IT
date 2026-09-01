@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint src/",
-    "test": "npm run lint && node --test src/security.test.js src/model-audit.test.js src/sensitivity-views.test.js src/i18n-plural.test.js src/state-currency.test.js src/dom-integrity.test.js"
+    "test": "npm run lint && node --test src/security.test.js src/model-audit.test.js src/sensitivity-views.test.js src/i18n-plural.test.js src/state-currency.test.js src/dom-integrity.test.js src/scenario-card.test.js"
   },
   "repository": {
     "type": "git",
