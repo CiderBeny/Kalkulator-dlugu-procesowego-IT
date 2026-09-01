@@ -273,8 +273,11 @@ PDE.computeModel = function computeModel(params) {
 PDE.scenCalc = function scenCalc(al, cx, recoverable, dr, ny) {
     const targetSavings = recoverable * al;
     const annualSavings = targetSavings * PDE.captureFactor(cx, targetSavings);
-    const pvifa = dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny;
-    const npvSavings = annualSavings * pvifa;
+    const monthly = annualSavings / 12;
+    let npvSavings = 0;
+    for (let m = 1; m <= ny * 12; m++) {
+        npvSavings += (monthly * PDE.rampFactor(m)) / Math.pow(1 + dr, m / 12);
+    }
     const net = npvSavings - cx;
     const pb = PDE.discountedPayback(annualSavings, cx, dr, ny, true);
     let irrVal = null;

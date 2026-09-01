@@ -857,6 +857,25 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
             'target savings are independent of CAPEX — only realized savings scale');
     });
 
+    it('scenCalc NPV uses ramp-adjusted monthly DCF, not flat annuity (P4 regression)', () => {
+        const real = realPDE.computeModel(sample);
+        const r = realPDE.scenCalc(0.8, 150000, real.recoverable, 0.093, 5);
+        const monthly = r.savings / 12;
+        const dr = 0.093;
+        const ny = 5;
+        let expectedNpv = 0;
+        for (let m = 1; m <= ny * 12; m++) {
+            expectedNpv += (monthly * realPDE.rampFactor(m)) / Math.pow(1 + dr, m / 12);
+        }
+        assert.ok(Math.abs(r.npvSavings - expectedNpv) < 0.01,
+            'scenCalc npvSavings (' + r.npvSavings.toFixed(2) + ') must match ramped DCF (' + expectedNpv.toFixed(2) + ')');
+        const flatAnnuity = r.savings * (dr > 0 ? (1 - Math.pow(1 + dr, -ny)) / dr : ny);
+        assert.ok(r.npvSavings < flatAnnuity,
+            'ramped NPV (' + r.npvSavings.toFixed(2) + ') must be less than flat annuity (' + flatAnnuity.toFixed(2) + ')');
+        assert.ok(Math.abs(r.net - (r.npvSavings - 150000)) < 0.01,
+            'net = npvSavings - capex');
+    });
+
     describe('paybackSeries — cumulative ROI series consistency', () => {
         it('break-even month matches discountedPayback exactly (same ramp + DCF)', () => {
             const capex = 300000;
