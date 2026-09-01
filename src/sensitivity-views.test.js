@@ -23,7 +23,7 @@ const mkParams = function (overrides) {
         managerHrs: 20, opportunityVal: 100000, riskLevel: 3, autoLevel: 50,
         teamSize: 5, capex: 300000, erosionRate: 0.25, discountRate: 0.093,
         horizonYears: 5, contextPremium: 0.15, taxRate: 19,
-        scenCAutoLevel: 0.8, scenCCapexMult: 1.5, leverAutomation: 0.3, leverRisk: 0.6,
+        scenCAutoLevel: 0.8, scenCCapexMult: 1.5, leverAuto: 0.3, leverRisk: 0.6,
     }, overrides || {});
 };
 
@@ -52,6 +52,24 @@ describe('Sensitivity Views — configuration integrity', () => {
         Object.keys(P.SENSITIVITY_VIEWS.conservative.mult).forEach((k) => {
             assert.notStrictEqual(base[k], undefined, 'param "' + k + '" exists in getParams() shape');
         });
+    });
+
+    it('leverAuto is actually perturbed by the automation-lever multipliers (P5)', () => {
+        assert.ok(P.SENSITIVITY_VIEWS.conservative.mult.leverAuto !== undefined,
+            'sensitivity config uses the model param name leverAuto (not leverAutomation)');
+        assert.ok(P.SENSITIVITY_VIEW_CLAMPS.leverAuto,
+            'leverAuto has a documented clamp');
+
+        // Isolate the automation lever: cRisk = 0 (failures=mttr=0), so
+        // recoverable = cWaste × leverAuto — purely lever-driven.
+        const s = mkParams({ failures: 0, mttr: 0, leverAuto: 0.3 });
+        const views = P.scenSensitivity(s);
+        assert.strictEqual(views[0].params.leverAuto, 0.3 * 0.70, 'conservative leverAuto ×0.70');
+        assert.strictEqual(views[1].params.leverAuto, 0.3, 'base leverAuto unchanged');
+        assert.strictEqual(views[2].params.leverAuto, 0.3 * 1.30, 'aggressive leverAuto ×1.30');
+        const rec = views.map(v => P.computeModel(v.params).recoverable);
+        assert.ok(rec[0] < rec[1] && rec[1] < rec[2],
+            'recoverable scales monotonically with leverAuto (' + rec.map(Math.round).join(' / ') + ')');
     });
 });
 
