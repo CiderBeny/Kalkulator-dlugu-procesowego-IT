@@ -1000,3 +1000,47 @@ describe('Known Issue #9 — Annual Hours drives OPEX (P8)', () => {
         }
     });
 });
+
+// ── Known Issue #10 — Region presets (P9) ──
+// README once claimed presets set WACC, but REGION_DEFAULTS has no discountRate
+// and the region handler never touches the WACC slider. Also, EU/PL lacked q8
+// (Opportunity Margin), so switching away from US left a stale value behind, and
+// q8 was not currency-converted like q4/q6/capex. Tests below pin the fixed
+// config: every region defines q8, q8 scales with the q6 blended rate, and the
+// handler's monetary set now includes q8.
+describe('Known Issue #10 — Region presets define q8 and omit WACC (P9)', () => {
+    let pre = null;
+
+    it('loads the real config under the Node shim', () => {
+        global.window = global;
+        require('./config.js');
+        pre = global.window.PDE;
+        assert.ok(pre && pre.REGION_DEFAULTS, 'real REGION_DEFAULTS available');
+    });
+
+    it('every region preset defines q8 — no stale carryover from a prior region', () => {
+        ['US', 'EU', 'PL'].forEach((region) => {
+            assert.ok(pre.REGION_DEFAULTS[region], 'region ' + region + ' has a preset');
+            assert.strictEqual(typeof pre.REGION_DEFAULTS[region].q8, 'number',
+                region + ' defines an Opportunity Margin (q8)');
+            assert.ok(pre.REGION_DEFAULTS[region].q8 > 0, region + ' has a positive q8');
+        });
+    });
+
+    it('no region preset sets WACC — changing region must not move discountRate', () => {
+        ['US', 'EU', 'PL'].forEach((region) => {
+            assert.strictEqual(pre.REGION_DEFAULTS[region].discountRate, undefined,
+                region + ' does not override WACC/discountRate');
+        });
+    });
+
+    it('q8 scales with the q6 blended rate (opportunity follows regional labor cost)', () => {
+        ['EU', 'PL'].forEach((region) => {
+            const r = pre.REGION_DEFAULTS[region];
+            const us = pre.REGION_DEFAULTS.US;
+            const ratio = (r.q8 / us.q8) - (r.q6 / us.q6);
+            assert.ok(Math.abs(ratio) < 0.02,
+                region + ' q8/q6 ratio tracks the US baseline (got ' + ratio.toFixed(4) + ')');
+        });
+    });
+});
