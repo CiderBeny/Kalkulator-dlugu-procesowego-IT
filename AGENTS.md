@@ -38,6 +38,7 @@
 │   ├── sensitivity-views.test.js  # Sensitivity views tests (~158 lines)
 │   ├── i18n-plural.test.js        # PL/EN plural & month declension tests
 │   └── dom-integrity.test.js      # getElementById targets exist in index.html
+│   └── state-currency.test.js     # hash currency round-trip (cur key) tests
 ├── .vscode/              # Recommended extensions
 ├── index.html            # Main HTML (UI, CSP, font bootstrap + cache, ~1046 lines)
 ├── style.css             # Custom CSS + base64-embedded fonts (~938 lines)
@@ -76,8 +77,19 @@ npx @tailwindcss/cli -i src/input.css -o output.css
 ## How to Run Tests
 ```sh
 npm test
-# Runs: node --test src/security.test.js src/model-audit.test.js src/sensitivity-views.test.js src/i18n-plural.test.js src/dom-integrity.test.js
+# Runs: node --test src/security.test.js src/model-audit.test.js src/sensitivity-views.test.js src/i18n-plural.test.js src/state-currency.test.js src/dom-integrity.test.js
 ```
+
+## URL Hash & Currency
+- The share hash stores monetary values (`q4`, `q6`, `q8`, `capex`) verbatim in the
+  sender's display currency and pins the currency code via `&cur=USD|EUR|PLN|GBP`
+  (see `PDE.encodeState` in `src/state.js`).
+- `PDE.decodeState` converts those values to the viewer's active currency; legacy
+  links without `cur` are treated as USD-based to stay backwards compatible.
+- `cur` is a reserved hash key (not in `ALLOWED_HASH_KEYS`) — it has no DOM element
+  and must be parsed/validated before the numeric fields loop.
+- `fetchNbpRates` (`src/utils.js`) re-runs `decodeState` after live NBP rates load
+  so cross-currency shares are only ever decoded with fallback rates when offline.
 
 ## i18n Conventions
 - Translations live in `PDE.TRANSLATIONS` object (`src/i18n.js`) — keys `en` and `pl`

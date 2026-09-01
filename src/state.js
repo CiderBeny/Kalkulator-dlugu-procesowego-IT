@@ -48,7 +48,9 @@ PDE.encodeState = function encodeState() {
     const ids = [...PDE.ALLOWED_HASH_KEYS];
     const vals = ids.map(id => document.getElementById(id).value);
     const hash = ids.map((id,i) => id+'='+encodeURIComponent(vals[i])).join('&');
-    history.replaceState(null, '', '#' + hash + '&mode=' + (PDE.currentMode || 'quick'));
+    // Monetary fields are stored verbatim in the current display currency;
+    // the active currency code is pinned so remote decoders can convert back.
+    history.replaceState(null, '', '#' + hash + '&cur=' + encodeURIComponent(PDE.currentCurrency) + '&mode=' + (PDE.currentMode || 'quick'));
 };
 
 PDE._encodeStateTimeout = null;
@@ -59,6 +61,19 @@ PDE.encodeStateDebounced = function encodeStateDebounced() {
 
 PDE.decodeState = function decodeState() {
     if (!location.hash || location.hash.length < 3) return;
+
+    // The sharing currency the values were encoded in. Absent on legacy
+    // links, which are treated as USD-based (the historical behaviour).
+    let hashCurrency = null;
+    const curMatch = location.hash.match(/(?:^|&)cur=([^&]*)/);
+    if (curMatch) {
+        let c = null;
+        try { c = decodeURIComponent(curMatch[1]); } catch { /* malformed encoding */ }
+        if (c && Object.prototype.hasOwnProperty.call(PDE.EXCHANGE_RATES, c)) hashCurrency = c;
+    }
+    const hashRate = hashCurrency ? PDE.EXCHANGE_RATES[hashCurrency] : 1;
+    PDE._hashCurrency = hashCurrency;
+
     const pairs = location.hash.slice(1).split('&');
     pairs.forEach(pair => {
         const eqIdx = pair.indexOf('=');
@@ -66,6 +81,7 @@ PDE.decodeState = function decodeState() {
         const key = pair.slice(0, eqIdx);
         const raw = pair.slice(eqIdx + 1);
 
+        if (key === 'cur') return;
         if (key === 'mode') {
             let decoded;
             try { decoded = decodeURIComponent(raw); } catch { return; }
@@ -82,14 +98,19 @@ PDE.decodeState = function decodeState() {
         if (!isFinite(num)) return;
 
         const { min, max } = PDE.HASH_CONSTRAINTS[key];
-        const safe = Math.min(max, Math.max(min, num));
-
         const el = document.getElementById(key);
         if (!el) return;
         const monetaryIds = ['q4', 'q6', 'q8', 'capex'];
         if (monetaryIds.includes(key)) {
-            el.value = (safe * PDE.EXCHANGE_RATES[PDE.currentCurrency]).toFixed(2);
+            // Stored in the hash currency — convert to the current display
+            // currency. Legacy links (no cur) have hashRate === 1, so this
+            // collapses to the old USD-based multiplication.
+            const lo = min * hashRate;
+            const hi = max * hashRate;
+            const safe = Math.min(hi, Math.max(lo, num));
+            el.value = (safe / hashRate * PDE.EXCHANGE_RATES[PDE.currentCurrency]).toFixed(2);
         } else {
+            const safe = Math.min(max, Math.max(min, num));
             el.value = safe;
         }
     });

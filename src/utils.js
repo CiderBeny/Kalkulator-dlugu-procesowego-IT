@@ -387,7 +387,16 @@ PDE.fetchNbpRates = async function fetchNbpRates() {
         const footerEl = document.getElementById('nbpFooter');
         if (footerEl) footerEl.textContent = PDE.TRANSLATIONS[PDE.currentLang].nbpFooter(new Date(PDE.nbpDate).toLocaleDateString(PDE.currentLang === 'pl' ? 'pl-PL' : 'en-US'));
 
-        if (PDE.currentCurrency !== 'USD') PDE.calculate();
+        // A shared link decoded with fallback rates should be re-decoded now
+        // that live NBP rates are available, so cross-currency amounts use
+        // the real exchange rates instead of the static ones. decodeState is
+        // idempotent — it only reads location.hash.
+        if (PDE._hashCurrency && typeof PDE.decodeState === 'function') {
+            PDE.decodeState();
+            PDE.syncInputMaxes();
+            PDE.ALLOWED_HASH_KEYS.forEach(function (id) { PDE.validateField(id); });
+        }
+        if (PDE.currentCurrency !== 'USD' || PDE._hashCurrency) PDE.calculate();
     } catch (e) {
         console.error('NBP API fetch failed:', e);
         PDE.nbpFetching = false;
