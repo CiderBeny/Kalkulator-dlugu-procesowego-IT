@@ -169,7 +169,7 @@ PDE.computeModel = function computeModel(params) {
     const nonlinearEnabled = params.nonlinearEnabled || false;
 
     const totalAnnualHrs   = annualHours;
-    const manualAnnualHrs  = PDE.COEFFICIENTS.SPRINT_HOURS * PDE.COEFFICIENTS.SPRINTS_PER_YEAR * (manualPercent / 100);
+    const manualAnnualHrs  = annualHours * (manualPercent / 100);
     const chasingAnnualHrs = managerHrs * PDE.COEFFICIENTS.MONTHS_PER_YEAR;
 
     let effectiveTeamSize = teamSize;

@@ -129,6 +129,7 @@ function computeModel(params, coeffs) {
     const riskRegulatoryWeight = params.riskRegulatoryWeight !== undefined ? params.riskRegulatoryWeight : RD.regulatoryWeight;
     const leverAuto      = params.leverAuto      !== undefined ? params.leverAuto      : coeffs.LEVER_AUTOMATION_DEFAULT;
     const leverRisk      = params.leverRisk      !== undefined ? params.leverRisk      : coeffs.LEVER_RISK_DEFAULT;
+    const annualHours    = params.annualHours    !== undefined ? params.annualHours    : coeffs.ANNUAL_HOURS_PER_ENGINEER;
 
     if (correlationsEnabled) {
         const cMult = params.correlationMultiplier !== undefined ? params.correlationMultiplier : CD.correlationMultiplier;
@@ -156,7 +157,7 @@ function computeModel(params, coeffs) {
 
     const nonlinearEnabled = params.nonlinearEnabled || false;
 
-    const manualAnnualHrs  = coeffs.SPRINT_HOURS * coeffs.SPRINTS_PER_YEAR * (manualPercent / 100);
+    const manualAnnualHrs  = annualHours * (manualPercent / 100);
     const chasingAnnualHrs = managerHrs * coeffs.MONTHS_PER_YEAR;
 
     let effectiveTeamSize = teamSize;

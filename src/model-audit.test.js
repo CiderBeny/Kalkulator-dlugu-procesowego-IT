@@ -384,6 +384,7 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
             autoLevel: 0.6,
             teamSize: 10,
             capex: 50000,
+            annualHours: COEFFICIENTS.ANNUAL_HOURS_PER_ENGINEER,
             erosionRate: COEFFICIENTS.PIPELINE_EROSION_RATE_DEFAULT,
             discountRate: COEFFICIENTS.DISCOUNT_RATE_DEFAULT,
             horizonYears: COEFFICIENTS.TIME_HORIZON_YEARS_DEFAULT,
@@ -391,7 +392,7 @@ describe('Known Issue #5 — Runtime integrity: calculate() logic audit', () => 
             leverRisk: COEFFICIENTS.LEVER_RISK_DEFAULT,
         }, sample);
 
-        const manualAnnualHrs = COEFFICIENTS.SPRINT_HOURS * COEFFICIENTS.SPRINTS_PER_YEAR * (s.manualPercent / 100);
+        const manualAnnualHrs = s.annualHours * (s.manualPercent / 100);
         const chasingAnnualHrs = s.managerHrs * COEFFICIENTS.MONTHS_PER_YEAR;
         const annualFailures = s.failures * COEFFICIENTS.QUARTERS_PER_YEAR;
 
@@ -495,6 +496,7 @@ describe('Known Issue #7 — Configurable context premium, tax shield, IRR ramp'
             autoLevel: 0.6,
             teamSize: 10,
             capex: 50000,
+            annualHours: COEFFICIENTS.ANNUAL_HOURS_PER_ENGINEER,
             erosionRate: COEFFICIENTS.PIPELINE_EROSION_RATE_DEFAULT,
             contextPremium: COEFFICIENTS.CONTEXT_PREMIUM_DEFAULT,
             taxRate: COEFFICIENTS.TAX_RATE_DEFAULT,
@@ -504,7 +506,7 @@ describe('Known Issue #7 — Configurable context premium, tax shield, IRR ramp'
             leverRisk: COEFFICIENTS.LEVER_RISK_DEFAULT,
         }, sample);
 
-        const manualAnnualHrs = COEFFICIENTS.SPRINT_HOURS * COEFFICIENTS.SPRINTS_PER_YEAR * (s.manualPercent / 100);
+        const manualAnnualHrs = s.annualHours * (s.manualPercent / 100);
         const chasingAnnualHrs = s.managerHrs * COEFFICIENTS.MONTHS_PER_YEAR;
         const annualFailures = s.failures * COEFFICIENTS.QUARTERS_PER_YEAR;
 
@@ -663,8 +665,9 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
         const taxRate = p.taxRate !== undefined ? p.taxRate : S.TAX_RATE_DEFAULT;
         const leverAuto = p.leverAuto !== undefined ? p.leverAuto : S.LEVER_AUTOMATION_DEFAULT;
         const leverRisk = p.leverRisk !== undefined ? p.leverRisk : S.LEVER_RISK_DEFAULT;
+        const annualHours = p.annualHours !== undefined ? p.annualHours : S.ANNUAL_HOURS_PER_ENGINEER;
 
-        const manualAnnualHrs = S.SPRINT_HOURS * S.SPRINTS_PER_YEAR * (manualPercent / 100);
+        const manualAnnualHrs = annualHours * (manualPercent / 100);
         const chasingAnnualHrs = managerHrs * S.MONTHS_PER_YEAR;
         const cWaste = (manualAnnualHrs + chasingAnnualHrs) * rate * teamSize * (1 + contextPremium);
         const cRisk = (failures * p.mttr * p.downCost) * (p.riskLevel / S.RISK_SCALE_MAX);
@@ -929,5 +932,71 @@ describe('Known Issue #8 — Real source integration (config + model)', () => {
             assert.ok(series.points[beYear - 1] >= 0,
                 'cumulative net is non-negative by the break-even year');
         });
+    });
+});
+
+// ── Known Issue #9 — Annual Hours must drive OPEX (P8) ──
+// Before the fix, manualAnnualHrs was hardcoded as SPRINT_HOURS × SPRINTS_PER_YEAR
+// (70 × 26 = 1820) × manualPercent, so dragging the Annual Hours slider changed
+// only the Capacity Erosion chart (totalAnnualHrs), not OPEX or the business case.
+// docs (i18n) promise "changing any control immediately recalculates all
+// dependent metrics". The fix computes manualAnnualHrs = annualHours × manualPercent.
+describe('Known Issue #9 — Annual Hours drives OPEX (P8)', () => {
+    let real = null;
+
+    it('loads the real computeModel under the Node shim', () => {
+        global.window = global;
+        global.document = {
+            getElementById: (id) => {
+                const els = { discountRate: { value: '9.3' }, timeHorizon: { value: '5' } };
+                return els[id] || null;
+            },
+        };
+        require('./config.js');
+        require('./i18n.js');
+        require('./utils.js');
+        require('./model.js');
+        real = global.window.PDE;
+        assert.ok(real && real.computeModel, 'real computeModel available');
+    });
+
+    const base = {
+        manualPercent: 40, downCost: 5000, failures: 8, mttr: 4, rate: 150,
+        managerHrs: 40, opportunityVal: 100000, riskLevel: 3, autoLevel: 60,
+        teamSize: 10, capex: 50000, erosionRate: 0.25, discountRate: 0.093,
+        horizonYears: 5, leverAuto: 0.3, leverRisk: 0.6, contextPremium: 0.15,
+    };
+
+    it('manualAnnualHrs == annualHours × (manualPercent/100)', () => {
+        const r = real.computeModel(Object.assign({}, base, { annualHours: 2000, manualPercent: 40 }));
+        assert.strictEqual(r.manualAnnualHrs, 800, '2000h × 40% = 800 manual hours');
+        assert.strictEqual(r.totalAnnualHrs, 2000, 'totalAnnualHrs mirrors annualHours');
+    });
+
+    it('raising annualHours increases cWaste and the whole business case', () => {
+        const low  = real.computeModel(Object.assign({}, base, { annualHours: 1500 }));
+        const high = real.computeModel(Object.assign({}, base, { annualHours: 2500 }));
+        assert.ok(high.cWaste > low.cWaste, 'cWaste scales with annual hours');
+        assert.ok(high.manualAnnualHrs > low.manualAnnualHrs, 'manual hours scale with annual hours');
+        assert.ok(high.potentialSavings > low.potentialSavings, 'potential savings scale with annual hours');
+        assert.ok(high.totalImpact > low.totalImpact, 'total debt scales with annual hours');
+    });
+
+    it('annualHours changes payback and IRR (not just a chart variable)', () => {
+        const low  = real.computeModel(Object.assign({}, base, { annualHours: 1500 }));
+        const high = real.computeModel(Object.assign({}, base, { annualHours: 2500 }));
+        // Payback floors at the 6-month ramp minimum, so it can coincide even
+        // when economics improve; assert it never worsens and IRR strictly moves.
+        assert.ok(high.paybackMonths <= low.paybackMonths, 'payback does not lengthen with more annual hours');
+        assert.notStrictEqual(high.irr, low.irr, 'IRR responds to annual hours');
+    });
+
+    it('is monotonic across the 1500–2500 slider range', () => {
+        let prev = -Infinity;
+        for (let h = 1500; h <= 2500; h += 100) {
+            const r = real.computeModel(Object.assign({}, base, { annualHours: h }));
+            assert.ok(r.cWaste > prev, 'cWaste strictly increases with annual hours @ ' + h);
+            prev = r.cWaste;
+        }
     });
 });
