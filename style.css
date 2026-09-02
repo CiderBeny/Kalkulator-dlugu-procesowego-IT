@@ -1,7 +1,7 @@
 /* ============================================================
-   Strategic Business Case Engine — Dark Theme
+   Strategic Business Case Engine — Warm Light Theme
    Font: Space Grotesk (display) + Inter (body)
-   Accent: Cyan #06b6d4  Surface hierarchy: #0f172a → #1e293b → #273548
+   Accent: Amber #B45309  Surface hierarchy: #F5F0E8 → #FDFAF5 → #FFFFFF
    ============================================================ */
 
 /*
@@ -575,20 +575,10 @@ section h2 {
 #statWaste   { color: var(--red)    !important; }
 #statRisk    { color: var(--orange) !important; }
 #statOpp     { color: var(--purple) !important; }
-#totalImpact { color: #FCD19C !important; font-family: 'Space Grotesk', 'DM Sans', 'Nunito Sans', 'Trebuchet MS', ui-rounded, system-ui, sans-serif; }
+#totalImpact { color: var(--text-primary) !important; font-family: 'Space Grotesk', 'DM Sans', 'Nunito Sans', 'Trebuchet MS', ui-rounded, system-ui, sans-serif; }
 #statNet     { color: var(--green)  !important; }
 
-/* Total Debt card dark override */
-.card.bg-slate-900 {
-  background: #2D1F0E !important;         /* dark espresso */
-  border-color: var(--accent) !important;
-  box-shadow: var(--shadow-card), 0 0 0 1px var(--accent-dim), var(--shadow-glow) !important;
-}
-
-.card.bg-slate-900 .label { color: #FCD19C !important; }
-.card.bg-slate-900 p      { color: #F5E6D0 !important; }
-
-/* Stat labels */
+/*── Stat labels ──*/
 #pdf-block-3 .label { color: var(--text-secondary) !important; }
 
 /* Left-border accent colours for stat cards */

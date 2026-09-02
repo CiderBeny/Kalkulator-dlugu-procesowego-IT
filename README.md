@@ -34,7 +34,7 @@ W świecie IT Service Managementu często trudno jest przekonać zarząd do inwe
 * **Testy:** 240+ testów automatycznych (bezpieczeństwo + audyt modelu + widoki wrażliwości + deklinacja i18n + zgodność worker↔model + round-trip linków współdzielenia + przypadki brzegowe finansowe) weryfikujących realny kod źródłowy, nie tylko kopię logiki.
 
 ### Wykorzystana Technologia
-* **Frontend:** HTML5, Tailwind CSS + custom CSS (dark theme, CSS custom properties).
+* **Frontend:** HTML5, Tailwind CSS + custom CSS (warm light theme, CSS custom properties).
 * **Logika:** Vanilla JavaScript (ES6+).
 * **Model finansowy:** czysty JS bez frameworka — łatwy do audytu, testowania i weryfikacji.
 * **Testy:** Node.js built-in test runner (`node:test`) — 240+ testów (security + model audit + sensitivity views + i18n plurals + MC worker parity + share-link round-trip + financial edge).
@@ -72,7 +72,7 @@ In the world of IT Service Management, it's often difficult to convince the boar
 * **Testing:** 240+ automated tests (security + model audit + sensitivity views + i18n plurals + worker⇄model parity + share-link round-trips + financial edge cases) verifying the actual source code, not a replicated copy of the logic.
 
 ### Tech Stack
-* **Frontend:** HTML5, Tailwind CSS + custom CSS (dark theme, CSS custom properties).
+* **Frontend:** HTML5, Tailwind CSS + custom CSS (warm light theme, CSS custom properties).
 * **Logic:** Vanilla JavaScript (ES6+).
 * **Financial model:** framework-free plain JS — easy to audit, test and verify.
 * **Testing:** Node.js built-in test runner (`node:test`) — 240+ tests (security + model audit + sensitivity views + i18n plurals + MC worker parity + share-link round-trip + financial edge).
