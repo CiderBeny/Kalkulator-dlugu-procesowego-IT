@@ -37,8 +37,11 @@
 │   ├── model-audit.test.js# Model integrity audit tests (~592 lines)
 │   ├── sensitivity-views.test.js  # Sensitivity views tests (~158 lines)
 │   ├── i18n-plural.test.js        # PL/EN plural & month declension tests
-│   └── dom-integrity.test.js      # getElementById targets exist in index.html
-│   └── state-currency.test.js     # hash currency round-trip (cur key) tests
+│   ├── dom-integrity.test.js      # getElementById targets exist in index.html
+│   ├── state-currency.test.js     # hash currency round-trip (cur key) tests
+│   ├── mc-contract.test.js        # MC worker ⇄ main-model parity contract tests
+│   ├── state-roundtrip.test.js    # full-state share-link round-trip per currency
+│   └── financial-edge.test.js     # zero-values, IRR no-root, NPV/IRR/payback consistency
 ├── .vscode/              # Recommended extensions
 ├── index.html            # Main HTML (UI, CSP, font bootstrap + cache, ~1046 lines)
 ├── style.css             # Custom CSS + base64-embedded fonts (~938 lines)
@@ -77,7 +80,7 @@ npx @tailwindcss/cli -i src/input.css -o output.css
 ## How to Run Tests
 ```sh
 npm test
-# Runs: node --test src/security.test.js src/model-audit.test.js src/sensitivity-views.test.js src/i18n-plural.test.js src/state-currency.test.js src/dom-integrity.test.js
+# Runs: node --test src/security.test.js src/model-audit.test.js src/sensitivity-views.test.js src/i18n-plural.test.js src/state-currency.test.js src/dom-integrity.test.js src/scenario-card.test.js src/mc-contract.test.js src/state-roundtrip.test.js src/financial-edge.test.js
 ```
 
 ## URL Hash & Currency
